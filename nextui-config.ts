@@ -66,9 +66,9 @@ export const nextUIConfig: NextUIPluginConfig = {
     },
     dark: {
       colors: {
-        // default: {
-        //   DEFAULT: '#121619'
-        // },
+        default: {
+          100: '#333'
+        },
         secondary: {
           DEFAULT: '#121619'
         },

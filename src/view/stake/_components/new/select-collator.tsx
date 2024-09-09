@@ -78,7 +78,7 @@ const SelectCollator = ({
         placement="center"
         isOpen={isOpen}
         onClose={onClose}
-        size="xl"
+        size="3xl"
         className="bg-background"
         classNames={{
           closeButton:
@@ -86,7 +86,7 @@ const SelectCollator = ({
         }}
         closeButton={<X />}
       >
-        <ModalContent className="w-[calc(100vw-1.24rem)] md:w-[35.625rem]">
+        <ModalContent className="w-[calc(100vw-1.24rem)] md:max-w-[58.125rem]">
           <ModalBody className={cn('p-5', isLoading ? 'overflow-hidden' : '')}>
             <Tabs
               aria-label="Options"

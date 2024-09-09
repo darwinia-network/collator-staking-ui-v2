@@ -193,7 +193,7 @@ const Records = ({ isOpen, onClose, onRefreshRingBalance }: SelectCollatorProps)
         isOpen={isOpen}
         placement="center"
         onClose={onClose}
-        size="4xl"
+        size="xl"
         className="bg-background"
         backdrop="blur"
         classNames={{
@@ -202,7 +202,7 @@ const Records = ({ isOpen, onClose, onRefreshRingBalance }: SelectCollatorProps)
         }}
         closeButton={<X />}
       >
-        <ModalContent className="w-[calc(100vw-1.24rem)] px-5 py-0 md:max-w-[58.125rem]">
+        <ModalContent className="w-[calc(100vw-1.24rem)] px-5 py-0 md:w-[35.625rem]">
           <ModalHeader className="px-0 py-5 text-[1.125rem] font-bold text-foreground">
             <span>Wallet Deposit</span>
           </ModalHeader>
@@ -211,13 +211,14 @@ const Records = ({ isOpen, onClose, onRefreshRingBalance }: SelectCollatorProps)
             className={cn('relative px-0 py-5', isDepositListLoading ? 'overflow-hidden' : '')}
           >
             <Table
-              aria-label="Select collator table"
+              aria-label="deposit records table"
               color="primary"
               layout="fixed"
               classNames={{
-                base: cn(isDepositListLoading ? '' : 'min-w-[100%] overflow-x-auto'),
+                wrapper: 'overflow-auto max-h-[50vh] rounded-medium  p-0 bg-secondary',
                 td: 'text-foreground'
               }}
+              bottomContentPlacement="outside"
               bottomContent={
                 depositList?.length ? (
                   <div className="flex w-full justify-end">
@@ -231,7 +232,6 @@ const Records = ({ isOpen, onClose, onRefreshRingBalance }: SelectCollatorProps)
                   </div>
                 ) : null
               }
-              removeWrapper
             >
               <TableHeader>
                 <TableColumn className="w-[9.375rem] bg-secondary" key="tokenId">

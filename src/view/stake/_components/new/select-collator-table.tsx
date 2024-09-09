@@ -8,7 +8,6 @@ import {
   TableCell,
   Input,
   Spinner,
-  cn,
   Pagination
 } from '@nextui-org/react';
 import { SearchIcon } from 'lucide-react';
@@ -114,9 +113,9 @@ const SelectCollatorTable = ({
         selectionBehavior="replace"
         selectedKeys={selection}
         onSelectionChange={onSelectionChange}
-        removeWrapper
+        bottomContentPlacement="outside"
         classNames={{
-          base: cn(isLoading ? '' : 'min-w-[100%] overflow-auto max-h-[50vh]'),
+          wrapper: 'overflow-auto max-h-[50vh] rounded-medium  p-0 bg-secondary',
           td: 'text-foreground'
         }}
         bottomContent={
@@ -135,17 +134,18 @@ const SelectCollatorTable = ({
         layout="fixed"
       >
         <TableHeader>
-          <TableColumn className="w-[10rem] bg-secondary" key="collator">
+          <TableColumn className="w-[10rem] bg-secondary" key="collator" width={100}>
             Collator
           </TableColumn>
-          <TableColumn className="w-[5rem] bg-secondary" key="balance">
+          <TableColumn className="w-[6rem] bg-secondary" key="balance" width={50}>
             Staked {symbol}
           </TableColumn>
-          <TableColumn className="w-[4.43rem] bg-secondary" key="commission">
+          <TableColumn className="w-[4.43rem] bg-secondary" key="commission" width={40}>
             Commission
           </TableColumn>
           <TableColumn
             className="w-[6rem] whitespace-normal bg-secondary"
+            width={60}
             key="session"
             align="end"
           >
