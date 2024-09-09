@@ -1,0 +1,1 @@
+# collator-staking-ui-v2
