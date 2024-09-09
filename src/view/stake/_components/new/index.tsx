@@ -110,20 +110,6 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
     setSelectCollatorOpen(false);
   }, []);
 
-  const handleStake = useCallback(async () => {
-    if (selected === 'stake-ring') {
-      const tx = await handleRingStake();
-      if (tx) {
-        setHash(tx);
-      }
-    } else if (selected === 'stake-deposit') {
-      const tx = await handleApprovalForAll();
-      if (tx) {
-        setApprovalHash(tx);
-      }
-    }
-  }, [selected, handleRingStake, handleApprovalForAll]);
-
   const handleDepositStakeStart = useCallback(async () => {
     const tx = await handleDepositStake();
     if (tx) {
@@ -132,11 +118,34 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
     }
   }, [handleDepositStake]);
 
+  const handleStake = useCallback(async () => {
+    if (selected === 'stake-ring') {
+      const tx = await handleRingStake();
+      if (tx) {
+        setHash(tx);
+      }
+    } else if (selected === 'stake-deposit') {
+      if (!isApprovedForAll) {
+        const tx = await handleApprovalForAll();
+        if (tx) {
+          setApprovalHash(tx);
+        }
+      } else {
+        const tx = await handleDepositStake();
+        if (tx) {
+          setHash(tx);
+        }
+      }
+    }
+  }, [selected, handleRingStake, handleApprovalForAll, isApprovedForAll, handleDepositStake]);
+
   const handleTransactionSuccess = useCallback(() => {
     if (selected === 'stake-ring') {
       stakeRingRef.current?.resetBalanceAndAmount();
+      setAmount('0');
     } else if (selected === 'stake-deposit') {
       depositListRef.current?.resetAndRefetch();
+      setCheckedDeposits([]);
     }
     setHash(undefined);
     refetchCollators();
@@ -150,19 +159,28 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
 
   // isDisabled 需要根据 selected 和 amount 来决定,每一种都是不一样的
   const isDisabled = useMemo(() => {
+    if (!selectedAddress) {
+      return true;
+    }
     if (selected === 'stake-ring') {
       return amount === '0';
     } else if (selected === 'stake-deposit') {
       return checkedDeposits.length === 0;
     }
     return false;
-  }, [selected, amount, checkedDeposits]);
+  }, [selected, amount, checkedDeposits, selectedAddress]);
 
   const isPending = useMemo(() => {
     if (selected === 'stake-ring') {
       return isLoadingOldAndNewPrevRing || isPendingRingStake;
     } else if (selected === 'stake-deposit') {
-      return isLoadingIsApprovedForAll || isPendingApprovalForAll || isLoadingOldAndNewPrevDeposit;
+      if (!isApprovedForAll) {
+        return (
+          isLoadingOldAndNewPrevDeposit || isLoadingIsApprovedForAll || isPendingApprovalForAll
+        );
+      } else {
+        return isLoadingOldAndNewPrevDeposit || isLoadingIsApprovedForAll || isPendingDepositStake;
+      }
     }
     return false;
   }, [
@@ -171,11 +189,13 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
     isPendingApprovalForAll,
     isLoadingOldAndNewPrevDeposit,
     selected,
-    isLoadingIsApprovedForAll
+    isLoadingIsApprovedForAll,
+    isApprovedForAll,
+    isPendingDepositStake
   ]);
 
   const buttonText = useMemo(() => {
-    if (selected === 'stake-deposit' && isApprovedForAll) {
+    if (selected === 'stake-deposit' && !isApprovedForAll) {
       return 'Approve';
     }
     return 'Staking';
@@ -187,6 +207,8 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
       setPage(1);
     } else {
       setSelection(new Set());
+      setAmount('0');
+      setCheckedDeposits([]);
     }
   }, [isOpen, refetchCollators]);
 
@@ -232,7 +254,7 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
                       <Spinner
                         size="sm"
                         classNames={{
-                          wrapper: cn('w-4 h-4')
+                          wrapper: cn('w-5 h-5')
                         }}
                       />
                     ) : (

@@ -1,10 +1,10 @@
-import { Suspense, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Button } from '@nextui-org/react';
 import useStakingAccountWithStatus from '@/hooks/useStakingAccountWithStatus';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import StakeList from './list';
 import NewStake from './new';
-import MangeStake from './mange';
+import ManageStake from './manage';
 
 import type { StakingAccountWithStatus } from '@/hooks/useStakingAccountWithStatus';
 
@@ -34,7 +34,7 @@ const StakePage = () => {
   }, []);
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <>
       <div className="flex flex-col gap-[1.25rem]">
         <StakeList
           data={stakingAccount}
@@ -59,7 +59,7 @@ const StakePage = () => {
         onSuccess={refetchStakingAccount}
       />
       {current?.collator && (
-        <MangeStake
+        <ManageStake
           isOpen={isEditStakeOpen}
           symbol={currentChain?.nativeCurrency.symbol || ''}
           collator={current?.collator}
@@ -67,7 +67,7 @@ const StakePage = () => {
           onSuccess={refetchStakingAccount}
         />
       )}
-    </Suspense>
+    </>
   );
 };
 

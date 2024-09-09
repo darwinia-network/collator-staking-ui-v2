@@ -176,7 +176,7 @@ const Records = ({ isOpen, onClose, onRefreshRingBalance }: SelectCollatorProps)
     },
     [currentChain?.nativeCurrency?.symbol, handleWithdrawEarlier, handleWithdraw]
   );
-  const totalPages = Math.ceil(depositList?.length / PAGE_SIZE);
+  const totalPages = Math.ceil((depositList?.length || 0) / PAGE_SIZE);
   const paginatedData = depositList?.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   useEffect(() => {
