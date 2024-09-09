@@ -33,17 +33,17 @@ export default function DefiTabs({ children }: { children: React.ReactNode }) {
           tabContent: 'group-data-[selected=true]:text-foreground'
         }}
         selectedKey={selectKey}
+        onSelectionChange={(key) => {
+          if (key) {
+            switchTab(key as string);
+          }
+        }}
       >
         {defiTabs.map((tab) => (
           <Tab
             key={tab.key}
             title={
-              <div
-                className="flex items-center space-x-2"
-                onClick={() => {
-                  switchTab(tab.key);
-                }}
-              >
+              <div className="flex items-center space-x-2">
                 <span>{tab.label}</span>
               </div>
             }
