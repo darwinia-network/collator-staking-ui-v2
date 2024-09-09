@@ -4,18 +4,26 @@ import { isNil } from 'lodash-es';
 import { useCallback, useMemo } from 'react';
 import { determineOldAndNewPrev } from '@/utils/getPrevNew';
 import type { CollatorSet } from '@/service/type';
+import { useCollatorByAddress } from '@/hooks/useService';
+import useWalletStatus from '@/hooks/useWalletStatus';
 
 type UpdateCommissionProps = {
   collatorList: CollatorSet[];
-  collator: `0x${string}`;
   newCommission: bigint;
 };
 
-const useUpdateCommission = ({ collatorList, collator, newCommission }: UpdateCommissionProps) => {
+const useUpdateCommission = ({ collatorList, newCommission }: UpdateCommissionProps) => {
+  const { address, currentChainId } = useWalletStatus();
+  const { data: collatorByAddress, isLoading: isLoadingCollatorByAddress } = useCollatorByAddress({
+    currentChainId,
+    address: address as `0x${string}`,
+    enabled: true
+  });
+
   const totalAssets = useMemo(() => {
-    const assets = collatorList.find((c) => c.address === collator)?.assets;
+    const assets = collatorByAddress?.[0]?.assets;
     return assets ? BigInt(assets) : BigInt(0);
-  }, [collatorList, collator]);
+  }, [collatorByAddress]);
 
   const { data: votes, isLoading: isLoadingVotes } = useReadContract({
     abi: hubAbi,
@@ -29,7 +37,7 @@ const useUpdateCommission = ({ collatorList, collator, newCommission }: UpdateCo
 
   const { oldPrev, newPrev } = determineOldAndNewPrev({
     collatorList,
-    collator,
+    collator: address as `0x${string}`,
     newVotes: votes || BigInt(0)
   });
 
@@ -44,7 +52,12 @@ const useUpdateCommission = ({ collatorList, collator, newCommission }: UpdateCo
     });
   }, [newCommission, oldPrev, newPrev, writeContractAsync]);
 
-  return { updateCommission, isPending, votes, isLoadingVotes };
+  return {
+    updateCommission,
+    isPending,
+    votes,
+    isLoading: isLoadingVotes || isLoadingCollatorByAddress
+  };
 };
 
 export default useUpdateCommission;

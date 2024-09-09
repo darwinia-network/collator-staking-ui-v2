@@ -25,6 +25,7 @@ export const useCommissionLocks = (address: `0x${string}`) => {
 
   return {
     isLockPeriod,
+    lockEndTime: result.data,
     isLoading: result.isLoading,
     refetch: result.refetch
   };

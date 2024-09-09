@@ -34,13 +34,29 @@ const ManageCollator = ({
   const [sessionKeyValue, setSessionKeyValue] = useState('');
   const [commissionValue, setCommissionValue] = useState('');
 
-  const { isLockPeriod, isLoading: isLockPeriodLoading } = useCommissionLocks(
-    address as `0x${string}`
-  );
+  const {
+    isLockPeriod,
+    isLoading: isLockPeriodLoading,
+    lockEndTime
+  } = useCommissionLocks(address as `0x${string}`);
+
+  const remainingLockTime = useMemo(() => {
+    if (!lockEndTime) return '';
+    const now = Math.floor(Date.now() / 1000); // 转换为秒
+    const end = Number(lockEndTime);
+    const diffInSeconds = end - now;
+    const diffInDays = Math.ceil(diffInSeconds / (24 * 60 * 60));
+    const rtf = new Intl.RelativeTimeFormat('en', { style: 'short' });
+    return rtf.format(diffInDays, 'day');
+  }, [lockEndTime]);
+
   const { setSessionKey, isPending: isPendingSetSessionKey } = useSetSessionKey();
-  const { updateCommission, isPending: isPendingUpdateCommission } = useUpdateCommission({
+  const {
+    updateCommission,
+    isPending: isPendingUpdateCommission,
+    isLoading: isLoadingUpdateCommission
+  } = useUpdateCommission({
     collatorList: collators,
-    collator: address as `0x${string}`,
     newCommission: BigInt(commissionValue)
   });
 
@@ -199,21 +215,23 @@ const ManageCollator = ({
             content={
               <div className="flex max-w-[16.25rem] items-center justify-center p-2 text-[0.75rem] font-normal text-foreground/50">
                 You can perform the update commssion operation 7 days after your last set commssion.
-                You have X days remaining before you can update.
+                You have {remainingLockTime} remaining before you can update.
               </div>
             }
             closeDelay={0}
             color="default"
             showArrow
           >
-            <Button
-              color="primary"
-              className="h-[2.125rem] w-full"
-              isDisabled
-              isLoading={isPendingUpdateCommission || isLockPeriodLoading}
-            >
-              Update Commission
-            </Button>
+            <div>
+              <Button
+                color="primary"
+                className="h-[2.125rem] w-full"
+                isDisabled
+                isLoading={isPendingUpdateCommission || isLockPeriodLoading}
+              >
+                Update Commission
+              </Button>
+            </div>
           </Tooltip>
         ) : (
           <Button
@@ -221,7 +239,9 @@ const ManageCollator = ({
             className="h-[2.125rem] w-full"
             isDisabled={!commissionValue}
             onClick={handleSetCommission}
-            isLoading={isPendingUpdateCommission || isLockPeriodLoading}
+            isLoading={
+              isPendingUpdateCommission || isLockPeriodLoading || isLoadingUpdateCommission
+            }
           >
             Update Commission
           </Button>

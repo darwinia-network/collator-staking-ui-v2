@@ -33,6 +33,39 @@ export function useCollatorSet({ currentChainId, enabled = true }: CollatorSetPa
   });
 }
 
+export function useCollatorByAddress({
+  currentChainId,
+  address,
+  enabled = true
+}: CollatorSetParams & { address: `0x${string}` }) {
+  const params: CollatorSetQueryParams = {
+    where: {
+      chainId: {
+        _eq: currentChainId
+      },
+      address: {
+        _eq: address
+      },
+      inset: {
+        _eq: 1
+      }
+    },
+    orderBy: [{ seq: 'asc' }, { votes: 'desc' }, { blockNumber: 'desc' }, { logIndex: 'desc' }]
+  };
+
+  return useQuery({
+    queryKey: ['collatorSet', params],
+    queryFn: async () => {
+      const result = await fetchCollatorSet(params);
+      if (result === null) {
+        throw new Error('Failed to fetch collator set');
+      }
+      return result;
+    },
+    enabled: !!currentChainId && !!address && !!enabled
+  });
+}
+
 export function useCollatorSetByInset({ currentChainId, enabled = true }: CollatorSetParams) {
   const params: CollatorSetQueryParams = {
     where: { chainId: { _eq: currentChainId } },
