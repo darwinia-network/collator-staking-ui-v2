@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --header-inner-height: 1.88rem;
+    --header-padding-y: 0.63rem;
+    --header-height: calc(var(--header-inner-height) + var(--header-padding-y) * 2);
+  
+    --footer-inner-height: 0.94rem;
+    --footer-padding-y: 0.63rem;
+    --footer-height: calc(var(--footer-inner-height) + var(--footer-padding-y) * 2);
+  
+    --container-padding-x: 0.62rem;
+  
+    --scrollbar-gap: 5px;
+  
+  
+  }
+  
+  @media (min-width: 768px) {
+    :root {
+      --header-inner-height: 2.25rem;
+      --header-padding-y: 0.63rem;
+      --header-height: calc(var(--header-inner-height) + var(--header-padding-y) * 2);
+  
+      --footer-inner-height: 2.75rem;
+      --footer-padding-y: 1.25rem;
+      --footer-height: calc(var(--footer-inner-height) + var(--footer-padding-y) * 2);
+  
+      --container-padding-x: 3.75rem;
+    }
+  }
+  
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  .rolling-square-container {
+    width: 5rem;
+    height: 5rem; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 200px;
+  }
+  
+  .rolling-square {
+    width: 5rem;
+    height: 5rem;
+    background-color: #FF1493; 
+    animation: roll 3s ease-in-out infinite;
+    transform-style: preserve-3d;
+  }
+  
+  @keyframes roll {
+    0% {
+      transform: rotateY(0deg);
+    }
+    50% {
+      transform: rotateY(180deg);
+    }
+    100% {
+      transform: rotateY(360deg);
+    }
+  }
+  
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px; 
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: var(--nextui-secondary);
+      border-radius: 3px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #C6C6C6;
+      border-radius: 3px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #A8A8A8;
+    }
+  
