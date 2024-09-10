@@ -11,20 +11,20 @@ import useUpdateCommission from './_hooks/update-commission';
 import { useCommissionLocks } from './_hooks/commissionLocks';
 import { validSessionKey } from '@/utils';
 
-interface ManageCollatorProps {
+interface CollatorManagementProps {
   sessionKey: string;
   commissionOf: bigint;
   collators: CollatorSet[];
   refetch: () => void;
   onStopSuccess: () => void;
 }
-const ManageCollator = ({
+const CollatorManagement = ({
   sessionKey,
   commissionOf,
   collators,
   refetch,
   onStopSuccess
-}: ManageCollatorProps) => {
+}: CollatorManagementProps) => {
   const { address } = useWalletStatus();
   const [open, setOpen] = useState(false);
   const [isValidSessionKey, setIsValidSessionKey] = useState(true);
@@ -280,4 +280,4 @@ const ManageCollator = ({
   );
 };
 
-export default ManageCollator;
+export default CollatorManagement;

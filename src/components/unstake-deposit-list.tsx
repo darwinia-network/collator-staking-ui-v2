@@ -1,5 +1,5 @@
 import { ScrollShadow } from '@nextui-org/react';
-import DepositItem from './unstake-deposit-item';
+import UnstakeDepositItem from './unstake-deposit-item';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import { useState, forwardRef, useImperativeHandle, useEffect, useCallback } from 'react';
 import Empty from './empty';
@@ -49,7 +49,7 @@ const UnstakeDepositList = forwardRef<DepositListRef, DepositListProps>(
           deposits
             .slice(0, maxCount)
             .map((deposit) => (
-              <DepositItem
+              <UnstakeDepositItem
                 key={deposit.tokenId}
                 item={deposit}
                 isChecked={checkedDeposits.includes(deposit)}

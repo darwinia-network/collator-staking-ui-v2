@@ -6,7 +6,7 @@ import { useDebouncedState } from '@/hooks/useDebouncedState';
 import AmountInput from '@/components/amount-input-with-balance';
 import TransactionStatus from '@/components/transaction-status';
 import Rewards from './rewards';
-import Records from './records';
+import DepositRecordsModal from './records';
 import useComputeInterest from '../_hooks/compute-interest';
 import useDeposit from '../_hooks/deposit';
 
@@ -120,7 +120,7 @@ const Deposit = () => {
           </Button>
         </div>
       </div>
-      <Records
+      <DepositRecordsModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onRefreshRingBalance={refetchBalance}

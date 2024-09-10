@@ -3,15 +3,15 @@ import { Modal, ModalContent, ModalHeader, ModalBody, Tab, Tabs, Spinner } from 
 import { X } from 'lucide-react';
 
 import { collatorTabs } from '@/config/tabs';
+import { useActiveAndWaitingCollators } from '@/hooks/useActiveAndWaitingCollators';
 
 import { TransitionPanel } from '../transition-panel';
-
-import JoinCollator from './join';
-import ManageCollator from './manage';
-import { Key } from '@/types/ui';
 import usePreview from './_hooks/preview';
-import OverviewCollator from './overview';
-import { useActiveAndWaitingCollators } from '@/hooks/useActiveAndWaitingCollators';
+import CollatorJoin from './join';
+import CollatorManagement from './manage';
+import CollatorOverview from './overview';
+
+import type { Key } from '@/types/ui';
 
 interface CollatorTabsProps {
   onClose: () => void;
@@ -119,7 +119,7 @@ const CollatorTabs = ({ onClose, isOpen }: CollatorTabsProps) => {
               }}
             >
               {selected === 'join' && (
-                <JoinCollator
+                <CollatorJoin
                   hasSessionKey={hasSessionKey}
                   sessionKey={sessionKey}
                   hasPool={hasPool}
@@ -128,10 +128,10 @@ const CollatorTabs = ({ onClose, isOpen }: CollatorTabsProps) => {
                 />
               )}
               {selected === 'overview' && (
-                <OverviewCollator sessionKey={sessionKey} commissionOf={commissionOf} />
+                <CollatorOverview sessionKey={sessionKey} commissionOf={commissionOf} />
               )}
               {selected === 'manage' && (
-                <ManageCollator
+                <CollatorManagement
                   sessionKey={sessionKey}
                   commissionOf={commissionOf}
                   collators={collators}

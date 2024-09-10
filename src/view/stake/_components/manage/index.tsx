@@ -20,7 +20,7 @@ import StakeMoreDeposits from './stake-more-deposits';
 import UnstakeDeposits from './unstake-deposts';
 import { useStaked } from '../../_hooks/staked';
 
-interface ManageStakeeProps {
+interface StakeManagementModalProps {
   isOpen: boolean;
   symbol: string;
   collator: `0x${string}`;
@@ -28,7 +28,13 @@ interface ManageStakeeProps {
   onSuccess: () => void;
 }
 
-const ManageStake = ({ isOpen, symbol, collator, onClose, onSuccess }: ManageStakeeProps) => {
+const StakeManagementModal = ({
+  isOpen,
+  symbol,
+  collator,
+  onClose,
+  onSuccess
+}: StakeManagementModalProps) => {
   const [isStakeMoreOpen, setIsStakeMoreOpen] = useState(false);
   const [isUnstakeOpen, setIsUnstakeOpen] = useState(false);
   const [isStakeMoreDepositsOpen, setIsStakeMoreDepositsOpen] = useState(false);
@@ -322,4 +328,4 @@ const ManageStake = ({ isOpen, symbol, collator, onClose, onSuccess }: ManageSta
   );
 };
 
-export default ManageStake;
+export default StakeManagementModal;

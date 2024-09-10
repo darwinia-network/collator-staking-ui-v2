@@ -5,14 +5,14 @@ import { formatNumericValue } from '@/utils';
 import { formatEther } from 'viem';
 import dayjs from 'dayjs';
 
-interface DepositItemProps {
+interface UnstakeDepositItemProps {
   item: StakedDepositInfo;
   isChecked?: boolean;
   symbol?: string;
   onChange: (id: bigint) => void;
 }
 
-const DepositItem = ({ item, isChecked, symbol, onChange }: DepositItemProps) => {
+const UnstakeDepositItem = ({ item, isChecked, symbol, onChange }: UnstakeDepositItemProps) => {
   const formattedValue = formatNumericValue(formatEther(item?.amount || 0n), 3);
   const startAtDate = dayjs(item?.startAt * 1000).format('YYYY-MM-DD');
   const endAtDate = dayjs(item?.endAt * 1000).format('YYYY-MM-DD');
@@ -66,4 +66,4 @@ const DepositItem = ({ item, isChecked, symbol, onChange }: DepositItemProps) =>
   );
 };
 
-export default DepositItem;
+export default UnstakeDepositItem;

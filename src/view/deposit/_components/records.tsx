@@ -31,13 +31,17 @@ import AsyncButton from '@/components/async-button';
 import { toast } from 'sonner';
 
 const PAGE_SIZE = 10;
-interface SelectCollatorProps {
+interface DepositRecordsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onRefreshRingBalance?: () => void;
 }
 
-const Records = ({ isOpen, onClose, onRefreshRingBalance }: SelectCollatorProps) => {
+const DepositRecordsModal = ({
+  isOpen,
+  onClose,
+  onRefreshRingBalance
+}: DepositRecordsModalProps) => {
   const { currentChain, ktonInfo } = useWalletStatus();
   const [page, setPage] = useState(1);
   const [currentTokenId, setCurrentTokenId] = useState<bigint>();
@@ -284,4 +288,4 @@ const Records = ({ isOpen, onClose, onRefreshRingBalance }: SelectCollatorProps)
   );
 };
 
-export default Records;
+export default DepositRecordsModal;

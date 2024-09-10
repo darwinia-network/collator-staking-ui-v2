@@ -4,7 +4,7 @@ import useStakingAccountWithStatus from '@/hooks/useStakingAccountWithStatus';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import StakeList from './list';
 import NewStake from './new';
-import ManageStake from './manage';
+import StakeManagementModal from './manage';
 
 import type { StakingAccountWithStatus } from '@/hooks/useStakingAccountWithStatus';
 
@@ -59,7 +59,7 @@ const StakePage = () => {
         onSuccess={refetchStakingAccount}
       />
       {current?.collator && (
-        <ManageStake
+        <StakeManagementModal
           isOpen={isEditStakeOpen}
           symbol={currentChain?.nativeCurrency.symbol || ''}
           collator={current?.collator}

@@ -18,7 +18,7 @@ import type { SelectionKeys } from '@/types/ui';
 import { formatEther } from 'viem';
 import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
 
-interface SelectCollatorTableProps {
+interface CollatorSelectionTableProps {
   symbol: string;
   data: CollatorSet[];
   isLoading: boolean;
@@ -31,7 +31,7 @@ interface SelectCollatorTableProps {
 }
 
 const PAGE_SIZE = 10;
-const SelectCollatorTable = ({
+const CollatorSelectionTable = ({
   symbol,
   keyword,
   page = 1,
@@ -41,7 +41,7 @@ const SelectCollatorTable = ({
   onSearchChange,
   onSelectionChange,
   onChangePage
-}: SelectCollatorTableProps) => {
+}: CollatorSelectionTableProps) => {
   const [isPending, startTransition] = useTransition();
 
   const handleSearchChange = useCallback(
@@ -172,4 +172,4 @@ const SelectCollatorTable = ({
     </div>
   );
 };
-export default SelectCollatorTable;
+export default CollatorSelectionTable;

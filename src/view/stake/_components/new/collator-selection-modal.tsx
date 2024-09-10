@@ -2,12 +2,12 @@ import { useState, useMemo, useCallback } from 'react';
 import { cn, Modal, ModalBody, ModalContent, Tab, Tabs } from '@nextui-org/react';
 import { X } from 'lucide-react';
 import { selectCollatorTabs } from '@/config/tabs';
-import SelectCollatorTable from './select-collator-table';
+import SelectCollatorTable from './collator-selection-table';
 import type { CollatorSet } from '@/service/type';
 import type { Key, SelectionKeys } from '@/types/ui';
 import useWalletStatus from '@/hooks/useWalletStatus';
 
-interface SelectCollatorProps {
+interface CollatorSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectionChange: (keys: SelectionKeys) => void;
@@ -19,7 +19,7 @@ interface SelectCollatorProps {
   onChangePage?: (page: number) => void;
 }
 
-const SelectCollator = ({
+const CollatorSelectionModal = ({
   isOpen,
   onClose,
   selection,
@@ -29,7 +29,7 @@ const SelectCollator = ({
   isLoading,
   page,
   onChangePage
-}: SelectCollatorProps) => {
+}: CollatorSelectionModalProps) => {
   const { currentChain } = useWalletStatus();
   const [selected, setSelected] = useState<Key>(selectCollatorTabs[0].key);
   const [keyword, setKeyword] = useState('');
@@ -132,4 +132,4 @@ const SelectCollator = ({
   );
 };
 
-export default SelectCollator;
+export default CollatorSelectionModal;

@@ -1,11 +1,11 @@
 import { Tooltip } from '@nextui-org/react';
 import { CircleHelp } from 'lucide-react';
 
-interface OverviewCollatorProps {
+interface CollatorOverviewProps {
   sessionKey: string;
   commissionOf: bigint;
 }
-const OverviewCollator = ({ sessionKey, commissionOf }: OverviewCollatorProps) => {
+const CollatorOverview = ({ sessionKey, commissionOf }: CollatorOverviewProps) => {
   return (
     <div className="flex flex-col gap-[1.25rem]">
       <div className="space-y-[0.62rem]">
@@ -55,4 +55,4 @@ const OverviewCollator = ({ sessionKey, commissionOf }: OverviewCollatorProps) =
   );
 };
 
-export default OverviewCollator;
+export default CollatorOverview;

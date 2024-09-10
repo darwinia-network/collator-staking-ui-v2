@@ -9,7 +9,7 @@ import { useCreateCollator, useCreateAndCollator } from './_hooks/collator';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import { validSessionKey } from '@/utils';
 
-interface JoinCollatorProps {
+interface CollatorJoinProps {
   hasSessionKey: boolean;
   sessionKey: string;
   hasPool: boolean;
@@ -17,13 +17,13 @@ interface JoinCollatorProps {
   refetch: () => void;
 }
 
-const JoinCollator = ({
+const CollatorJoin = ({
   hasSessionKey,
   sessionKey,
   hasPool,
   collators,
   refetch
-}: JoinCollatorProps) => {
+}: CollatorJoinProps) => {
   const { address: account } = useWalletStatus();
 
   const [isValidSessionKey, setIsValidSessionKey] = useState(true);
@@ -221,4 +221,4 @@ const JoinCollator = ({
   );
 };
 
-export default JoinCollator;
+export default CollatorJoin;

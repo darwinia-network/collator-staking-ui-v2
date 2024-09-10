@@ -20,7 +20,7 @@ import { stakeTabs } from '@/config/tabs';
 
 import StakeRing, { StakeRingRef } from './stake-ring';
 import StakeDeposit from './stake-deposit';
-import SelectCollator from './select-collator';
+import SelectCollator from './collator-selection-modal';
 
 import Avatar from '@/components/avatar';
 import { toShortAddress } from '@/utils';
