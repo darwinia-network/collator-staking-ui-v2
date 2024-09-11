@@ -77,7 +77,11 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
     return collators?.[0];
   }, [collators]);
 
-  const { data: isApprovedForAll, isLoading: isLoadingIsApprovedForAll } = useIsApprovedForAll();
+  const {
+    data: isApprovedForAll,
+    isLoading: isLoadingIsApprovedForAll,
+    refetch: refetchIsApprovedForAll
+  } = useIsApprovedForAll();
 
   const {
     handleStake: handleRingStake,
@@ -122,12 +126,13 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
   }, []);
 
   const handleDepositStakeStart = useCallback(async () => {
+    refetchIsApprovedForAll();
     const tx = await handleDepositStake();
     if (tx) {
       setApprovalHash(undefined);
       setHash(tx);
     }
-  }, [handleDepositStake]);
+  }, [handleDepositStake, refetchIsApprovedForAll]);
 
   const handleStake = useCallback(async () => {
     if (selected === 'stake-ring') {

@@ -4,7 +4,7 @@ import { X } from 'lucide-react';
 import DepositList, { DepositListRef } from '@/components/deposit-list';
 import { useCallback, useRef, useState } from 'react';
 import { DepositInfo } from '@/hooks/useUserDepositDetails';
-import { useDepositStake } from '../../_hooks/stake';
+import { useApprovalForAll, useDepositStake, useIsApprovedForAll } from '../../_hooks/stake';
 import { CollatorSet } from '@/service/type';
 import TransactionStatus from '@/components/transaction-status';
 
@@ -16,6 +16,14 @@ interface EditStakeProps {
 }
 
 const StakeMoreDeposits = ({ isOpen, collator, onClose, onOk }: EditStakeProps) => {
+  const [approvalHash, setApprovalHash] = useState<`0x${string}` | undefined>(undefined);
+  const {
+    data: isApprovedForAll,
+    isLoading: isLoadingIsApprovedForAll,
+    refetch: refetchIsApprovedForAll
+  } = useIsApprovedForAll();
+  const { handleApprovalForAll, isPending: isPendingApprovalForAll } = useApprovalForAll();
+
   const depositListRef = useRef<DepositListRef>(null);
   const [checkedDeposits, setCheckedDeposits] = useState<DepositInfo[]>([]);
 
@@ -30,12 +38,25 @@ const StakeMoreDeposits = ({ isOpen, collator, onClose, onOk }: EditStakeProps) 
     deposits: checkedDeposits
   });
 
+  const handleDepositApproval = useCallback(async () => {
+    const tx = await handleApprovalForAll();
+    if (tx) {
+      setApprovalHash(tx);
+    }
+  }, [handleApprovalForAll]);
+
   const handleDepositStakeStart = useCallback(async () => {
+    await refetchIsApprovedForAll();
     const tx = await handleDepositStake();
     if (tx) {
+      setApprovalHash(undefined);
       setHash(tx);
     }
-  }, [handleDepositStake]);
+  }, [handleDepositStake, refetchIsApprovedForAll]);
+
+  const handleDepositFail = useCallback(() => {
+    setHash(undefined);
+  }, []);
 
   const handleSuccess = useCallback(() => {
     setHash(undefined);
@@ -70,16 +91,28 @@ const StakeMoreDeposits = ({ isOpen, collator, onClose, onOk }: EditStakeProps) 
             <Button
               color="primary"
               className="w-full"
-              onClick={handleDepositStakeStart}
+              onClick={isApprovedForAll ? handleDepositStakeStart : handleDepositApproval}
               isDisabled={checkedDeposits?.length === 0}
-              isLoading={isLoadingOldAndNewPrevDeposit || isPendingDepositStake}
+              isLoading={
+                isLoadingOldAndNewPrevDeposit ||
+                isPendingDepositStake ||
+                isLoadingIsApprovedForAll ||
+                isPendingApprovalForAll
+              }
             >
-              Stake
+              {isApprovedForAll ? 'Stake' : 'Approve'}
             </Button>
           </ModalBody>
         </ModalContent>
       </Modal>
       <TransactionStatus hash={hash} onFail={handleFail} onSuccess={handleSuccess} title="Stake" />
+      <TransactionStatus
+        hash={approvalHash}
+        title="Approval"
+        onSuccess={handleDepositStakeStart}
+        onFail={handleDepositFail}
+        isLoading={isPendingDepositStake || isPendingApprovalForAll}
+      />
     </>
   );
 };
