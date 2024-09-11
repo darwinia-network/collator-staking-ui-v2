@@ -1,4 +1,4 @@
-export const address = '0xb037E75fE2BFA42DdDC17BB90963Dafe10A5Dd11';
+export const address = '0xa4fFAC7A5Da311D724eD47393848f694Baee7930';
 export const abi = [
   {
     inputs: [],
@@ -884,5 +884,3 @@ export const abi = [
     type: 'function'
   }
 ] as const;
-
-// staked 还有一个是 unstake 的时间

@@ -3,7 +3,6 @@ import { Modal, ModalContent, ModalHeader, ModalBody, Tab, Tabs, Spinner } from 
 import { X } from 'lucide-react';
 
 import { collatorTabs } from '@/config/tabs';
-import { useActiveAndWaitingCollators } from '@/hooks/useActiveAndWaitingCollators';
 
 import { TransitionPanel } from '../transition-panel';
 import usePreview from './_hooks/preview';
@@ -18,12 +17,6 @@ interface CollatorTabsProps {
   isOpen?: boolean;
 }
 const CollatorTabs = ({ onClose, isOpen }: CollatorTabsProps) => {
-  const {
-    all: collators,
-    isLoading: isCollatorSetLoading,
-    refetch: refetchCollators
-  } = useActiveAndWaitingCollators();
-
   const {
     hasSessionKey,
     sessionKey,
@@ -45,8 +38,7 @@ const CollatorTabs = ({ onClose, isOpen }: CollatorTabsProps) => {
 
   const refetch = useCallback(async () => {
     await refetchPreview();
-    await refetchCollators();
-  }, [refetchPreview, refetchCollators]);
+  }, [refetchPreview]);
 
   const handleStopSuccess = useCallback(async () => {
     await refetch();
@@ -123,7 +115,6 @@ const CollatorTabs = ({ onClose, isOpen }: CollatorTabsProps) => {
                   hasSessionKey={hasSessionKey}
                   sessionKey={sessionKey}
                   hasPool={hasPool}
-                  collators={collators}
                   refetch={refetch}
                 />
               )}
@@ -134,13 +125,12 @@ const CollatorTabs = ({ onClose, isOpen }: CollatorTabsProps) => {
                 <CollatorManagement
                   sessionKey={sessionKey}
                   commissionOf={commissionOf}
-                  collators={collators}
                   refetch={refetch}
                   onStopSuccess={handleStopSuccess}
                 />
               )}
             </TransitionPanel>
-            {(isLoading || isCollatorSetLoading) && (
+            {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-background/50">
                 <Spinner />
               </div>

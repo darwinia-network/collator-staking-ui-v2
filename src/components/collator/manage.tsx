@@ -5,27 +5,26 @@ import useWalletStatus from '@/hooks/useWalletStatus';
 import TransactionStatus from '../transaction-status';
 import StopCollation from './stop-collation';
 import useStop from './_hooks/stop';
-import type { CollatorSet } from '@/service/type';
 import { useSetSessionKey } from './_hooks/set-session-key';
 import useUpdateCommission from './_hooks/update-commission';
 import { useCommissionLocks } from './_hooks/commissionLocks';
 import { validSessionKey } from '@/utils';
+import { useCollatorByAddress, useCollatorSetPrev } from '@/hooks/useService';
+import { DEFAULT_PREV } from '@/utils/getPrevNew';
 
 interface CollatorManagementProps {
   sessionKey: string;
   commissionOf: bigint;
-  collators: CollatorSet[];
   refetch: () => void;
   onStopSuccess: () => void;
 }
 const CollatorManagement = ({
   sessionKey,
   commissionOf,
-  collators,
   refetch,
   onStopSuccess
 }: CollatorManagementProps) => {
-  const { address } = useWalletStatus();
+  const { address, currentChainId } = useWalletStatus();
   const [open, setOpen] = useState(false);
   const [isValidSessionKey, setIsValidSessionKey] = useState(true);
   const [sessionKeyHash, setSessionKeyHash] = useState('');
@@ -33,6 +32,33 @@ const CollatorManagement = ({
   const [stopHash, setStopHash] = useState('');
   const [sessionKeyValue, setSessionKeyValue] = useState('');
   const [commissionValue, setCommissionValue] = useState('');
+
+  const { data: collatorByAddress, isLoading: isLoadingCollatorByAddress } = useCollatorByAddress({
+    currentChainId,
+    address: address as `0x${string}`,
+    enabled: !!address
+  });
+  const currentCollator = collatorByAddress?.[0];
+  const oldKey = currentCollator?.key || '';
+  const collatorAddress = currentCollator?.address;
+  const totalAssets = useMemo(() => {
+    const assets = currentCollator?.assets;
+    return assets ? BigInt(assets) : BigInt(0);
+  }, [currentCollator]);
+
+  const {
+    data: collatorSetPrev,
+    isLoading: isLoadingPrev,
+    isRefetching: isRefetchingPrev
+  } = useCollatorSetPrev({
+    key: oldKey,
+    currentChainId,
+    enabled: !!oldKey
+  });
+
+  const oldPrev = (
+    collatorSetPrev?.[0] ? collatorSetPrev?.[0]?.address : DEFAULT_PREV
+  ) as `0x${string}`;
 
   const {
     isLockPeriod,
@@ -51,26 +77,20 @@ const CollatorManagement = ({
   }, [lockEndTime]);
 
   const { setSessionKey, isPending: isPendingSetSessionKey } = useSetSessionKey();
+
   const {
     updateCommission,
     isPending: isPendingUpdateCommission,
     isLoading: isLoadingUpdateCommission
   } = useUpdateCommission({
-    collatorList: collators,
-    newCommission: BigInt(commissionValue)
+    newCommission: BigInt(commissionValue),
+    oldKey,
+    oldPrev,
+    collatorAddress: collatorAddress as `0x${string}`,
+    totalAssets
   });
 
   const { stop, isPending: isPendingStop } = useStop();
-
-  const prev = useMemo(() => {
-    if (!collators?.length) {
-      return '0x0000000000000000000000000000000000000000';
-    }
-    const currentIndex = collators.findIndex((collator) => collator.address === address);
-    return collators[currentIndex - 1]
-      ? (collators[currentIndex - 1]?.address as `0x${string}`)
-      : '0x0000000000000000000000000000000000000000';
-  }, [collators, address]);
 
   const isSameSessionKey = useMemo(() => {
     return sessionKey === sessionKeyValue;
@@ -127,11 +147,11 @@ const CollatorManagement = ({
   }, []);
 
   const handleStop = useCallback(async () => {
-    const tx = await stop({ address: prev });
+    const tx = await stop({ address: oldPrev });
     if (tx) {
       setStopHash(tx);
     }
-  }, [stop, prev]);
+  }, [stop, oldPrev]);
 
   const handleStopSuccess = useCallback(() => {
     setStopHash('');
@@ -227,7 +247,13 @@ const CollatorManagement = ({
                 color="primary"
                 className="h-[2.125rem] w-full"
                 isDisabled
-                isLoading={isPendingUpdateCommission || isLockPeriodLoading}
+                isLoading={
+                  isPendingUpdateCommission ||
+                  isLockPeriodLoading ||
+                  isLoadingCollatorByAddress ||
+                  isLoadingPrev ||
+                  isRefetchingPrev
+                }
               >
                 Update Commission
               </Button>
@@ -240,7 +266,11 @@ const CollatorManagement = ({
             isDisabled={!commissionValue}
             onClick={handleSetCommission}
             isLoading={
-              isPendingUpdateCommission || isLockPeriodLoading || isLoadingUpdateCommission
+              isPendingUpdateCommission ||
+              isLockPeriodLoading ||
+              isLoadingUpdateCommission ||
+              isLoadingPrev ||
+              isRefetchingPrev
             }
           >
             Update Commission

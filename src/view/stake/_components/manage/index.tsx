@@ -13,17 +13,18 @@ import { formatEther } from 'viem';
 import { X } from 'lucide-react';
 import AddressCard from '@/components/address-card';
 import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
-import { useActiveAndWaitingCollators } from '@/hooks/useActiveAndWaitingCollators';
 import StakeMore from './stake-more';
 import Unstake from './unstake';
 import StakeMoreDeposits from './stake-more-deposits';
 import UnstakeDeposits from './unstake-deposts';
 import { useStaked } from '../../_hooks/staked';
+import { useCollatorByAddress } from '@/hooks/useService';
+import useWalletStatus from '@/hooks/useWalletStatus';
 
 interface StakeManagementModalProps {
   isOpen: boolean;
   symbol: string;
-  collator: `0x${string}`;
+  collatorAddress: `0x${string}`;
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -31,23 +32,32 @@ interface StakeManagementModalProps {
 const StakeManagementModal = ({
   isOpen,
   symbol,
-  collator,
+  collatorAddress,
   onClose,
   onSuccess
 }: StakeManagementModalProps) => {
+  const { currentChainId } = useWalletStatus();
   const [isStakeMoreOpen, setIsStakeMoreOpen] = useState(false);
   const [isUnstakeOpen, setIsUnstakeOpen] = useState(false);
   const [isStakeMoreDepositsOpen, setIsStakeMoreDepositsOpen] = useState(false);
   const [isUnstakeDepositsOpen, setIsUnstakeDepositsOpen] = useState(false);
 
   const {
-    all: collators,
-    isLoading: isCollatorSetLoading,
-    refetch: refetchCollators
-  } = useActiveAndWaitingCollators();
+    data: collators,
+    isLoading: isCollatorLoading,
+    refetch: refetchCollator
+  } = useCollatorByAddress({
+    currentChainId: currentChainId,
+    address: collatorAddress,
+    enabled: !!collatorAddress
+  });
+
+  const collator = useMemo(() => {
+    return collators?.[0];
+  }, [collators]);
 
   const { stakedRING, stakingLocks, stakedDeposits, isLoading, refetch } = useStaked({
-    collator
+    collatorAddress: collatorAddress
   });
 
   const formattedStakedRING = useMemo(() => {
@@ -64,9 +74,9 @@ const StakeManagementModal = ({
 
   const handleSuccess = useCallback(() => {
     refetch();
-    refetchCollators();
+    refetchCollator();
     onSuccess();
-  }, [refetch, refetchCollators, onSuccess]);
+  }, [refetch, refetchCollator, onSuccess]);
 
   const handleOkStakeMore = useCallback(() => {
     setIsStakeMoreOpen(false);
@@ -168,9 +178,9 @@ const StakeManagementModal = ({
 
   useEffect(() => {
     if (isOpen) {
-      refetchCollators();
+      refetchCollator();
     }
-  }, [isOpen, refetch, refetchCollators]);
+  }, [isOpen, refetch, refetchCollator]);
 
   return (
     <>
@@ -192,7 +202,7 @@ const StakeManagementModal = ({
           </ModalHeader>
           <Divider />
           <ModalBody className="relative flex w-full flex-col items-center justify-center gap-5 px-0 py-5">
-            {(isLoading || isCollatorSetLoading) && (
+            {(isLoading || isCollatorLoading) && (
               <div className="absolute inset-0 flex items-center justify-center bg-background/50">
                 <Spinner />
               </div>
@@ -202,7 +212,7 @@ const StakeManagementModal = ({
               <div className="flex flex-col gap-[0.62rem] rounded-medium bg-secondary p-[0.62rem] hover:opacity-[var(--nextui-opacity-hover)]">
                 <p className="m-0 text-[0.875rem] text-foreground/50">Collator</p>
                 <div className="flex items-center justify-between">
-                  <AddressCard address={collator} copyable={false} />
+                  <AddressCard address={collator?.address as `0x${string}`} copyable={false} />
                 </div>
               </div>
 
@@ -297,7 +307,6 @@ const StakeManagementModal = ({
         onClose={handleCloseStakeMore}
         onOk={handleOkStakeMore}
         collator={collator}
-        collatorList={collators}
       />
       <Unstake
         isOpen={isUnstakeOpen}
@@ -306,14 +315,12 @@ const StakeManagementModal = ({
         totalAmount={formattedStakedRING}
         onOk={handleOkUnstake}
         collator={collator}
-        collatorList={collators}
       />
       <StakeMoreDeposits
         isOpen={isStakeMoreDepositsOpen}
         onClose={handleCloseStakeMoreDeposits}
         onOk={handleOkStakeMoreDeposits}
-        collators={collators}
-        targetCollator={collator}
+        collator={collator}
       />
       <UnstakeDeposits
         isOpen={isUnstakeDepositsOpen}
@@ -321,8 +328,7 @@ const StakeManagementModal = ({
         onOk={handleOkUnstakeDeposits}
         symbol={symbol}
         deposits={stakedDeposits}
-        collators={collators}
-        targetCollator={collator}
+        collator={collator}
       />
     </>
   );

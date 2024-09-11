@@ -1,29 +1,28 @@
 import { abi as hubAbi, address as hubAddress } from '@/config/abi/hub';
 import { useReadContract, useWriteContract } from 'wagmi';
 import { isNil } from 'lodash-es';
-import { useCallback, useMemo } from 'react';
-import { determineOldAndNewPrev } from '@/utils/getPrevNew';
-import type { CollatorSet } from '@/service/type';
-import { useCollatorByAddress } from '@/hooks/useService';
+import { useCallback } from 'react';
+import { DEFAULT_PREV } from '@/utils/getPrevNew';
+import { useCollatorSetNewPrev } from '@/hooks/useService';
 import useWalletStatus from '@/hooks/useWalletStatus';
+import { genKey } from '@/utils';
 
 type UpdateCommissionProps = {
-  collatorList: CollatorSet[];
   newCommission: bigint;
+  oldKey: string;
+  oldPrev: `0x${string}`;
+  collatorAddress: `0x${string}`;
+  totalAssets: bigint;
 };
 
-const useUpdateCommission = ({ collatorList, newCommission }: UpdateCommissionProps) => {
-  const { address, currentChainId } = useWalletStatus();
-  const { data: collatorByAddress, isLoading: isLoadingCollatorByAddress } = useCollatorByAddress({
-    currentChainId,
-    address: address as `0x${string}`,
-    enabled: true
-  });
-
-  const totalAssets = useMemo(() => {
-    const assets = collatorByAddress?.[0]?.assets;
-    return assets ? BigInt(assets) : BigInt(0);
-  }, [collatorByAddress]);
+const useUpdateCommission = ({
+  newCommission,
+  oldKey,
+  oldPrev,
+  collatorAddress,
+  totalAssets
+}: UpdateCommissionProps) => {
+  const { currentChainId } = useWalletStatus();
 
   const { data: votes, isLoading: isLoadingVotes } = useReadContract({
     abi: hubAbi,
@@ -35,11 +34,22 @@ const useUpdateCommission = ({ collatorList, newCommission }: UpdateCommissionPr
     }
   });
 
-  const { oldPrev, newPrev } = determineOldAndNewPrev({
-    collatorList,
-    collator: address as `0x${string}`,
-    newVotes: votes || BigInt(0)
+  const newKey = genKey({ address: collatorAddress, votes: votes ?? 0n });
+
+  const {
+    data: collatorSetNewPrev,
+    isLoading: isLoadingNewPrev,
+    isRefetching: isRefetchingNewPrev
+  } = useCollatorSetNewPrev({
+    key: newKey,
+    newKey,
+    currentChainId,
+    enabled: !!collatorAddress && !!newKey && !!oldKey
   });
+
+  const newPrev = (
+    collatorSetNewPrev?.[0] ? collatorSetNewPrev?.[0]?.address : DEFAULT_PREV
+  ) as `0x${string}`;
 
   const { writeContractAsync, isPending } = useWriteContract();
 
@@ -56,7 +66,7 @@ const useUpdateCommission = ({ collatorList, newCommission }: UpdateCommissionPr
     updateCommission,
     isPending,
     votes,
-    isLoading: isLoadingVotes || isLoadingCollatorByAddress
+    isLoading: isLoadingVotes || isLoadingNewPrev || isRefetchingNewPrev
   };
 };
 

@@ -6,13 +6,12 @@ import { useCallback, useState } from 'react';
 import { parseEther } from 'viem';
 import { useUnstakeRING } from '../../_hooks/unstake';
 import { CollatorSet } from '@/service/type';
+import useDebounceState from '@/hooks/useDebounceState';
 
 interface EditStakeProps {
   isOpen: boolean;
-
   symbol: string;
-  collator: `0x${string}`;
-  collatorList: CollatorSet[];
+  collator?: CollatorSet;
   totalAmount: string;
   onClose: () => void;
   onOk: () => void;
@@ -23,22 +22,23 @@ const Unstake = ({
 
   symbol,
   collator,
-  collatorList,
   totalAmount,
   onClose,
   onOk
 }: EditStakeProps) => {
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
-  const [amount, setAmount] = useState<string>('0');
+  const [amount, debouncedAmount, setAmount] = useDebounceState<string>('0');
   const { unstakeRING, isPending, isLoadingOldAndNewPrev } = useUnstakeRING({
-    collatorList,
     collator,
-    inputAmount: parseEther(amount)
+    inputAmount: parseEther(debouncedAmount)
   });
 
-  const handleAmountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setAmount(e.target.value);
-  }, []);
+  const handleAmountChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setAmount(e.target.value);
+    },
+    [setAmount]
+  );
 
   const handleUnstake = useCallback(async () => {
     const tx = await unstakeRING();

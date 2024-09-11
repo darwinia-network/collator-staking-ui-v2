@@ -62,7 +62,7 @@ const StakePage = () => {
         <StakeManagementModal
           isOpen={isEditStakeOpen}
           symbol={currentChain?.nativeCurrency.symbol || ''}
-          collator={current?.collator}
+          collatorAddress={current?.collator}
           onClose={handleCloseEditStake}
           onSuccess={refetchStakingAccount}
         />

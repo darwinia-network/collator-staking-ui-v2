@@ -2,50 +2,42 @@ import { useCallback } from 'react';
 import { useReadContract, useWriteContract } from 'wagmi';
 import { abi, address } from '@/config/abi/hub';
 import { abi as depositAbi, address as depositAddress } from '@/config/abi/deposit';
-import { useOldAndNewPrev } from '@/hooks/useOldAndNewPrev';
+import { useStakeOldAndNewPrev } from '@/hooks/useStakeOldAndNewPrev';
 import { CollatorSet } from '@/service/type';
 import { DepositInfo } from '@/hooks/useUserDepositDetails';
 import useWalletStatus from '@/hooks/useWalletStatus';
 
 type UseRingStakeProps = {
-  collators: CollatorSet[];
-  targetCollator: `0x${string}`;
+  collator?: CollatorSet;
   assets: bigint;
 };
 
-export const useRingStake = ({ collators, targetCollator, assets }: UseRingStakeProps) => {
+export const useRingStake = ({ collator, assets }: UseRingStakeProps) => {
+  const collatorAddress = collator?.address as `0x${string}`;
   const {
     oldPrev,
     newPrev,
     isLoading: isLoadingOldAndNewPrev
-  } = useOldAndNewPrev({
-    collatorList: collators,
-    collator: targetCollator,
-    inputAmount: assets,
-    operation: 'add'
+  } = useStakeOldAndNewPrev({
+    collator,
+    inputAmount: assets
   });
 
   const result = useWriteContract();
 
   const handleStake = useCallback(async () => {
-    if (!targetCollator || !oldPrev || !newPrev || !assets) return;
+    if (!collatorAddress || !oldPrev || !newPrev || !assets) return;
 
     return result.writeContractAsync({
       address,
       abi,
       functionName: 'stakeRING',
-      args: [targetCollator, oldPrev, newPrev],
+      args: [collatorAddress, oldPrev, newPrev],
       value: assets
     });
-  }, [result, targetCollator, oldPrev, newPrev, assets]);
+  }, [result, collatorAddress, oldPrev, newPrev, assets]);
 
   return { ...result, handleStake, isLoadingOldAndNewPrev };
-};
-
-type UseDepositStakeProps = {
-  collators: CollatorSet[];
-  targetCollator: `0x${string}`;
-  deposits: DepositInfo[];
 };
 
 export const useIsApprovedForAll = () => {
@@ -76,31 +68,36 @@ export const useApprovalForAll = () => {
   return { ...result, handleApprovalForAll };
 };
 
-export const useDepositStake = ({ collators, targetCollator, deposits }: UseDepositStakeProps) => {
+type UseDepositStakeProps = {
+  collator?: CollatorSet;
+  deposits: DepositInfo[];
+};
+
+export const useDepositStake = ({ collator, deposits }: UseDepositStakeProps) => {
+  const collatorAddress = collator?.address as `0x${string}`;
   const assets = deposits.reduce((acc, deposit) => acc + deposit.value, 0n);
+
   const {
     oldPrev,
     newPrev,
     isLoading: isLoadingOldAndNewPrev
-  } = useOldAndNewPrev({
-    collatorList: collators,
-    collator: targetCollator,
-    inputAmount: assets,
-    operation: 'add'
+  } = useStakeOldAndNewPrev({
+    collator,
+    inputAmount: assets
   });
 
   const result = useWriteContract();
 
   const handleStake = useCallback(async () => {
-    if (!targetCollator || !oldPrev || !newPrev || !assets) return;
+    if (!collatorAddress || !oldPrev || !newPrev || !assets) return;
 
     return result.writeContractAsync({
       address,
       abi,
       functionName: 'stakeDeposits',
-      args: [targetCollator, deposits.map((deposit) => BigInt(deposit.tokenId)), oldPrev, newPrev]
+      args: [collatorAddress, deposits.map((deposit) => BigInt(deposit.tokenId)), oldPrev, newPrev]
     });
-  }, [result, targetCollator, oldPrev, newPrev, assets, deposits]);
+  }, [result, collatorAddress, oldPrev, newPrev, assets, deposits]);
 
   return { ...result, handleStake, isLoadingOldAndNewPrev };
 };

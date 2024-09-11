@@ -1,6 +1,6 @@
 import type { CollatorSet } from '@/service/type';
 
-export const DEFAULT_PREV = '0x0000000000000000000000000000000000000001';
+export const DEFAULT_PREV = '0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF';
 
 type DetermineOldAndNewPrevProps = {
   collatorList: CollatorSet[];

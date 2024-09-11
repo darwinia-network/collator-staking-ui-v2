@@ -23,9 +23,9 @@ export const GET_COLLATOR_SET = gql`
       inset
       pool
       prev
-      seq
       votes
       reward
+      key
     }
   }
 `;

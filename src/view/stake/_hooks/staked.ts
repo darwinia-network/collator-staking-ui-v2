@@ -105,9 +105,9 @@ export const useStakedDepositsOf = ({ account }: StakedDepositsOfProps) => {
 };
 
 type StakedProps = {
-  collator: `0x${string}`;
+  collatorAddress: `0x${string}`;
 };
-export const useStaked = ({ collator }: StakedProps) => {
+export const useStaked = ({ collatorAddress }: StakedProps) => {
   const { address: account } = useWalletStatus();
 
   const {
@@ -121,10 +121,10 @@ export const useStaked = ({ collator }: StakedProps) => {
   const filteredStakedDeposits = useMemo(() => {
     return (
       stakedDeposits?.filter((deposit) => {
-        return deposit?.collator?.toLowerCase() === collator?.toLowerCase();
+        return deposit?.collator?.toLowerCase() === collatorAddress?.toLowerCase();
       }) ?? []
     );
-  }, [stakedDeposits, collator]);
+  }, [stakedDeposits, collatorAddress]);
 
   const {
     data,
@@ -137,13 +137,13 @@ export const useStaked = ({ collator }: StakedProps) => {
         address,
         abi: hubAbi,
         functionName: 'stakedRINGOf',
-        args: [collator, account as `0x${string}`]
+        args: [collatorAddress, account as `0x${string}`]
       },
       {
         address,
         abi: hubAbi,
         functionName: 'stakingLocks',
-        args: [collator, account as `0x${string}`]
+        args: [collatorAddress, account as `0x${string}`]
       }
     ]
   });

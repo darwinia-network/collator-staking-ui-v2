@@ -11,29 +11,20 @@ import { CollatorSet } from '@/service/type';
 
 interface EditStakeProps {
   isOpen: boolean;
-  collators: CollatorSet[];
-  targetCollator: `0x${string}`;
+  collator?: CollatorSet;
   symbol: string;
   deposits: StakedDepositInfo[];
   onClose: () => void;
   onOk: () => void;
 }
 
-const UnstakeDeposits = ({
-  isOpen,
-  collators,
-  targetCollator,
-  deposits,
-  onClose,
-  onOk
-}: EditStakeProps) => {
+const UnstakeDeposits = ({ isOpen, collator, deposits, onClose, onOk }: EditStakeProps) => {
   const depositListRef = useRef<DepositListRef>(null);
   const [checkedDeposits, setCheckedDeposits] = useState<StakedDepositInfo[]>([]);
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
 
   const { unstakeDeposits, isLoadingOldAndNewPrev, isPending } = useUnstakeDeposits({
-    collatorList: collators,
-    collator: targetCollator,
+    collator,
     deposits: checkedDeposits
   });
 

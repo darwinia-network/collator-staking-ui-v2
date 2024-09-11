@@ -1,21 +1,17 @@
-import { useState, useMemo, useCallback } from 'react';
-import { cn, Modal, ModalBody, ModalContent, Tab, Tabs } from '@nextui-org/react';
+import { useState, useCallback } from 'react';
+import { Modal, ModalBody, ModalContent, Tab, Tabs } from '@nextui-org/react';
 import { X } from 'lucide-react';
 import { selectCollatorTabs } from '@/config/tabs';
-import SelectCollatorTable from './collator-selection-table';
-import type { CollatorSet } from '@/service/type';
-import type { Key, SelectionKeys } from '@/types/ui';
+import SelectCollatorSelectionTable from './collator-active-selection-table';
+import SelectCollatorWaitingSelectionTable from './collator-waiting-selection-table';
 import useWalletStatus from '@/hooks/useWalletStatus';
+import type { Key, SelectionKeys } from '@/types/ui';
 
 interface CollatorSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectionChange: (keys: SelectionKeys) => void;
   selection: SelectionKeys;
-  activeCollators: CollatorSet[];
-  waitingCollators: CollatorSet[];
-  isLoading: boolean;
-  page: number;
+  onSelectionChange: (keys: SelectionKeys) => void;
   onChangePage?: (page: number) => void;
 }
 
@@ -24,18 +20,10 @@ const CollatorSelectionModal = ({
   onClose,
   selection,
   onSelectionChange,
-  activeCollators,
-  waitingCollators,
-  isLoading,
-  page,
   onChangePage
 }: CollatorSelectionModalProps) => {
   const { currentChain } = useWalletStatus();
   const [selected, setSelected] = useState<Key>(selectCollatorTabs[0].key);
-  const [keyword, setKeyword] = useState('');
-  const handleSearchChange = useCallback((keyword: string) => {
-    setKeyword(keyword);
-  }, []);
 
   const handleTabChange = useCallback(
     (key: Key) => {
@@ -55,23 +43,6 @@ const CollatorSelectionModal = ({
     [onSelectionChange]
   );
 
-  const data = useMemo(() => {
-    let filteredData: CollatorSet[] = [];
-    if (selected === 'active-pool') {
-      filteredData = activeCollators || [];
-    } else if (selected === 'waiting-pool') {
-      filteredData = waitingCollators || [];
-    }
-
-    if (keyword) {
-      const lowercaseKeyword = keyword.toLowerCase();
-      return filteredData.filter((collator) =>
-        collator.address.toLowerCase().includes(lowercaseKeyword)
-      );
-    }
-
-    return filteredData;
-  }, [activeCollators, waitingCollators, selected, keyword]);
   return (
     <>
       <Modal
@@ -87,7 +58,7 @@ const CollatorSelectionModal = ({
         closeButton={<X />}
       >
         <ModalContent className="w-[calc(100vw-1.24rem)] md:max-w-[58.125rem]">
-          <ModalBody className={cn('p-5', isLoading ? 'overflow-hidden' : '')}>
+          <ModalBody className="p-5">
             <Tabs
               aria-label="Options"
               color="primary"
@@ -113,18 +84,19 @@ const CollatorSelectionModal = ({
                 />
               ))}
             </Tabs>
-
-            <SelectCollatorTable
-              symbol={currentChain?.nativeCurrency?.symbol || 'RING'}
-              data={data}
-              page={page}
-              selection={selection}
-              isLoading={isLoading}
-              keyword={keyword}
-              onSearchChange={handleSearchChange}
-              onSelectionChange={handleSelectionChange}
-              onChangePage={onChangePage}
-            />
+            {selected === 'active-pool' ? (
+              <SelectCollatorSelectionTable
+                symbol={currentChain?.nativeCurrency?.symbol || 'RING'}
+                selection={selection}
+                onSelectionChange={handleSelectionChange}
+              />
+            ) : (
+              <SelectCollatorWaitingSelectionTable
+                symbol={currentChain?.nativeCurrency?.symbol || 'RING'}
+                selection={selection}
+                onSelectionChange={handleSelectionChange}
+              />
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>

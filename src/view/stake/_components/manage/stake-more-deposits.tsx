@@ -10,19 +10,12 @@ import TransactionStatus from '@/components/transaction-status';
 
 interface EditStakeProps {
   isOpen: boolean;
-  collators: CollatorSet[];
-  targetCollator: `0x${string}`;
+  collator?: CollatorSet;
   onClose: () => void;
   onOk: () => void;
 }
 
-const StakeMoreDeposits = ({
-  isOpen,
-  collators,
-  targetCollator,
-  onClose,
-  onOk
-}: EditStakeProps) => {
+const StakeMoreDeposits = ({ isOpen, collator, onClose, onOk }: EditStakeProps) => {
   const depositListRef = useRef<DepositListRef>(null);
   const [checkedDeposits, setCheckedDeposits] = useState<DepositInfo[]>([]);
 
@@ -33,8 +26,7 @@ const StakeMoreDeposits = ({
     isLoadingOldAndNewPrev: isLoadingOldAndNewPrevDeposit,
     isPending: isPendingDepositStake
   } = useDepositStake({
-    collators,
-    targetCollator,
+    collator,
     deposits: checkedDeposits
   });
 

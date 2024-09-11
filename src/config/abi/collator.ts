@@ -1,13 +1,26 @@
-export const address = '0x9a005e083d9696423f715ae45c48af2e11a37079';
+export const address = '0x0352355296dc3b8498a386f4f7db495a4899f68b';
 export const abi = [
   {
     inputs: [],
-    name: 'getContractCollators',
+    name: 'getActiveCollatorCount',
     outputs: [
       {
         internalType: 'uint256',
         name: '',
         type: 'uint256'
+      }
+    ],
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    inputs: [],
+    name: 'getActiveCollators',
+    outputs: [
+      {
+        internalType: 'address[]',
+        name: '',
+        type: 'address[]'
       }
     ],
     stateMutability: 'view',

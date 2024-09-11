@@ -19,7 +19,7 @@ export async function fetchCollatorSet(
   }
 }
 
-export async function fetchCollatorSetByInset(
+export async function fetchCollatorSetByAccounts(
   params: CollatorSetQueryParams
 ): Promise<Pick<CollatorSet, 'address' | 'inset'>[] | null> {
   try {

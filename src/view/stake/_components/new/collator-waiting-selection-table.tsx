@@ -1,4 +1,4 @@
-import { Key, useCallback, useTransition } from 'react';
+import { Key, useCallback, useMemo, useState, useTransition } from 'react';
 import {
   Table,
   TableHeader,
@@ -17,45 +17,55 @@ import type { CollatorSet } from '@/service/type';
 import type { SelectionKeys } from '@/types/ui';
 import { formatEther } from 'viem';
 import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
+import { useWaitingCollatorList } from '@/hooks/useCollatorList';
 
 interface CollatorSelectionTableProps {
   symbol: string;
-  data: CollatorSet[];
-  isLoading: boolean;
-  keyword?: string;
-  page: number;
   selection: SelectionKeys;
-  onSearchChange?: (keyword: string) => void;
   onSelectionChange?: (keys: SelectionKeys) => void;
-  onChangePage?: (page: number) => void;
 }
 
 const PAGE_SIZE = 10;
 const CollatorSelectionTable = ({
   symbol,
-  keyword,
-  page = 1,
-  data,
-  isLoading,
   selection,
-  onSearchChange,
-  onSelectionChange,
-  onChangePage
+  onSelectionChange
 }: CollatorSelectionTableProps) => {
+  const [keyword, setKeyword] = useState('');
+  const [page, setPage] = useState(1);
   const [isPending, startTransition] = useTransition();
 
-  const handleSearchChange = useCallback(
-    (keyword: string) => {
-      startTransition(() => {
-        onSearchChange?.(keyword);
-      });
-    },
-    [onSearchChange]
-  );
+  const handlePageChange = useCallback((page: number) => {
+    setPage(page);
+  }, []);
+
+  const handleSearchChange = useCallback((keyword: string) => {
+    startTransition(() => {
+      setKeyword?.(keyword);
+      setPage(0);
+    });
+  }, []);
+
+  const { list, isLoading } = useWaitingCollatorList({
+    enabled: true,
+    page: page - 1,
+    pageSize: PAGE_SIZE
+  });
 
   const handleClear = useCallback(() => {
-    onSearchChange?.('');
-  }, [onSearchChange]);
+    setKeyword?.('');
+  }, []);
+
+  const data = useMemo(() => {
+    if (keyword) {
+      if (!list?.length) {
+        return [];
+      }
+      const lowercaseKeyword = keyword.trim()?.toLowerCase();
+      return list.filter((collator) => collator.address.toLowerCase().includes(lowercaseKeyword));
+    }
+    return list || [];
+  }, [list, keyword]);
 
   const renderCell = useCallback((item: CollatorSet, columnKey: Key) => {
     const cellValue = item[columnKey as keyof CollatorSet];
@@ -85,7 +95,6 @@ const CollatorSelectionTable = ({
         return null;
     }
   }, []);
-
   const totalPages = Math.ceil(data.length / PAGE_SIZE);
   const paginatedData = data.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
@@ -126,7 +135,7 @@ const CollatorSelectionTable = ({
                 page={page}
                 total={totalPages}
                 size="sm"
-                onChange={onChangePage}
+                onChange={handlePageChange}
               />
             </div>
           ) : null

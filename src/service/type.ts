@@ -1,16 +1,3 @@
-export enum CollatorSetSelectColumn {
-  Address = 'address',
-  BlockNumber = 'blockNumber',
-  BlockTimestamp = 'blockTimestamp',
-  ChainId = 'chainId',
-  DbWriteTimestamp = 'db_write_timestamp',
-  Id = 'id',
-  LogIndex = 'logIndex',
-  Prev = 'prev',
-  Seq = 'seq',
-  Votes = 'votes'
-}
-
 interface ComparisonExp<T> {
   _eq?: T;
   _gt?: T;
@@ -50,10 +37,11 @@ export interface CollatorSetBoolExp {
   db_write_timestamp?: TimestampComparisonExp;
   id?: StringComparisonExp;
   inset?: IntComparisonExp;
+  key?: StringComparisonExp;
   logIndex?: IntComparisonExp;
   pool?: StringComparisonExp;
   prev?: StringComparisonExp;
-  seq?: IntComparisonExp;
+  reward?: NumericComparisonExp;
   votes?: NumericComparisonExp;
 }
 
@@ -75,29 +63,30 @@ export interface CollatorSetOrderBy {
   db_write_timestamp?: OrderByDirection;
   id?: OrderByDirection;
   inset?: OrderByDirection;
+  key?: OrderByDirection;
   logIndex?: OrderByDirection;
   pool?: OrderByDirection;
   prev?: OrderByDirection;
-  seq?: OrderByDirection;
+  reward?: OrderByDirection;
   votes?: OrderByDirection;
 }
 
 export interface CollatorSet {
-  address: string;
+  address: `0x${string}`;
   assets?: string;
   chainId: string;
   commission?: string;
   id: string;
   inset?: number;
+  key?: string;
+  logIndex?: number;
   pool?: string;
   prev?: string;
-  seq?: number;
-  votes?: string;
   reward?: string;
+  votes?: string;
 }
 
 export interface CollatorSetQueryParams {
-  distinctOn?: CollatorSetSelectColumn[];
   limit?: number;
   offset?: number;
   orderBy?: CollatorSetOrderBy[];

@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useCollatorSet } from '@/hooks/useService';
-import useActiveCollatorCount from '@/hooks/useActiveCollatorCount';
+import useActiveCollators from '@/hooks/useActiveCollators';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import type { CollatorSet } from '@/service/type';
 
@@ -26,12 +26,12 @@ export function useActiveAndWaitingCollators(): UseActiveAndWaitingCollatorsResu
   });
 
   const {
-    data: activeCollatorCount,
-    isLoading: isContractCollatorsLoading,
-    isRefetching: isContractCollatorsRefetching,
-    error: contractCollatorsError,
+    data: activeCollators,
+    isLoading: isActiveCollatorsLoading,
+    isRefetching: isActiveCollatorsRefetching,
+    error: activeCollatorsError,
     refetch: refetchContractCollators
-  } = useActiveCollatorCount({
+  } = useActiveCollators({
     enabled: !!currentChainId && !!collators && !!collators?.length
   });
 
@@ -43,15 +43,15 @@ export function useActiveAndWaitingCollators(): UseActiveAndWaitingCollatorsResu
   const isLoading = useMemo(() => {
     return (
       isCollatorSetLoading ||
-      isContractCollatorsLoading ||
+      isActiveCollatorsLoading ||
       isCollatorSetRefetching ||
-      isContractCollatorsRefetching
+      isActiveCollatorsRefetching
     );
   }, [
     isCollatorSetLoading,
-    isContractCollatorsLoading,
+    isActiveCollatorsLoading,
     isCollatorSetRefetching,
-    isContractCollatorsRefetching
+    isActiveCollatorsRefetching
   ]);
 
   const result = useMemo(() => {
@@ -59,21 +59,21 @@ export function useActiveAndWaitingCollators(): UseActiveAndWaitingCollatorsResu
       return { active: [], waiting: [], all: [] };
     }
 
-    if (collatorSetError || contractCollatorsError) {
+    if (collatorSetError || activeCollatorsError) {
       return { active: [], waiting: [], all: [] };
     }
 
-    const activeCount = activeCollatorCount ? Number(activeCollatorCount) : 0;
+    const activeCount = activeCollators?.length ? Number(activeCollators.length) : 0;
     const allCollators = [...(collators || [])];
-    const activeCollators = allCollators.slice(0, activeCount);
-    const waitingCollators = allCollators.slice(activeCount);
+    const active = allCollators.slice(0, activeCount);
+    const waiting = allCollators.slice(activeCount);
 
     return {
-      active: activeCollators,
-      waiting: waitingCollators,
+      active,
+      waiting,
       all: allCollators
     };
-  }, [collators, activeCollatorCount, collatorSetError, contractCollatorsError, isLoading]);
+  }, [collators, activeCollators, collatorSetError, activeCollatorsError, isLoading]);
 
   return {
     ...result,

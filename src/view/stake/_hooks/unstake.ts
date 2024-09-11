@@ -1,23 +1,22 @@
 import { useWriteContract } from 'wagmi';
 import { abi, address } from '@/config/abi/hub';
 import { useCallback } from 'react';
-import { useOldAndNewPrev } from '@/hooks/useOldAndNewPrev';
+import { useStakeOldAndNewPrev } from '@/hooks/useStakeOldAndNewPrev';
 import type { CollatorSet } from '@/service/type';
 import { StakedDepositInfo } from './staked';
 import { sumBy } from 'lodash-es';
 type UnstakeRINGParams = {
-  collatorList: CollatorSet[];
-  collator: `0x${string}`;
+  collator?: CollatorSet;
   inputAmount: bigint;
 };
-export const useUnstakeRING = ({ collatorList, collator, inputAmount }: UnstakeRINGParams) => {
+export const useUnstakeRING = ({ collator, inputAmount }: UnstakeRINGParams) => {
   const { writeContractAsync, ...rest } = useWriteContract();
+  const collatorAddress = collator?.address as `0x${string}`;
   const {
     oldPrev,
     newPrev,
     isLoading: isLoadingOldAndNewPrev
-  } = useOldAndNewPrev({
-    collatorList,
+  } = useStakeOldAndNewPrev({
     collator,
     inputAmount,
     operation: 'subtract'
@@ -28,27 +27,27 @@ export const useUnstakeRING = ({ collatorList, collator, inputAmount }: UnstakeR
       address: address,
       abi: abi,
       functionName: 'unstakeRING',
-      args: [collator, inputAmount, oldPrev, newPrev]
+      args: [collatorAddress, inputAmount, oldPrev, newPrev]
     });
-  }, [writeContractAsync, collator, inputAmount, oldPrev, newPrev]);
+  }, [writeContractAsync, collatorAddress, inputAmount, oldPrev, newPrev]);
 
   return { unstakeRING, ...rest, isLoadingOldAndNewPrev };
 };
 
 type UnstakeDepositsParams = {
-  collatorList: CollatorSet[];
-  collator: `0x${string}`;
+  collator?: CollatorSet;
   deposits: StakedDepositInfo[];
 };
 
-export const useUnstakeDeposits = ({ collatorList, collator, deposits }: UnstakeDepositsParams) => {
+export const useUnstakeDeposits = ({ collator, deposits }: UnstakeDepositsParams) => {
   const { writeContractAsync, ...rest } = useWriteContract();
+  const collatorAddress = collator?.address as `0x${string}`;
+
   const {
     oldPrev,
     newPrev,
     isLoading: isLoadingOldAndNewPrev
-  } = useOldAndNewPrev({
-    collatorList,
+  } = useStakeOldAndNewPrev({
     collator,
     inputAmount: sumBy(deposits, 'amount'),
     operation: 'subtract'
@@ -59,9 +58,9 @@ export const useUnstakeDeposits = ({ collatorList, collator, deposits }: Unstake
       address: address,
       abi: abi,
       functionName: 'unstakeDeposits',
-      args: [collator, deposits.map((deposit) => deposit.tokenId), oldPrev, newPrev]
+      args: [collatorAddress, deposits.map((deposit) => deposit.tokenId), oldPrev, newPrev]
     });
-  }, [writeContractAsync, collator, deposits, oldPrev, newPrev]);
+  }, [writeContractAsync, collatorAddress, deposits, oldPrev, newPrev]);
 
   return { unstakeDeposits, ...rest, isLoadingOldAndNewPrev };
 };
