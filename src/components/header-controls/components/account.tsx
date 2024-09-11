@@ -6,7 +6,6 @@ import {
   Button,
   cn
 } from '@nextui-org/react';
-import { toast } from 'sonner';
 import { ChevronDown, CopyIcon, LogOutIcon } from 'lucide-react';
 import { useCopyToClipboard } from 'react-use';
 import { useCallback, useState } from 'react';
@@ -14,6 +13,7 @@ import { useCallback, useState } from 'react';
 import { toShortAddress } from '@/utils';
 import { useDisconnectWallet } from '@/hooks/useDisconnectWallet';
 import Avatar from '@/components/avatar';
+import { success } from '@/components/toast';
 
 interface DesktopAccountProps {
   address: `0x${string}`;
@@ -28,14 +28,7 @@ const DesktopAccount = ({ address, isMobile }: DesktopAccountProps) => {
 
   const handleCopy = useCallback(() => {
     copyToClipboard(address);
-    toast.success('Address successfully copied to clipboard.', {
-      unstyled: true,
-      classNames: {
-        toast:
-          'flex items-center gap-[0.31rem] !bg-background  px-[0.62rem] py-[0.5rem] rounded-medium',
-        title: 'text-foreground text-[0.75rem] font-normal'
-      }
-    });
+    success('Address successfully copied to clipboard.');
   }, [address, copyToClipboard]);
 
   const handleDisconnect = useCallback(() => {

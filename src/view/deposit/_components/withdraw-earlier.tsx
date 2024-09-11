@@ -10,7 +10,7 @@ import useGetWithdrawPenalty from '../_hooks/get-withdraw-penalty';
 import { useTokenAllowanceAndApprove } from '../_hooks/token-allowance-and-approve';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import { useKtonBalance } from '@/hooks/useKtonBalance';
-import { toast } from 'sonner';
+import { error } from '@/components/toast';
 
 interface WithdrawEarlierProps {
   tokenId?: bigint;
@@ -78,15 +78,9 @@ const WithdrawEarlier = ({ tokenId, isOpen, onClose, symbol, onSuccess }: Withdr
         if (hash) {
           setApproveHash(hash);
         }
-      } catch (error) {
-        console.error('Error approving:', error);
-        toast.error('Something went wrong while approving', {
-          classNames: {
-            toast:
-              'flex items-center gap-[0.31rem] !bg-background  px-[0.62rem] py-[0.5rem] rounded-medium',
-            title: 'text-danger text-[0.75rem] font-normal'
-          }
-        });
+      } catch (e) {
+        console.error('Error approving:', e);
+        error('Something went wrong while approving');
       }
       return;
     }
@@ -95,15 +89,9 @@ const WithdrawEarlier = ({ tokenId, isOpen, onClose, symbol, onSuccess }: Withdr
       if (hash) {
         setWithdrawEarlierHash(hash);
       }
-    } catch (error) {
-      console.warn('Error withdrawing earlier:', error);
-      toast.error('Something went wrong while withdrawing earlier', {
-        classNames: {
-          toast:
-            'flex items-center gap-[0.31rem] !bg-background  px-[0.62rem] py-[0.5rem] rounded-medium',
-          title: 'text-danger text-[0.75rem] font-normal'
-        }
-      });
+    } catch (e) {
+      console.warn('Error withdrawing earlier:', e);
+      error('Something went wrong while withdrawing earlier');
     }
   };
 

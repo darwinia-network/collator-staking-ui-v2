@@ -28,7 +28,7 @@ import WithdrawEarlier from './withdraw-earlier';
 import { useWithdraw } from '@/view/deposit/_hooks/withdraw';
 import TransactionStatus from '@/components/transaction-status';
 import AsyncButton from '@/components/async-button';
-import { toast } from 'sonner';
+import { error } from '@/components/toast';
 
 const PAGE_SIZE = 10;
 interface DepositRecordsModalProps {
@@ -62,15 +62,9 @@ const DepositRecordsModal = ({
       try {
         const tx = await withdraw(tokenId);
         setWithdrawHash(tx);
-      } catch (error) {
-        console.warn('Error withdrawing:', error);
-        toast.error('Something went wrong while withdrawing', {
-          classNames: {
-            toast:
-              'flex items-center gap-[0.31rem] !bg-background  px-[0.62rem] py-[0.5rem] rounded-medium',
-            title: 'text-danger text-[0.75rem] font-normal'
-          }
-        });
+      } catch (e) {
+        console.warn('Error withdrawing:', e);
+        error('Something went wrong while withdrawing');
         setCurrentTokenId(undefined);
       }
     },

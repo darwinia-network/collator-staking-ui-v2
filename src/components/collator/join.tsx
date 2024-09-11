@@ -6,6 +6,8 @@ import TransactionStatus from '../transaction-status';
 import { useSetSessionKey } from './_hooks/set-session-key';
 import { useCreateCollator, useCreateAndCollator } from './_hooks/collator';
 import { validSessionKey } from '@/utils';
+import useWalletStatus from '@/hooks/useWalletStatus';
+import { useCommissionLockInfo } from './_hooks/commissionLockInfo';
 
 interface CollatorJoinProps {
   hasSessionKey: boolean;
@@ -15,6 +17,7 @@ interface CollatorJoinProps {
 }
 
 const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJoinProps) => {
+  const { address } = useWalletStatus();
   const [isValidSessionKey, setIsValidSessionKey] = useState(true);
   const [sessionKeyHash, setSessionKeyHash] = useState('');
   const [commissionHash, setCommissionHash] = useState('');
@@ -26,6 +29,10 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
   const commission = useMemo(() => {
     return commissionValue ? BigInt(commissionValue) : 0n;
   }, [commissionValue]);
+
+  const { isLockPeriod, isLockPeriodLoading, remainingLockTime } = useCommissionLockInfo(
+    address as `0x${string}`
+  );
 
   const {
     createCollator,
@@ -198,15 +205,43 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
           </div>
         </div>
 
-        <Button
-          color="primary"
-          className="h-[2.125rem] w-full"
-          isDisabled={!hasSessionKey || !commissionValue || !commissionValue || commission < 0n}
-          onClick={handleSetCommission}
-          isLoading={isSetCommissionLoading}
-        >
-          {hasPool ? 'Collate' : 'Create Nomination Pool & Collate'}
-        </Button>
+        {isLockPeriod ? (
+          <Tooltip
+            content={
+              <div className="flex max-w-[16.25rem] items-center justify-center p-2 text-[0.75rem] font-normal text-foreground/50">
+                You can perform the update commssion operation 7 days after your last set commssion.
+                You have {remainingLockTime} remaining before you can update.
+              </div>
+            }
+            closeDelay={0}
+            color="default"
+            showArrow
+          >
+            <div>
+              <Button
+                color="primary"
+                className="h-[2.125rem] w-full"
+                isDisabled={
+                  !hasSessionKey || !commissionValue || !commissionValue || commission < 0n
+                }
+                onClick={handleSetCommission}
+                isLoading={isSetCommissionLoading || isLockPeriodLoading}
+              >
+                {hasPool ? 'Collate' : 'Create Nomination Pool & Collate'}
+              </Button>
+            </div>
+          </Tooltip>
+        ) : (
+          <Button
+            color="primary"
+            className="h-[2.125rem] w-full"
+            isDisabled={!hasSessionKey || !commissionValue || !commissionValue || commission < 0n}
+            onClick={handleSetCommission}
+            isLoading={isSetCommissionLoading || isLockPeriodLoading}
+          >
+            {hasPool ? 'Collate' : 'Create Nomination Pool & Collate'}
+          </Button>
+        )}
         <TransactionStatus
           hash={sessionKeyHash as `0x${string}`}
           onSuccess={handleSetSessionKeySuccess}

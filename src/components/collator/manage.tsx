@@ -7,11 +7,10 @@ import StopCollation from './stop-collation';
 import useStop from './_hooks/stop';
 import { useSetSessionKey } from './_hooks/set-session-key';
 import useUpdateCommission from './_hooks/update-commission';
-import { useCommissionLocks } from './_hooks/commissionLocks';
 import { validSessionKey } from '@/utils';
 import { useCollatorByAddress, useCollatorSetPrev } from '@/hooks/useService';
 import { DEFAULT_PREV } from '@/utils/getPrevNew';
-
+import { useCommissionLockInfo } from './_hooks/commissionLockInfo';
 interface CollatorManagementProps {
   sessionKey: string;
   commissionOf: bigint;
@@ -60,21 +59,9 @@ const CollatorManagement = ({
     collatorSetPrev?.[0] ? collatorSetPrev?.[0]?.address : DEFAULT_PREV
   ) as `0x${string}`;
 
-  const {
-    isLockPeriod,
-    isLoading: isLockPeriodLoading,
-    lockEndTime
-  } = useCommissionLocks(address as `0x${string}`);
-
-  const remainingLockTime = useMemo(() => {
-    if (!lockEndTime) return '';
-    const now = Math.floor(Date.now() / 1000); // 转换为秒
-    const end = Number(lockEndTime);
-    const diffInSeconds = end - now;
-    const diffInDays = Math.ceil(diffInSeconds / (24 * 60 * 60));
-    const rtf = new Intl.RelativeTimeFormat('en', { style: 'short' });
-    return rtf.format(diffInDays, 'day');
-  }, [lockEndTime]);
+  const { isLockPeriod, isLockPeriodLoading, remainingLockTime } = useCommissionLockInfo(
+    address as `0x${string}`
+  );
 
   const { setSessionKey, isPending: isPendingSetSessionKey } = useSetSessionKey();
 
