@@ -10,16 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build
-        run: yarn build
-
-      - name: Prepare Project Config
-        run: |
-          mv dist build
-          mv vercel.json build/
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - uses: darwinia-network/devops/actions/smart-vercel@main
         name: Deploy to Vercel
