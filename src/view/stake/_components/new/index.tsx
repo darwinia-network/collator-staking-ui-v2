@@ -33,7 +33,7 @@ import {
   useRingStake
 } from '../../_hooks/stake';
 
-import type { Key, SelectionKeys } from '@/types/ui';
+import type { Key } from '@/types/ui';
 import useDebounceState from '@/hooks/useDebounceState';
 import { useCollatorByAddress } from '@/hooks/useService';
 import useWalletStatus from '@/hooks/useWalletStatus';
@@ -51,13 +51,11 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
   const [approvalHash, setApprovalHash] = useState<`0x${string}` | undefined>(undefined);
   const [, debouncedAmount, setAmount] = useDebounceState<string | undefined>('0');
   const [selected, setSelected] = useState<Key>(stakeTabs[0].key);
-  const [selection, setSelection] = useState<SelectionKeys>(new Set());
+  const [selectedCollatorAddress, setSelectedCollatorAddress] = useState<`0x${string}` | undefined>(
+    undefined
+  );
   const [selectCollatorOpen, setSelectCollatorOpen] = useState(false);
   const [checkedDeposits, setCheckedDeposits] = useState<DepositInfo[]>([]);
-
-  const selectedAddress = useMemo(() => {
-    return Array.from(selection)[0] as `0x${string}`;
-  }, [selection]);
 
   const {
     data: collators,
@@ -65,15 +63,15 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
     refetch: refetchCollator
   } = useCollatorByAddress({
     currentChainId: currentChainId,
-    address: selectedAddress,
-    enabled: !!selectedAddress
+    address: selectedCollatorAddress!,
+    enabled: !!selectedCollatorAddress
   });
 
   useEffect(() => {
-    if (selectedAddress) {
+    if (selectedCollatorAddress) {
       refetchCollator();
     }
-  }, [selectedAddress, refetchCollator]);
+  }, [selectedCollatorAddress, refetchCollator]);
 
   const collator = useMemo(() => {
     return collators?.[0];
@@ -112,10 +110,9 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
     setSelected(key);
   }, []);
 
-  const handleSelectionChange = useCallback((selection: SelectionKeys) => {
-    setSelection(selection);
-    const arr = Array.from(selection);
-    if (arr.length !== 0) {
+  const handleSelectionChange = useCallback((address: `0x${string}`) => {
+    setSelectedCollatorAddress(address);
+    if (address) {
       setSelectCollatorOpen(false);
     }
   }, []);
@@ -171,7 +168,7 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
 
   // isDisabled 需要根据 selected 和 amount 来决定,每一种都是不一样的
   const isDisabled = useMemo(() => {
-    if (!selectedAddress) {
+    if (!selectedCollatorAddress) {
       return true;
     }
     if (selected === 'stake-ring') {
@@ -180,7 +177,7 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
       return checkedDeposits.length === 0;
     }
     return false;
-  }, [selected, debouncedAmount, checkedDeposits, selectedAddress]);
+  }, [selected, debouncedAmount, checkedDeposits, selectedCollatorAddress]);
 
   const isPending = useMemo(() => {
     if (selected === 'stake-ring') {
@@ -224,7 +221,7 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
 
   useEffect(() => {
     if (!isOpen) {
-      setSelection(new Set());
+      setSelectedCollatorAddress(undefined);
       setAmount('0');
       setCheckedDeposits([]);
     }
@@ -259,11 +256,11 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
             >
               <div className="text-[0.75rem] font-normal text-foreground/50">Collator</div>
               <div className="flex items-center justify-between">
-                {selectedAddress ? (
+                {selectedCollatorAddress ? (
                   <div className="flex items-center gap-[0.62rem]">
-                    <Avatar address={selectedAddress} className="size-[1.625rem]" />
+                    <Avatar address={selectedCollatorAddress} className="size-[1.625rem]" />
                     <div className="text-[0.875rem] font-bold text-foreground">
-                      {toShortAddress(selectedAddress)}
+                      {toShortAddress(selectedCollatorAddress)}
                     </div>
                   </div>
                 ) : (
@@ -358,7 +355,7 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
       <SelectCollator
         isOpen={selectCollatorOpen}
         onClose={handleClose}
-        selection={selection}
+        selection={selectedCollatorAddress}
         onSelectionChange={handleSelectionChange}
       />
       <TransactionStatus

@@ -1,4 +1,4 @@
-import { Key, useCallback, useMemo, useState, useTransition } from 'react';
+import { Key, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import {
   Table,
   TableHeader,
@@ -8,21 +8,20 @@ import {
   TableCell,
   Input,
   Spinner,
-  Pagination
+  Button
 } from '@nextui-org/react';
 import { SearchIcon } from 'lucide-react';
 
 import AddressCard from '@/components/address-card';
 import type { CollatorSet } from '@/service/type';
-import type { SelectionKeys } from '@/types/ui';
 import { formatEther } from 'viem';
 import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
 import { useWaitingCollatorList } from '@/hooks/useCollatorList';
 
 interface CollatorSelectionTableProps {
   symbol: string;
-  selection: SelectionKeys;
-  onSelectionChange?: (keys: SelectionKeys) => void;
+  selection?: `0x${string}`;
+  onSelectionChange?: (address: `0x${string}`) => void;
 }
 
 const PAGE_SIZE = 10;
@@ -35,39 +34,28 @@ const CollatorSelectionTable = ({
   const [page, setPage] = useState(1);
   const [isPending, startTransition] = useTransition();
 
-  const handlePageChange = useCallback((page: number) => {
-    setPage(page);
-  }, []);
-
   const handleSearchChange = useCallback((keyword: string) => {
     startTransition(() => {
       setKeyword?.(keyword);
-      setPage(0);
+      setPage(1);
     });
   }, []);
 
   const { list, isLoading } = useWaitingCollatorList({
     enabled: true,
-    page: page - 1,
+    page,
+    searchedAddress: keyword?.toLowerCase(),
     pageSize: PAGE_SIZE
   });
+  const data = useMemo(() => {
+    return list || [];
+  }, [list]);
 
   const handleClear = useCallback(() => {
     setKeyword?.('');
   }, []);
 
-  const data = useMemo(() => {
-    if (keyword) {
-      if (!list?.length) {
-        return [];
-      }
-      const lowercaseKeyword = keyword.trim()?.toLowerCase();
-      return list.filter((collator) => collator.address.toLowerCase().includes(lowercaseKeyword));
-    }
-    return list || [];
-  }, [list, keyword]);
-
-  const renderCell = useCallback((item: CollatorSet, columnKey: Key) => {
+  const renderCell = (item: CollatorSet, columnKey: Key) => {
     const cellValue = item[columnKey as keyof CollatorSet];
 
     switch (columnKey) {
@@ -94,10 +82,14 @@ const CollatorSelectionTable = ({
       default:
         return null;
     }
-  }, []);
-  const totalPages = Math.ceil(data.length / PAGE_SIZE);
-  const paginatedData = data.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  };
 
+  useEffect(() => {
+    return () => {
+      setPage(1);
+      setKeyword('');
+    };
+  }, []);
   return (
     <div className="flex flex-col gap-5">
       <Input
@@ -121,24 +113,34 @@ const CollatorSelectionTable = ({
         selectionMode="single"
         selectionBehavior="replace"
         selectedKeys={selection}
-        onSelectionChange={onSelectionChange}
         bottomContentPlacement="outside"
         classNames={{
           wrapper: 'overflow-auto max-h-[50vh] rounded-medium  p-0 bg-secondary',
           td: 'text-foreground'
         }}
         bottomContent={
-          data.length ? (
-            <div className="flex w-full justify-end">
-              <Pagination
-                showControls
-                page={page}
-                total={totalPages}
+          page === 1 && data?.length < PAGE_SIZE ? null : (
+            <div className="flex w-full justify-end gap-2">
+              <Button
                 size="sm"
-                onChange={handlePageChange}
-              />
+                variant="flat"
+                color="default"
+                isDisabled={page === 1}
+                onPress={() => setPage((prev) => (prev > 1 ? prev - 1 : prev))}
+              >
+                Previous
+              </Button>
+              <Button
+                size="sm"
+                variant="flat"
+                color="default"
+                isDisabled={data?.length < PAGE_SIZE}
+                onPress={() => setPage((prev) => prev + 1)}
+              >
+                Next
+              </Button>
             </div>
-          ) : null
+          )
         }
         layout="fixed"
       >
@@ -162,7 +164,7 @@ const CollatorSelectionTable = ({
           </TableColumn>
         </TableHeader>
         <TableBody
-          items={paginatedData || []}
+          items={data || []}
           loadingContent={
             <div className="absolute inset-0 flex w-full items-center justify-center bg-background/50">
               <Spinner />
@@ -172,7 +174,12 @@ const CollatorSelectionTable = ({
           loadingState={isLoading || isPending ? 'loading' : 'idle'}
         >
           {(item: CollatorSet) => (
-            <TableRow key={item?.id}>
+            <TableRow
+              key={item?.id}
+              onClick={() => {
+                onSelectionChange?.(item.address as `0x${string}`);
+              }}
+            >
               {(columnKey: Key) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
             </TableRow>
           )}

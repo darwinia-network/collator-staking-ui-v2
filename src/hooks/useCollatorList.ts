@@ -40,12 +40,14 @@ export const useActiveCollatorList = ({ enabled }: { enabled: boolean }) => {
 
 export const useWaitingCollatorList = ({
   enabled,
+  searchedAddress,
   page,
   pageSize
 }: {
   enabled: boolean;
   page: number;
   pageSize: number;
+  searchedAddress?: string;
 }) => {
   const { currentChainId } = useWalletStatus();
   const {
@@ -67,6 +69,7 @@ export const useWaitingCollatorList = ({
     refetch: refetchWaitingCollators
   } = useCollatorSet({
     currentChainId,
+    searchedAddress,
     offset,
     limit: pageSize,
     enabled: !!currentChainId && !!activeCollators && enabled

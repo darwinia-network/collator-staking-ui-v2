@@ -5,13 +5,13 @@ import { selectCollatorTabs } from '@/config/tabs';
 import SelectCollatorSelectionTable from './collator-active-selection-table';
 import SelectCollatorWaitingSelectionTable from './collator-waiting-selection-table';
 import useWalletStatus from '@/hooks/useWalletStatus';
-import type { Key, SelectionKeys } from '@/types/ui';
+import type { Key } from '@/types/ui';
 
 interface CollatorSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  selection: SelectionKeys;
-  onSelectionChange: (keys: SelectionKeys) => void;
+  selection?: `0x${string}`;
+  onSelectionChange: (address: `0x${string}`) => void;
   onChangePage?: (page: number) => void;
 }
 
@@ -34,10 +34,9 @@ const CollatorSelectionModal = ({
   );
 
   const handleSelectionChange = useCallback(
-    (selection: SelectionKeys) => {
-      const arr = Array.from(selection);
-      if (arr.length) {
-        onSelectionChange(selection);
+    (id: `0x${string}`) => {
+      if (id) {
+        onSelectionChange(id);
       }
     },
     [onSelectionChange]

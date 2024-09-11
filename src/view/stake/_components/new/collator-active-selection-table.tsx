@@ -1,4 +1,4 @@
-import { Key, useCallback, useMemo, useState, useTransition } from 'react';
+import { Key, useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import {
   Table,
   TableHeader,
@@ -13,15 +13,14 @@ import { SearchIcon } from 'lucide-react';
 
 import AddressCard from '@/components/address-card';
 import type { CollatorSet } from '@/service/type';
-import type { SelectionKeys } from '@/types/ui';
 import { formatEther } from 'viem';
 import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
 import { useActiveCollatorList } from '@/hooks/useCollatorList';
 
 interface CollatorSelectionTableProps {
   symbol: string;
-  selection: SelectionKeys;
-  onSelectionChange?: (keys: SelectionKeys) => void;
+  selection?: `0x${string}`;
+  onSelectionChange?: (address: `0x${string}`) => void;
 }
 
 const CollatorSelectionTable = ({
@@ -85,6 +84,12 @@ const CollatorSelectionTable = ({
     }
   }, []);
 
+  useEffect(() => {
+    return () => {
+      setKeyword('');
+    };
+  }, []);
+
   return (
     <div className="flex flex-col gap-5">
       <Input
@@ -108,7 +113,6 @@ const CollatorSelectionTable = ({
         selectionMode="single"
         selectionBehavior="replace"
         selectedKeys={selection}
-        onSelectionChange={onSelectionChange}
         bottomContentPlacement="outside"
         classNames={{
           wrapper: 'overflow-auto max-h-[50vh] rounded-medium  p-0 bg-secondary',
@@ -146,7 +150,12 @@ const CollatorSelectionTable = ({
           loadingState={isCollatorListLoading || isPending ? 'loading' : 'idle'}
         >
           {(item: CollatorSet) => (
-            <TableRow key={item?.id}>
+            <TableRow
+              key={item?.id}
+              onClick={() => {
+                onSelectionChange?.(item.address as `0x${string}`);
+              }}
+            >
               {(columnKey: Key) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
             </TableRow>
           )}

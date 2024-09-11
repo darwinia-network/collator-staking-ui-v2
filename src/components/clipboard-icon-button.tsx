@@ -15,12 +15,17 @@ const ClipboardIconButton = ({ text = '', size = 16 }: ClipboardIconButtonProps)
   const enterTimeout = useRef<NodeJS.Timeout | undefined>();
   const leaveTimeout = useRef<NodeJS.Timeout | undefined>();
 
-  const handleCopy = useCallback(() => {
-    if (!text) return;
-    copyToClipboard(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1000);
-  }, [copyToClipboard, text]);
+  const handleCopy = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (!text) return;
+      copyToClipboard(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1000);
+    },
+    [copyToClipboard, text]
+  );
 
   useEffect(() => {
     if (state.error) {

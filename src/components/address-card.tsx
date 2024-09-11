@@ -14,7 +14,11 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
       <span className="text-[0.875rem] text-foreground" title={address}>
         {toShortAddress(address)}
       </span>
-      {copyable && <ClipboardIconButton size={16} text={address} />}
+      {copyable && (
+        <div>
+          <ClipboardIconButton size={16} text={address} />
+        </div>
+      )}
     </div>
   );
 };
