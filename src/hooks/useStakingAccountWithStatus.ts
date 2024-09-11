@@ -13,7 +13,12 @@ export type StakingAccountWithStatus = StakingAccount & {
 function useStakingAccountWithStatus() {
   const { address, currentChainId, isEnabled } = useWalletStatus();
 
-  const { data: activeCollators, refetch: refetchActiveCollators } = useActiveCollators({
+  const {
+    data: activeCollators,
+    refetch: refetchActiveCollators,
+    isLoading: isLoadingActiveCollators,
+    isRefetching: isRefetchingActiveCollators
+  } = useActiveCollators({
     enabled: isEnabled
   });
 
@@ -43,11 +48,15 @@ function useStakingAccountWithStatus() {
       const collatorAddress = account.collator.toLowerCase().trim();
       const collatorSet = collatorSetByAccounts?.[collatorAddress];
 
-      let status: CollatorStatus = 'waiting';
-      if (collatorSet?.inset === 0) {
+      let status: CollatorStatus | undefined = undefined;
+      if (isLoadingActiveCollators || isRefetchingActiveCollators) {
+        status = undefined;
+      } else if (collatorSet?.inset === 0) {
         status = 'inactive';
       } else if (activeCollatorSet.has(collatorAddress)) {
         status = 'active';
+      } else {
+        status = 'waiting';
       }
 
       return {
@@ -55,7 +64,13 @@ function useStakingAccountWithStatus() {
         status
       };
     });
-  }, [data, activeCollators, collatorSetByAccounts]);
+  }, [
+    data,
+    activeCollators,
+    collatorSetByAccounts,
+    isLoadingActiveCollators,
+    isRefetchingActiveCollators
+  ]);
 
   const refetch = useCallback(() => {
     refetchActiveCollators();

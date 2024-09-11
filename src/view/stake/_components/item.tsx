@@ -17,7 +17,7 @@ const Item = ({ item, onClick, style }: ItemProps) => {
     <div style={style}>
       <div className="flex h-[72px] w-full flex-col gap-[0.62rem] rounded-medium bg-secondary p-[0.62rem]">
         <div className="flex items-center justify-between text-[0.75rem] font-normal text-foreground/50">
-          {item?.status && <CollatorStatus status={item?.status} />}
+          {item?.status ? <CollatorStatus status={item?.status} /> : <div />}
 
           <div
             className="cursor-pointer text-foreground/50 transition-opacity hover:opacity-[--nextui-hover-opacity]"

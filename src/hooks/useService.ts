@@ -7,6 +7,8 @@ import {
 } from '@/service/services';
 import type { CollatorSetQueryParams, StakingAccountQueryParams } from '@/service/type';
 
+const toLowerCase = (value: string | undefined) => (value ? value.toLowerCase() : '');
+
 type CollatorSetParams = {
   currentChainId?: number;
   currentKey?: string;
@@ -27,7 +29,7 @@ export function useCollatorSet({
       chainId: {
         _eq: currentChainId
       },
-      ...(searchedAddress ? { address: { _eq: searchedAddress?.toLowerCase() } } : {}),
+      ...(searchedAddress ? { address: { _eq: toLowerCase(searchedAddress) } } : {}),
       inset: {
         _eq: 1
       }
@@ -81,16 +83,23 @@ export function useCollatorSetPrev({ currentChainId, key, enabled = true }: Coll
       }
       return result;
     },
-    enabled: !!currentChainId && !!key && !!enabled
+    enabled: !!currentChainId && !!key && !!enabled,
+    staleTime: 0
   });
 }
 
+type CollatorSetNewPrevParams = {
+  currentChainId?: number;
+  key?: string;
+  newKey?: string;
+  enabled?: boolean;
+};
 export function useCollatorSetNewPrev({
   currentChainId,
   key,
   newKey,
   enabled = true
-}: CollatorSetParams & { key: string; newKey: string }) {
+}: CollatorSetNewPrevParams) {
   const params: CollatorSetQueryParams = {
     where: {
       chainId: {
@@ -123,7 +132,8 @@ export function useCollatorSetNewPrev({
       }
       return result;
     },
-    enabled: !!currentChainId && !!key && !!newKey && !!enabled
+    enabled: !!currentChainId && !!key && !!newKey && !!enabled,
+    staleTime: 0
   });
 }
 
@@ -142,7 +152,7 @@ export function useCollatorByAddress({
       chainId: {
         _eq: currentChainId
       },
-      ...(address ? { address: { _eq: address?.toLowerCase() } } : {}),
+      ...(address ? { address: { _eq: toLowerCase(address) } } : {}),
       inset: {
         _eq: 1
       }
@@ -159,7 +169,8 @@ export function useCollatorByAddress({
       }
       return result;
     },
-    enabled: !!currentChainId && !!address && !!enabled
+    enabled: !!currentChainId && !!address && !!enabled,
+    staleTime: 0
   });
 }
 
@@ -179,7 +190,7 @@ export function useCollatorSetByAccounts({
         _eq: currentChainId
       },
       id: {
-        _in: accounts?.map((account) => account?.toLowerCase())
+        _in: accounts?.map((account) => toLowerCase(account))
       }
     },
     orderBy: [{ key: 'asc' }]
@@ -205,7 +216,7 @@ export function useStakingAccount({ address, currentChainId }: StakingAccountPar
   const params: StakingAccountQueryParams = {
     where: {
       account: {
-        _eq: address?.toLowerCase()
+        _eq: toLowerCase(address)
       },
       chainId: {
         _eq: currentChainId

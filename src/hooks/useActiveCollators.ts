@@ -8,7 +8,9 @@ const useActiveCollators = ({ enabled }: { enabled: boolean }) => {
     functionName: 'getActiveCollators',
     args: [],
     query: {
-      enabled
+      enabled,
+      refetchOnMount: true,
+      staleTime: 0
     }
   });
 

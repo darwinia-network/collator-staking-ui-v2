@@ -21,14 +21,12 @@ const { wallets } = getDefaultWallets();
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60 * 1_000
+      staleTime: 5 * 1_000
     }
   }
 });
 
 export async function fetchBlockData() {
-  console.log('config.state.chainId', config.state.chainId);
-
   return queryClient.fetchQuery(
     getBlockQueryOptions(config, {
       chainId: config.state.chainId

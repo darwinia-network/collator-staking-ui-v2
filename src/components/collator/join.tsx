@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { Button, Tooltip } from '@nextui-org/react';
 import { CircleHelp } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import TransactionStatus from '../transaction-status';
 import { useSetSessionKey } from './_hooks/set-session-key';
 import { useCreateCollator, useCreateAndCollator } from './_hooks/collator';
@@ -22,18 +22,24 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
   const [commissionValue, setCommissionValue] = useState('');
 
   const { setSessionKey, isPending: isPendingSetSessionKey } = useSetSessionKey();
+
+  const commission = useMemo(() => {
+    return commissionValue ? BigInt(commissionValue) : 0n;
+  }, [commissionValue]);
+
   const {
     createCollator,
     isPending: isPendingCreateCollator,
     isLoading: isLoadingCreateCollator
   } = useCreateCollator({
-    commission: commissionValue ? BigInt(commissionValue) : 0n
+    commission,
+    enabled: !!hasPool
   });
   const {
     createAndCollator,
     isPending: isPendingCreateAndCollator,
     isLoading: isLoadingCreateAndCollator
-  } = useCreateAndCollator();
+  } = useCreateAndCollator({ enabled: !hasPool });
 
   const handleChangeSessionKeyValue = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setIsValidSessionKey(true);
@@ -72,20 +78,20 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
   const handleSetCommission = useCallback(async () => {
     if (hasPool) {
       const tx = await createCollator({
-        commission: BigInt(commissionValue)
+        commission
       });
       if (tx) {
         setCommissionHash(tx);
       }
     } else {
       const tx = await createAndCollator({
-        commission: BigInt(commissionValue)
+        commission
       });
       if (tx) {
         setCommissionHash(tx);
       }
     }
-  }, [hasPool, commissionValue, createCollator, createAndCollator]);
+  }, [hasPool, commission, createCollator, createAndCollator]);
 
   const handleSetCommissionSuccess = useCallback(() => {
     setCommissionHash('');
@@ -95,6 +101,19 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
   const handleSetCommissionError = useCallback(() => {
     setCommissionHash('');
   }, []);
+
+  const isSetCommissionLoading = useMemo(() => {
+    if (hasPool) {
+      return isLoadingCreateCollator || isPendingCreateCollator;
+    }
+    return isLoadingCreateAndCollator || isPendingCreateAndCollator;
+  }, [
+    isLoadingCreateCollator,
+    isLoadingCreateAndCollator,
+    hasPool,
+    isPendingCreateCollator,
+    isPendingCreateAndCollator
+  ]);
 
   useEffect(() => {
     return () => {
@@ -182,14 +201,9 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
         <Button
           color="primary"
           className="h-[2.125rem] w-full"
-          isDisabled={!hasSessionKey || !commissionValue || !commissionValue}
+          isDisabled={!hasSessionKey || !commissionValue || !commissionValue || commission < 0n}
           onClick={handleSetCommission}
-          isLoading={
-            isPendingCreateCollator ||
-            isPendingCreateAndCollator ||
-            isLoadingCreateCollator ||
-            isLoadingCreateAndCollator
-          }
+          isLoading={isSetCommissionLoading}
         >
           {hasPool ? 'Collate' : 'Create Nomination Pool & Collate'}
         </Button>

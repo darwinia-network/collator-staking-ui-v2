@@ -8,8 +8,9 @@
  * @param {string} address - The address to be shortened.
  * @returns {string} The shortened address or the original address if it's not longer than 16 characters.
  */
-export function toShortAddress(address: string) {
-  return address.length > 16 ? `${address.slice(0, 6)}...${address.slice(-4)}` : address;
+export function toShortAddress(address?: string) {
+  if (!address) return '';
+  return address?.length > 16 ? `${address?.slice(0, 6)}...${address?.slice(-4)}` : address;
 }
 
 type GenKeyParams = {

@@ -34,7 +34,9 @@ export function useUserDepositDetails({ enabled = true }: UseUserDepositDetailsP
     args: [account as `0x${string}`],
     query: {
       enabled: !!account && enabled,
-      refetchOnWindowFocus: false
+      refetchOnWindowFocus: false,
+      refetchOnMount: true,
+      staleTime: 0
     }
   });
 
@@ -53,7 +55,9 @@ export function useUserDepositDetails({ enabled = true }: UseUserDepositDetailsP
     })),
     query: {
       enabled: balanceNumber > 0,
-      refetchOnWindowFocus: false
+      refetchOnWindowFocus: false,
+      refetchOnMount: true,
+      staleTime: 0
     }
   });
 
@@ -91,7 +95,9 @@ export function useUserDepositDetails({ enabled = true }: UseUserDepositDetailsP
       .flat(),
     query: {
       enabled: validTokenIds.length > 0,
-      refetchOnWindowFocus: false
+      refetchOnWindowFocus: false,
+      refetchOnMount: true,
+      staleTime: 0
     }
   });
 

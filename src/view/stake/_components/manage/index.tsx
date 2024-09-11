@@ -45,11 +45,12 @@ const StakeManagementModal = ({
   const {
     data: collators,
     isLoading: isCollatorLoading,
+    isRefetching: isCollatorRefetching,
     refetch: refetchCollator
   } = useCollatorByAddress({
     currentChainId: currentChainId,
     address: collatorAddress,
-    enabled: !!collatorAddress
+    enabled: !!collatorAddress && isOpen
   });
 
   const collator = useMemo(() => {
@@ -202,7 +203,7 @@ const StakeManagementModal = ({
           </ModalHeader>
           <Divider />
           <ModalBody className="relative flex w-full flex-col items-center justify-center gap-5 px-0 py-5">
-            {(isLoading || isCollatorLoading) && (
+            {(isLoading || isCollatorLoading || isCollatorRefetching) && (
               <div className="absolute inset-0 flex items-center justify-center bg-background/50">
                 <Spinner />
               </div>
@@ -212,7 +213,7 @@ const StakeManagementModal = ({
               <div className="flex flex-col gap-[0.62rem] rounded-medium bg-secondary p-[0.62rem] hover:opacity-[var(--nextui-opacity-hover)]">
                 <p className="m-0 text-[0.875rem] text-foreground/50">Collator</p>
                 <div className="flex items-center justify-between">
-                  <AddressCard address={collator?.address as `0x${string}`} copyable={false} />
+                  <AddressCard address={collatorAddress as `0x${string}`} copyable={false} />
                 </div>
               </div>
 

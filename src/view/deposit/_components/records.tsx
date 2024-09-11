@@ -50,10 +50,9 @@ const DepositRecordsModal = ({
   const {
     depositList,
     isLoading: isDepositListLoading,
-    deleteDepositInfoByTokenId,
-    refetch: refetchDepositList
+    deleteDepositInfoByTokenId
   } = useUserDepositDetails({
-    enabled: false
+    enabled: isOpen
   });
   const { withdraw } = useWithdraw();
 
@@ -184,12 +183,10 @@ const DepositRecordsModal = ({
   const paginatedData = depositList?.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   useEffect(() => {
-    if (isOpen) {
-      refetchDepositList();
-    } else {
+    if (!isOpen) {
       setPage(1);
     }
-  }, [isOpen, refetchDepositList]);
+  }, [isOpen]);
 
   return (
     <>

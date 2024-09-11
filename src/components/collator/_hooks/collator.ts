@@ -9,7 +9,7 @@ import { useReadContract, useWriteContract } from 'wagmi';
 type CreateAndCollatorProps = {
   commission: bigint;
 };
-export const useCreateAndCollator = () => {
+export const useCreateAndCollator = ({ enabled }: { enabled: boolean }) => {
   const { writeContractAsync, ...rest } = useWriteContract();
   const { currentChainId, address } = useWalletStatus();
   const oldKey = genKey({ address: address as `0x${string}`, votes: 0n });
@@ -20,7 +20,7 @@ export const useCreateAndCollator = () => {
   } = useCollatorSetPrev({
     key: oldKey,
     currentChainId,
-    enabled: !!oldKey
+    enabled: !!oldKey && enabled
   });
 
   const prev = (
@@ -48,7 +48,13 @@ export const useCreateAndCollator = () => {
 
 export default useCreateAndCollator;
 
-export const useCreateCollator = ({ commission }: { commission: bigint }) => {
+export const useCreateCollator = ({
+  commission,
+  enabled
+}: {
+  commission: bigint;
+  enabled: boolean;
+}) => {
   const { address, currentChainId } = useWalletStatus();
   const {
     data: stakedOf,
@@ -58,7 +64,10 @@ export const useCreateCollator = ({ commission }: { commission: bigint }) => {
     abi: hubAbi,
     address: hubAddress,
     functionName: 'stakedOf',
-    args: [address as `0x${string}`]
+    args: [address as `0x${string}`],
+    query: {
+      enabled: !!address && enabled
+    }
   });
 
   const {
@@ -71,10 +80,12 @@ export const useCreateCollator = ({ commission }: { commission: bigint }) => {
     functionName: 'assetsToVotes',
     args: [stakedOf ?? 0n, commission],
     query: {
-      enabled: !!commission && !!stakedOf
+      enabled: !!commission && !!stakedOf && enabled
     }
   });
+
   const { writeContractAsync, ...rest } = useWriteContract();
+
   const oldKey = genKey({ address: address as `0x${string}`, votes: votes ?? 0n });
 
   const {
@@ -84,7 +95,7 @@ export const useCreateCollator = ({ commission }: { commission: bigint }) => {
   } = useCollatorSetPrev({
     key: oldKey,
     currentChainId,
-    enabled: !!oldKey
+    enabled: !!oldKey && enabled
   });
 
   const prev = (

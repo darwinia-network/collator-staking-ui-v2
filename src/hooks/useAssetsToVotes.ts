@@ -18,7 +18,8 @@ function useAssetsToVotes({ commission, totalAmount, inputAmount, operation }: A
     functionName: 'assetsToVotes',
     args: [commission, calculateAssets(totalAmount, inputAmount, operation)],
     query: {
-      enabled: !!commission && !isNil(totalAmount) && !isNil(inputAmount)
+      enabled: !isNil(totalAmount) && !isNil(inputAmount),
+      staleTime: 0
     }
   });
 

@@ -17,7 +17,6 @@ export interface MobileControlsProps {
 }
 
 const MobileControls = forwardRef<MobileControlsProps, unknown>((props, ref) => {
-  console.log('MobileControls', props);
   const {
     isConnected,
     address,

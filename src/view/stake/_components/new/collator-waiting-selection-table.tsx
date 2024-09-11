@@ -17,6 +17,7 @@ import type { CollatorSet } from '@/service/type';
 import { formatEther } from 'viem';
 import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
 import { useWaitingCollatorList } from '@/hooks/useCollatorList';
+import useDebounceState from '@/hooks/useDebounceState';
 
 interface CollatorSelectionTableProps {
   symbol: string;
@@ -30,30 +31,34 @@ const CollatorSelectionTable = ({
   selection,
   onSelectionChange
 }: CollatorSelectionTableProps) => {
-  const [keyword, setKeyword] = useState('');
+  const [keyword, debouncedKeyword, setKeyword] = useDebounceState('');
   const [page, setPage] = useState(1);
   const [isPending, startTransition] = useTransition();
 
-  const handleSearchChange = useCallback((keyword: string) => {
-    startTransition(() => {
-      setKeyword?.(keyword);
-      setPage(1);
-    });
-  }, []);
+  const handleSearchChange = useCallback(
+    (keyword: string) => {
+      startTransition(() => {
+        setKeyword?.(keyword);
+        setPage(1);
+      });
+    },
+    [setKeyword, setPage]
+  );
 
   const { list, isLoading } = useWaitingCollatorList({
     enabled: true,
     page,
-    searchedAddress: keyword?.toLowerCase(),
+    searchedAddress: debouncedKeyword?.toLowerCase(),
     pageSize: PAGE_SIZE
   });
+
   const data = useMemo(() => {
     return list || [];
   }, [list]);
 
   const handleClear = useCallback(() => {
     setKeyword?.('');
-  }, []);
+  }, [setKeyword]);
 
   const renderCell = (item: CollatorSet, columnKey: Key) => {
     const cellValue = item[columnKey as keyof CollatorSet];
@@ -89,7 +94,8 @@ const CollatorSelectionTable = ({
       setPage(1);
       setKeyword('');
     };
-  }, []);
+  }, [setKeyword]);
+
   return (
     <div className="flex flex-col gap-5">
       <Input

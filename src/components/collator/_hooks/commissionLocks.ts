@@ -17,9 +17,6 @@ export const useCommissionLocks = (address: `0x${string}`) => {
     const locked = result?.data ?? 0n;
     const now = BigInt(Math.floor(Date.now() / 1000));
 
-    console.log('locked', locked);
-    console.log('now', now);
-
     return locked > now;
   }, [result.data]);
 

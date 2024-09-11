@@ -29,7 +29,9 @@ export const useStakedDepositsOf = ({ account }: StakedDepositsOfProps) => {
     functionName: 'stakedDepositsOf',
     args: [account as `0x${string}`],
     query: {
-      enabled: !!account
+      enabled: !!account,
+      refetchOnMount: true,
+      staleTime: 0
     }
   });
 
@@ -145,7 +147,12 @@ export const useStaked = ({ collatorAddress }: StakedProps) => {
         functionName: 'stakingLocks',
         args: [collatorAddress, account as `0x${string}`]
       }
-    ]
+    ],
+    query: {
+      enabled: !!account && !!collatorAddress,
+      refetchOnMount: true,
+      staleTime: 0
+    }
   });
   const refetch = useCallback(() => {
     refetchStakedDeposits();
