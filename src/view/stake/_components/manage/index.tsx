@@ -200,7 +200,13 @@ const StakeManagementModal = ({
             Manage Stake
           </ModalHeader>
           <Divider />
-          <ModalBody className="relative flex w-full flex-col items-center justify-center gap-5 px-0 py-5">
+          <ModalBody
+            className="relative flex w-full flex-col items-center justify-center gap-5 px-0 py-5"
+            style={{
+              pointerEvents:
+                isLoading || isCollatorLoading || isCollatorRefetching ? 'none' : 'auto'
+            }}
+          >
             {(isLoading || isCollatorLoading || isCollatorRefetching) && (
               <div className="absolute inset-0 flex items-center justify-center bg-background/50">
                 <Spinner />

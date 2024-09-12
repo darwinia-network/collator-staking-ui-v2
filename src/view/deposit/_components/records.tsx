@@ -214,7 +214,8 @@ const DepositRecordsModal = ({
               color="primary"
               layout="fixed"
               classNames={{
-                wrapper: 'overflow-auto max-h-[50vh] rounded-medium  p-0 bg-secondary',
+                wrapper:
+                  'overflow-auto max-h-[50vh] rounded-medium  p-0 shadow-none bg-background dark:bg-secondary',
                 td: 'text-foreground'
               }}
               bottomContentPlacement="outside"
