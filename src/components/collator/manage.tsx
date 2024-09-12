@@ -86,6 +86,9 @@ const CollatorManagement = ({
   }, []);
 
   const handleCommissionBlur = useCallback(() => {
+    if (!commissionValue) {
+      return;
+    }
     const commission = Number(commissionValue);
     setCommissionValue(Math.min(Math.max(commission, 0), 100).toString());
   }, [commissionValue]);
