@@ -221,9 +221,7 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
               <Button
                 color="primary"
                 className="h-[2.125rem] w-full"
-                isDisabled={
-                  !hasSessionKey || !commissionValue || !commissionValue || commission < 0n
-                }
+                isDisabled={!hasSessionKey || !commissionValue || commission < 0n}
                 onClick={handleSetCommission}
                 isLoading={isSetCommissionLoading || isLockPeriodLoading}
               >
@@ -235,7 +233,7 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
           <Button
             color="primary"
             className="h-[2.125rem] w-full"
-            isDisabled={!hasSessionKey || !commissionValue || !commissionValue || commission < 0n}
+            isDisabled={!hasSessionKey || !commissionValue || commission < 0n}
             onClick={handleSetCommission}
             isLoading={isSetCommissionLoading || isLockPeriodLoading}
           >
