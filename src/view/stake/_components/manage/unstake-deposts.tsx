@@ -8,6 +8,7 @@ import UnstakeDepositList, { DepositListRef } from '@/components/unstake-deposit
 import TransactionStatus from '@/components/transaction-status';
 import { useUnstakeDeposits } from '../../_hooks/unstake';
 import { CollatorSet } from '@/service/type';
+import { error } from '@/components/toast';
 
 interface EditStakeProps {
   isOpen: boolean;
@@ -29,7 +30,9 @@ const UnstakeDeposits = ({ isOpen, collator, deposits, onClose, onOk }: EditStak
   });
 
   const handleUnstakeStart = useCallback(async () => {
-    const tx = await unstakeDeposits();
+    const tx = await unstakeDeposits()?.catch((e) => {
+      error(e.shortMessage);
+    });
     if (tx) {
       setHash(tx);
     }

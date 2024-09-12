@@ -8,6 +8,7 @@ import type { CollatorSet } from '@/service/type';
 import { parseEther } from 'viem';
 import TransactionStatus from '@/components/transaction-status';
 import useDebounceState from '@/hooks/useDebounceState';
+import { error } from '@/components/toast';
 
 interface StakeMoreProps {
   isOpen: boolean;
@@ -28,7 +29,9 @@ const StakeMore = ({ isOpen, onClose, collator, onOk }: StakeMoreProps) => {
   });
 
   const handleStakeMore = useCallback(async () => {
-    const hash = await handleStake();
+    const hash = await handleStake()?.catch((e) => {
+      error(e.shortMessage);
+    });
     if (hash) {
       setHash(hash);
     }

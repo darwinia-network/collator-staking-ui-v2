@@ -11,6 +11,7 @@ import { useTokenAllowanceAndApprove } from '../_hooks/token-allowance-and-appro
 import useWalletStatus from '@/hooks/useWalletStatus';
 import { useKtonBalance } from '@/hooks/useKtonBalance';
 import { error } from '@/components/toast';
+import type { BaseError } from 'wagmi';
 
 interface WithdrawEarlierProps {
   tokenId?: bigint;
@@ -74,13 +75,14 @@ const WithdrawEarlier = ({ tokenId, isOpen, onClose, symbol, onSuccess }: Withdr
     if (!tokenId) return;
     if (needApprove) {
       try {
-        const hash = await handleApprove();
+        const hash = await handleApprove()?.catch((e) => {
+          error(e.shortMessage);
+        });
         if (hash) {
           setApproveHash(hash);
         }
       } catch (e) {
-        console.error('Error approving:', e);
-        error('Something went wrong while approving');
+        error((e as BaseError).shortMessage);
       }
       return;
     }
@@ -90,8 +92,7 @@ const WithdrawEarlier = ({ tokenId, isOpen, onClose, symbol, onSuccess }: Withdr
         setWithdrawEarlierHash(hash);
       }
     } catch (e) {
-      console.warn('Error withdrawing earlier:', e);
-      error('Something went wrong while withdrawing earlier');
+      error((e as BaseError).shortMessage);
     }
   };
 

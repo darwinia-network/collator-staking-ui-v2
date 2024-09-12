@@ -11,6 +11,7 @@ import { validSessionKey } from '@/utils';
 import { useCollatorByAddress, useCollatorSetPrev } from '@/hooks/useService';
 import { DEFAULT_PREV } from '@/utils/getPrevNew';
 import { useCommissionLockInfo } from './_hooks/commissionLockInfo';
+import { error } from '../toast';
 interface CollatorManagementProps {
   sessionKey: string;
   commissionOf: bigint;
@@ -99,7 +100,9 @@ const CollatorManagement = ({
 
   const handleSetSessionKey = useCallback(async () => {
     if (validSessionKey(sessionKeyValue)) {
-      const tx = await setSessionKey(sessionKeyValue);
+      const tx = await setSessionKey(sessionKeyValue)?.catch((e) => {
+        error(e.shortMessage);
+      });
       if (tx) {
         setSessionKeyHash(tx);
       }
@@ -119,7 +122,9 @@ const CollatorManagement = ({
   }, []);
 
   const handleSetCommission = useCallback(async () => {
-    const tx = await updateCommission();
+    const tx = await updateCommission()?.catch((e) => {
+      error(e.shortMessage);
+    });
     if (tx) {
       setCommissionHash(tx);
     }
@@ -134,7 +139,9 @@ const CollatorManagement = ({
   }, []);
 
   const handleStop = useCallback(async () => {
-    const tx = await stop({ address: oldPrev });
+    const tx = await stop({ address: oldPrev })?.catch((e) => {
+      error(e.shortMessage);
+    });
     if (tx) {
       setStopHash(tx);
     }

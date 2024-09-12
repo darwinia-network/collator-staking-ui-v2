@@ -8,6 +8,7 @@ import { abi as rewardAbi } from '@/config/abi/reward';
 import { ClaimableReward } from './item';
 import useClaim from '../_hooks/cliam';
 import ClaimList from './list';
+import { error } from '@/components/toast';
 
 const Claim = () => {
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
@@ -44,7 +45,9 @@ const Claim = () => {
 
   const handleClick = useCallback(
     async (item: StakingAccountWithStatus) => {
-      const tx = await claim(item?.collator as `0x${string}`);
+      const tx = await claim(item?.collator as `0x${string}`)?.catch((e) => {
+        error(e.shortMessage);
+      });
       if (tx) {
         setHash(tx);
       }

@@ -7,6 +7,7 @@ import { parseEther } from 'viem';
 import { useUnstakeRING } from '../../_hooks/unstake';
 import { CollatorSet } from '@/service/type';
 import useDebounceState from '@/hooks/useDebounceState';
+import { error } from '@/components/toast';
 
 interface EditStakeProps {
   isOpen: boolean;
@@ -41,7 +42,9 @@ const Unstake = ({
   );
 
   const handleUnstake = useCallback(async () => {
-    const tx = await unstakeRING();
+    const tx = await unstakeRING()?.catch((e) => {
+      error(e.shortMessage);
+    });
     if (tx) {
       setHash(tx);
     }

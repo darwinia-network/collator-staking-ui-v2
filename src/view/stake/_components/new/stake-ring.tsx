@@ -9,6 +9,7 @@ import TransactionStatus from '@/components/transaction-status';
 import useDebounceState from '@/hooks/useDebounceState';
 import { useRingStake } from '../../_hooks/stake';
 import type { CollatorSet } from '@/service/type';
+import { error } from '@/components/toast';
 
 interface StakeRingProps {
   selectedCollator?: CollatorSet;
@@ -53,7 +54,9 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
   });
 
   const handleStake = useCallback(async () => {
-    const tx = await handleRingStake();
+    const tx = await handleRingStake()?.catch((e) => {
+      error(e.shortMessage);
+    });
     if (tx) {
       setHash(tx);
     }

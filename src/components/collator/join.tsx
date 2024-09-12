@@ -8,6 +8,7 @@ import { useCreateCollator, useCreateAndCollator } from './_hooks/collator';
 import { validSessionKey } from '@/utils';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import { useCommissionLockInfo } from './_hooks/commissionLockInfo';
+import { error } from '../toast';
 
 interface CollatorJoinProps {
   hasSessionKey: boolean;
@@ -64,7 +65,9 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
 
   const handleSetSessionKey = useCallback(async () => {
     if (validSessionKey(sessionKeyValue)) {
-      const tx = await setSessionKey(sessionKeyValue);
+      const tx = await setSessionKey(sessionKeyValue)?.catch((e) => {
+        error(e.shortMessage);
+      });
       if (tx) {
         setSessionKeyHash(tx);
       }
@@ -86,6 +89,8 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
     if (hasPool) {
       const tx = await createCollator({
         commission
+      })?.catch((e) => {
+        error(e.shortMessage);
       });
       if (tx) {
         setCommissionHash(tx);
@@ -93,6 +98,8 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
     } else {
       const tx = await createAndCollator({
         commission
+      })?.catch((e) => {
+        error(e.shortMessage);
       });
       if (tx) {
         setCommissionHash(tx);

@@ -9,6 +9,7 @@ import Rewards from './rewards';
 import DepositRecordsModal from './records';
 import useComputeInterest from '../_hooks/compute-interest';
 import useDeposit from '../_hooks/deposit';
+import { error } from '@/components/toast';
 
 import type { SharedSelection } from '@nextui-org/react';
 
@@ -40,8 +41,12 @@ const Deposit = () => {
     const hash = await handleDeposit({
       months: selectedMonthPeriod?.currentKey,
       value: debounceAmount
+    })?.catch((e) => {
+      error(e.shortMessage);
     });
-    setHash(hash);
+    if (hash) {
+      setHash(hash);
+    }
   }, [handleDeposit, selectedMonthPeriod, debounceAmount]);
 
   const handleCloseTransactionStatus = useCallback(() => {

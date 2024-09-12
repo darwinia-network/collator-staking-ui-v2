@@ -60,8 +60,12 @@ const DepositRecordsModal = ({
     async (tokenId: bigint) => {
       setCurrentTokenId(tokenId);
       try {
-        const tx = await withdraw(tokenId);
-        setWithdrawHash(tx);
+        const tx = await withdraw(tokenId)?.catch((e) => {
+          error(e.shortMessage);
+        });
+        if (tx) {
+          setWithdrawHash(tx);
+        }
       } catch (e) {
         console.warn('Error withdrawing:', e);
         error('Something went wrong while withdrawing');

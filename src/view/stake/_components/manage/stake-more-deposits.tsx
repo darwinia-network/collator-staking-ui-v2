@@ -7,6 +7,7 @@ import { DepositInfo } from '@/hooks/useUserDepositDetails';
 import { useApprovalForAll, useDepositStake, useIsApprovedForAll } from '../../_hooks/stake';
 import { CollatorSet } from '@/service/type';
 import TransactionStatus from '@/components/transaction-status';
+import { error } from '@/components/toast';
 
 interface EditStakeProps {
   isOpen: boolean;
@@ -39,7 +40,9 @@ const StakeMoreDeposits = ({ isOpen, collator, onClose, onOk }: EditStakeProps) 
   });
 
   const handleDepositApproval = useCallback(async () => {
-    const tx = await handleApprovalForAll();
+    const tx = await handleApprovalForAll()?.catch((e) => {
+      error(e.shortMessage);
+    });
     if (tx) {
       setApprovalHash(tx);
     }
@@ -47,7 +50,9 @@ const StakeMoreDeposits = ({ isOpen, collator, onClose, onOk }: EditStakeProps) 
 
   const handleDepositStakeStart = useCallback(async () => {
     await refetchIsApprovedForAll();
-    const tx = await handleDepositStake();
+    const tx = await handleDepositStake()?.catch((e) => {
+      error(e.shortMessage);
+    });
     if (tx) {
       setApprovalHash(undefined);
       setHash(tx);

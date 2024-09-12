@@ -6,6 +6,7 @@ import TransactionStatus from '@/components/transaction-status';
 import { useApprovalForAll, useDepositStake, useIsApprovedForAll } from '../../_hooks/stake';
 import type { CollatorSet } from '@/service/type';
 import type { DepositInfo } from '@/hooks/useUserDepositDetails';
+import { error } from '@/components/toast';
 
 interface StakeDepositProps {
   selectedCollator?: CollatorSet;
@@ -38,12 +39,16 @@ const StakeDeposit = ({ selectedCollator, onSuccess }: StakeDepositProps) => {
 
   const handleStake = useCallback(async () => {
     if (!isApprovedForAll) {
-      const tx = await handleApprovalForAll();
+      const tx = await handleApprovalForAll()?.catch((e) => {
+        error(e.shortMessage);
+      });
       if (tx) {
         setApprovalHash(tx);
       }
     } else {
-      const tx = await handleDepositStake();
+      const tx = await handleDepositStake()?.catch((e) => {
+        error(e.shortMessage);
+      });
       if (tx) {
         setHash(tx);
       }
@@ -52,7 +57,9 @@ const StakeDeposit = ({ selectedCollator, onSuccess }: StakeDepositProps) => {
 
   const handleApprovalTransactionSuccess = useCallback(async () => {
     refetchIsApprovedForAll();
-    const tx = await handleDepositStake();
+    const tx = await handleDepositStake()?.catch((e) => {
+      error(e.shortMessage);
+    });
     if (tx) {
       setApprovalHash(undefined);
       setHash(tx);
