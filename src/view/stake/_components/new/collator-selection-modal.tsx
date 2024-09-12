@@ -6,20 +6,21 @@ import SelectCollatorSelectionTable from './collator-active-selection-table';
 import SelectCollatorWaitingSelectionTable from './collator-waiting-selection-table';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import type { Key } from '@/types/ui';
+import type { CollatorSet } from '@/service/type';
 
 interface CollatorSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  selection?: `0x${string}`;
-  onSelectionChange: (address: `0x${string}`) => void;
+  selectedCollator?: CollatorSet;
+  onSelectCollatorChange: (collator: CollatorSet) => void;
   onChangePage?: (page: number) => void;
 }
 
 const CollatorSelectionModal = ({
   isOpen,
   onClose,
-  selection,
-  onSelectionChange,
+  selectedCollator,
+  onSelectCollatorChange,
   onChangePage
 }: CollatorSelectionModalProps) => {
   const { currentChain } = useWalletStatus();
@@ -33,13 +34,13 @@ const CollatorSelectionModal = ({
     [onChangePage]
   );
 
-  const handleSelectionChange = useCallback(
-    (id: `0x${string}`) => {
-      if (id) {
-        onSelectionChange(id);
+  const handleSelectCollatorChange = useCallback(
+    (collator: CollatorSet) => {
+      if (collator) {
+        onSelectCollatorChange(collator);
       }
     },
-    [onSelectionChange]
+    [onSelectCollatorChange]
   );
 
   return (
@@ -86,14 +87,14 @@ const CollatorSelectionModal = ({
             {selected === 'active-pool' ? (
               <SelectCollatorSelectionTable
                 symbol={currentChain?.nativeCurrency?.symbol || 'RING'}
-                selection={selection}
-                onSelectionChange={handleSelectionChange}
+                selectedCollator={selectedCollator}
+                onSelectCollatorChange={handleSelectCollatorChange}
               />
             ) : (
               <SelectCollatorWaitingSelectionTable
                 symbol={currentChain?.nativeCurrency?.symbol || 'RING'}
-                selection={selection}
-                onSelectionChange={handleSelectionChange}
+                selectedCollator={selectedCollator}
+                onSelectCollatorChange={handleSelectCollatorChange}
               />
             )}
           </ModalBody>

@@ -19,14 +19,14 @@ import { useActiveCollatorList } from '@/hooks/useCollatorList';
 
 interface CollatorSelectionTableProps {
   symbol: string;
-  selection?: `0x${string}`;
-  onSelectionChange?: (address: `0x${string}`) => void;
+  selectedCollator?: CollatorSet;
+  onSelectCollatorChange?: (collator: CollatorSet) => void;
 }
 
 const CollatorSelectionTable = ({
   symbol,
-  selection,
-  onSelectionChange
+  selectedCollator,
+  onSelectCollatorChange
 }: CollatorSelectionTableProps) => {
   const [keyword, setKeyword] = useState('');
   const [isPending, startTransition] = useTransition();
@@ -112,7 +112,7 @@ const CollatorSelectionTable = ({
         color="primary"
         selectionMode="single"
         selectionBehavior="replace"
-        selectedKeys={selection}
+        selectedKeys={selectedCollator?.address}
         bottomContentPlacement="outside"
         classNames={{
           wrapper: 'overflow-auto max-h-[50vh] rounded-medium  p-0 bg-secondary',
@@ -153,7 +153,7 @@ const CollatorSelectionTable = ({
             <TableRow
               key={item?.id}
               onClick={() => {
-                onSelectionChange?.(item.address as `0x${string}`);
+                onSelectCollatorChange?.(item);
               }}
             >
               {(columnKey: Key) => <TableCell>{renderCell(item, columnKey)}</TableCell>}

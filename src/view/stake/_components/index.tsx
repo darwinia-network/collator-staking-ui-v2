@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@nextui-org/react';
 import useStakingAccountWithStatus from '@/hooks/useStakingAccountWithStatus';
 import useWalletStatus from '@/hooks/useWalletStatus';
@@ -10,6 +10,7 @@ import type { StakingAccountWithStatus } from '@/hooks/useStakingAccountWithStat
 
 const StakePage = () => {
   const { currentChain, isEnabled } = useWalletStatus();
+  const refetchTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [current, setCurrent] = useState<StakingAccountWithStatus | null>(null);
   const [isNewStakeOpen, setIsNewStakeOpen] = useState(false);
   const [isEditStakeOpen, setIsEditStakeOpen] = useState(false);
@@ -19,6 +20,17 @@ const StakePage = () => {
     isLoading: isStakingAccountLoading,
     refetch: refetchStakingAccount
   } = useStakingAccountWithStatus();
+
+  //   // Use a timer to prevent issues with delayed indexing of stakingAccount data
+  const handleRefetchStakingAccount = useCallback(() => {
+    if (refetchTimerRef.current) {
+      clearTimeout(refetchTimerRef.current);
+    }
+    refetchTimerRef.current = setTimeout(() => {
+      refetchStakingAccount();
+      refetchTimerRef.current = null;
+    }, 1000);
+  }, [refetchStakingAccount]);
 
   const handleCloseNewStake = useCallback(() => {
     setIsNewStakeOpen(false);
@@ -31,6 +43,14 @@ const StakePage = () => {
   const handleClick = useCallback((item: StakingAccountWithStatus) => {
     setCurrent(item);
     setIsEditStakeOpen(true);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (refetchTimerRef.current) {
+        clearTimeout(refetchTimerRef.current);
+      }
+    };
   }, []);
 
   return (
@@ -56,7 +76,7 @@ const StakePage = () => {
       <NewStake
         isOpen={isNewStakeOpen}
         onClose={handleCloseNewStake}
-        onSuccess={refetchStakingAccount}
+        onSuccess={handleRefetchStakingAccount}
       />
       {current?.collator && (
         <StakeManagementModal
@@ -64,7 +84,7 @@ const StakePage = () => {
           symbol={currentChain?.nativeCurrency.symbol || ''}
           collatorAddress={current?.collator}
           onClose={handleCloseEditStake}
-          onSuccess={refetchStakingAccount}
+          onSuccess={handleRefetchStakingAccount}
         />
       )}
     </>

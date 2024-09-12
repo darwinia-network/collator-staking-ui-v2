@@ -21,7 +21,9 @@ const { wallets } = getDefaultWallets();
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 1_000
+      staleTime: 1 * 1_000,
+      refetchOnMount: true,
+      refetchOnWindowFocus: false
     }
   }
 });

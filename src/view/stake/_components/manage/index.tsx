@@ -58,7 +58,8 @@ const StakeManagementModal = ({
   }, [collators]);
 
   const { stakedRING, stakingLocks, stakedDeposits, isLoading, refetch } = useStaked({
-    collatorAddress: collatorAddress
+    collatorAddress: collatorAddress,
+    enabled: isOpen
   });
 
   const formattedStakedRING = useMemo(() => {

@@ -19,18 +19,18 @@ import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
 import { useWaitingCollatorList } from '@/hooks/useCollatorList';
 import useDebounceState from '@/hooks/useDebounceState';
 
-interface CollatorSelectionTableProps {
+interface CollatorWaitingSelectionTableProps {
   symbol: string;
-  selection?: `0x${string}`;
-  onSelectionChange?: (address: `0x${string}`) => void;
+  selectedCollator?: CollatorSet;
+  onSelectCollatorChange?: (collator: CollatorSet) => void;
 }
 
 const PAGE_SIZE = 10;
-const CollatorSelectionTable = ({
+const CollatorWaitingSelectionTable = ({
   symbol,
-  selection,
-  onSelectionChange
-}: CollatorSelectionTableProps) => {
+  selectedCollator,
+  onSelectCollatorChange
+}: CollatorWaitingSelectionTableProps) => {
   const [keyword, debouncedKeyword, setKeyword] = useDebounceState('');
   const [page, setPage] = useState(1);
   const [isPending, startTransition] = useTransition();
@@ -118,7 +118,7 @@ const CollatorSelectionTable = ({
         color="primary"
         selectionMode="single"
         selectionBehavior="replace"
-        selectedKeys={selection}
+        selectedKeys={selectedCollator?.address}
         bottomContentPlacement="outside"
         classNames={{
           wrapper: 'overflow-auto max-h-[50vh] rounded-medium  p-0 bg-secondary',
@@ -183,7 +183,7 @@ const CollatorSelectionTable = ({
             <TableRow
               key={item?.id}
               onClick={() => {
-                onSelectionChange?.(item.address as `0x${string}`);
+                onSelectCollatorChange?.(item);
               }}
             >
               {(columnKey: Key) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
@@ -194,4 +194,4 @@ const CollatorSelectionTable = ({
     </div>
   );
 };
-export default CollatorSelectionTable;
+export default CollatorWaitingSelectionTable;

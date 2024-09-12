@@ -41,7 +41,7 @@ export function useStakeOldAndNewPrev({
   } = useCollatorSetPrev({
     key: oldKey,
     currentChainId,
-    enabled: !!oldKey
+    enabled: !!oldKey && !!collatorAddress
   });
 
   const newKey = genKey({ address: collatorAddress, votes: assetsToVotesResult ?? 0n });
@@ -54,7 +54,7 @@ export function useStakeOldAndNewPrev({
     key: oldKey,
     newKey,
     currentChainId,
-    enabled: !!collator && !!newKey && !!oldKey
+    enabled: !!collatorAddress && !!newKey && !!oldKey
   });
 
   const oldPrev = (

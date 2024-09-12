@@ -16,8 +16,9 @@ export type StakedDepositInfo = {
 
 type StakedDepositsOfProps = {
   account?: `0x${string}`;
+  enabled?: boolean;
 };
-export const useStakedDepositsOf = ({ account }: StakedDepositsOfProps) => {
+export const useStakedDepositsOf = ({ account, enabled = true }: StakedDepositsOfProps) => {
   const {
     data: stakedDepositsOf,
     isLoading: isStakedDepositsOfLoading,
@@ -29,7 +30,7 @@ export const useStakedDepositsOf = ({ account }: StakedDepositsOfProps) => {
     functionName: 'stakedDepositsOf',
     args: [account as `0x${string}`],
     query: {
-      enabled: !!account,
+      enabled: !!account && enabled,
       refetchOnMount: true,
       staleTime: 0
     }
@@ -108,8 +109,9 @@ export const useStakedDepositsOf = ({ account }: StakedDepositsOfProps) => {
 
 type StakedProps = {
   collatorAddress: `0x${string}`;
+  enabled?: boolean;
 };
-export const useStaked = ({ collatorAddress }: StakedProps) => {
+export const useStaked = ({ collatorAddress, enabled = true }: StakedProps) => {
   const { address: account } = useWalletStatus();
 
   const {
@@ -117,7 +119,8 @@ export const useStaked = ({ collatorAddress }: StakedProps) => {
     isLoading: isStakedDepositsLoading,
     refetch: refetchStakedDeposits
   } = useStakedDepositsOf({
-    account
+    account,
+    enabled
   });
 
   const filteredStakedDeposits = useMemo(() => {
@@ -149,9 +152,7 @@ export const useStaked = ({ collatorAddress }: StakedProps) => {
       }
     ],
     query: {
-      enabled: !!account && !!collatorAddress,
-      refetchOnMount: true,
-      staleTime: 0
+      enabled: !!account && !!collatorAddress && enabled
     }
   });
   const refetch = useCallback(() => {
