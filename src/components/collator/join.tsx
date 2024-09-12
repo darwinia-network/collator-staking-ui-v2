@@ -224,13 +224,7 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
             showArrow
           >
             <div>
-              <Button
-                color="primary"
-                className="h-[2.125rem] w-full"
-                isDisabled={!hasSessionKey || !commissionValue || commission < 0n}
-                onClick={handleSetCommission}
-                isLoading={isSetCommissionLoading || isLockPeriodLoading}
-              >
+              <Button color="primary" className="h-[2.125rem] w-full" isDisabled>
                 {hasPool ? 'Collate' : 'Create Nomination Pool & Collate'}
               </Button>
             </div>

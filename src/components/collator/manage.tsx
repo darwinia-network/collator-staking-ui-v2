@@ -236,18 +236,7 @@ const CollatorManagement = ({
             showArrow
           >
             <div>
-              <Button
-                color="primary"
-                className="h-[2.125rem] w-full"
-                isDisabled
-                isLoading={
-                  isPendingUpdateCommission ||
-                  isLockPeriodLoading ||
-                  isLoadingCollatorByAddress ||
-                  isLoadingPrev ||
-                  isRefetchingPrev
-                }
-              >
+              <Button color="primary" className="h-[2.125rem] w-full" isDisabled>
                 Update Commission
               </Button>
             </div>
@@ -263,7 +252,8 @@ const CollatorManagement = ({
               isLockPeriodLoading ||
               isLoadingUpdateCommission ||
               isLoadingPrev ||
-              isRefetchingPrev
+              isRefetchingPrev ||
+              isLoadingCollatorByAddress
             }
           >
             Update Commission
