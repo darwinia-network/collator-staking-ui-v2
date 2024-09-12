@@ -16,7 +16,7 @@ export interface MobileControlsProps {
   closeDrawer: () => void;
 }
 
-const MobileControls = forwardRef<MobileControlsProps, unknown>((props, ref) => {
+const MobileControls = forwardRef<MobileControlsProps, unknown>((_props, ref) => {
   const {
     isConnected,
     address,
