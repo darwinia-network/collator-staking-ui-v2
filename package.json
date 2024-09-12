@@ -1,7 +1,7 @@
 {
-  "name": "my-vue-app",
+  "name": "collator-ui",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@kwooshung/react-themes": "^3.0.3",
     "@nextui-org/react": "^2.4.6",
     "@polkadot/util": "^13.0.2",
     "@polkadot/util-crypto": "^13.0.2",
@@ -38,7 +37,6 @@
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@rainbow-me/rainbowkit": "^2.1.5",
-    "@tanstack/router-devtools": "^1.51.2",
     "@tanstack/router-plugin": "^1.51.0",
     "@types/node": "^22.5.1",
     "@types/react": "^18.3.3",
