@@ -4,11 +4,11 @@ import useStakingAccountWithStatus, {
   StakingAccountWithStatus
 } from '@/hooks/useStakingAccountWithStatus';
 import TransactionStatus from '@/components/transaction-status';
+import { error } from '@/components/toast';
 import { abi as rewardAbi } from '@/config/abi/reward';
 import { ClaimableReward } from './item';
 import useClaim from '../_hooks/cliam';
 import ClaimList from './list';
-import { error } from '@/components/toast';
 
 const Claim = () => {
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
