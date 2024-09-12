@@ -6,10 +6,10 @@ import AmountInputWithBalance from '@/components/amount-input-with-balance';
 import useBalance from '@/hooks/useBalance';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import TransactionStatus from '@/components/transaction-status';
-import useDebounceState from '@/hooks/useDebounceState';
 import { useRingStake } from '../../_hooks/stake';
 import type { CollatorSet } from '@/service/type';
 import { error } from '@/components/toast';
+import { useDebouncedState } from '@/hooks/useDebouncedState';
 
 interface StakeRingProps {
   selectedCollator?: CollatorSet;
@@ -18,7 +18,16 @@ interface StakeRingProps {
 
 const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
-  const [amount, debouncedAmount, setAmount] = useDebounceState<string | undefined>('0');
+
+  const {
+    value: amount,
+    debouncedValue: debouncedAmount,
+    reset: resetAmount,
+    handleChange: handleAmountChange
+  } = useDebouncedState<string>({
+    initialValue: '0'
+  });
+
   const { watchAsset, isPending: isPendingWatchAsset } = useWatchAsset();
   const { ringDAOGovernanceUrl, gringTokenInfo } = useWalletStatus();
   const {
@@ -32,17 +41,10 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
     return !!debouncedAmount && debouncedAmount !== '0' ? parseEther(debouncedAmount) : 0n;
   }, [debouncedAmount]);
 
-  const handleAmountChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setAmount(e.target.value);
-    },
-    [setAmount]
-  );
-
   const resetBalanceAndAmount = useCallback(() => {
-    setAmount('0');
+    resetAmount();
     refetchBalance();
-  }, [setAmount, refetchBalance]);
+  }, [resetAmount, refetchBalance]);
 
   const {
     handleStake: handleRingStake,
@@ -85,9 +87,9 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
 
   useEffect(() => {
     return () => {
-      setAmount('0');
+      resetAmount();
     };
-  }, [setAmount]);
+  }, [resetAmount]);
 
   const handleAddToken = useCallback(() => {
     watchAsset({

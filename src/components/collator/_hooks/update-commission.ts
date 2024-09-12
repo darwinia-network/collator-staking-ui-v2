@@ -4,7 +4,6 @@ import { isNil } from 'lodash-es';
 import { useCallback } from 'react';
 import { DEFAULT_PREV } from '@/utils/getPrevNew';
 import { useCollatorSetNewPrev } from '@/hooks/useService';
-import useWalletStatus from '@/hooks/useWalletStatus';
 import { genKey } from '@/utils';
 
 type UpdateCommissionProps = {
@@ -22,8 +21,6 @@ const useUpdateCommission = ({
   collatorAddress,
   totalAssets
 }: UpdateCommissionProps) => {
-  const { currentChainId } = useWalletStatus();
-
   const { data: votes, isLoading: isLoadingVotes } = useReadContract({
     abi: hubAbi,
     address: hubAddress,
@@ -43,7 +40,6 @@ const useUpdateCommission = ({
   } = useCollatorSetNewPrev({
     key: newKey,
     newKey,
-    currentChainId,
     enabled: !!collatorAddress && !!newKey && !!oldKey
   });
 

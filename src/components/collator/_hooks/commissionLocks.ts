@@ -1,15 +1,17 @@
+import { useMemo } from 'react';
 import { useReadContract } from 'wagmi';
 import { address as hubAddress, abi as hubAbi } from '@/config/abi/hub';
-import { useMemo } from 'react';
+import useWalletStatus from '@/hooks/useWalletStatus';
 
-export const useCommissionLocks = (address: `0x${string}`) => {
+export const useCommissionLocks = () => {
+  const { isEnabled, address } = useWalletStatus();
   const result = useReadContract({
     address: hubAddress,
     abi: hubAbi,
     functionName: 'commissionLocks',
     args: [address as `0x${string}`],
     query: {
-      enabled: !!address
+      enabled: isEnabled
     }
   });
 

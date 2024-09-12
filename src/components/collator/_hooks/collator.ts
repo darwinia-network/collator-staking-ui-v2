@@ -10,8 +10,8 @@ type CreateAndCollatorProps = {
   commission: bigint;
 };
 export const useCreateAndCollator = ({ enabled }: { enabled: boolean }) => {
+  const { address, isEnabled } = useWalletStatus();
   const { writeContractAsync, ...rest } = useWriteContract();
-  const { currentChainId, address } = useWalletStatus();
   const oldKey = genKey({ address: address as `0x${string}`, votes: 0n });
   const {
     data: collatorSetPrev,
@@ -19,8 +19,7 @@ export const useCreateAndCollator = ({ enabled }: { enabled: boolean }) => {
     isRefetching: isRefetchingPrev
   } = useCollatorSetPrev({
     key: oldKey,
-    currentChainId,
-    enabled: !!oldKey && enabled
+    enabled: isEnabled && !!oldKey && enabled
   });
 
   const prev = (
@@ -46,8 +45,6 @@ export const useCreateAndCollator = ({ enabled }: { enabled: boolean }) => {
   };
 };
 
-export default useCreateAndCollator;
-
 export const useCreateCollator = ({
   commission,
   enabled
@@ -55,7 +52,7 @@ export const useCreateCollator = ({
   commission: bigint;
   enabled: boolean;
 }) => {
-  const { address, currentChainId } = useWalletStatus();
+  const { address, isEnabled } = useWalletStatus();
   const {
     data: stakedOf,
     isLoading: isLoadingStakedOf,
@@ -66,7 +63,7 @@ export const useCreateCollator = ({
     functionName: 'stakedOf',
     args: [address as `0x${string}`],
     query: {
-      enabled: !!address && enabled
+      enabled: isEnabled && enabled
     }
   });
 
@@ -80,7 +77,7 @@ export const useCreateCollator = ({
     functionName: 'assetsToVotes',
     args: [stakedOf ?? 0n, commission],
     query: {
-      enabled: !!commission && !!stakedOf && enabled
+      enabled: isEnabled && !!commission && !!stakedOf && enabled
     }
   });
 
@@ -94,8 +91,7 @@ export const useCreateCollator = ({
     isRefetching: isRefetchingPrev
   } = useCollatorSetPrev({
     key: oldKey,
-    currentChainId,
-    enabled: !!oldKey && enabled
+    enabled: isEnabled && !!oldKey && enabled
   });
 
   const prev = (

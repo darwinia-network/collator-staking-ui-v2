@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from 'react';
-import useWalletStatus from './useWalletStatus';
 import { useStakingAccount, useCollatorSetByAccounts } from './useService';
 import type { StakingAccount } from '@/service/type';
 import useActiveCollators from './useActiveCollators';
@@ -11,15 +10,13 @@ export type StakingAccountWithStatus = StakingAccount & {
 };
 
 function useStakingAccountWithStatus() {
-  const { address, currentChainId, isEnabled } = useWalletStatus();
-
   const {
     data: activeCollators,
     refetch: refetchActiveCollators,
     isLoading: isLoadingActiveCollators,
     isRefetching: isRefetchingActiveCollators
   } = useActiveCollators({
-    enabled: isEnabled
+    enabled: true
   });
 
   const {
@@ -28,15 +25,13 @@ function useStakingAccountWithStatus() {
     isRefetching,
     refetch: refetchStakingAccount
   } = useStakingAccount({
-    address,
-    currentChainId
+    enabled: true
   });
 
   const { data: collatorSetByAccounts, refetch: refetchCollatorSetByAccounts } =
     useCollatorSetByAccounts({
       accounts: data?.map((account) => account.collator) ?? [],
-      currentChainId,
-      enabled: !!data?.length && isEnabled
+      enabled: !!data?.length
     });
 
   const processedData = useMemo<StakingAccountWithStatus[]>(() => {

@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Tooltip } from '@nextui-org/react';
 import { CircleHelp } from 'lucide-react';
+import { validSessionKey } from '@/utils';
+import { useCollatorByAddress, useCollatorSetPrev } from '@/hooks/useService';
 import useWalletStatus from '@/hooks/useWalletStatus';
+import { DEFAULT_PREV } from '@/utils/getPrevNew';
 import TransactionStatus from '../transaction-status';
 import StopCollation from './stop-collation';
 import useStop from './_hooks/stop';
 import { useSetSessionKey } from './_hooks/set-session-key';
 import useUpdateCommission from './_hooks/update-commission';
-import { validSessionKey } from '@/utils';
-import { useCollatorByAddress, useCollatorSetPrev } from '@/hooks/useService';
-import { DEFAULT_PREV } from '@/utils/getPrevNew';
 import { useCommissionLockInfo } from './_hooks/commissionLockInfo';
 import { error } from '../toast';
 interface CollatorManagementProps {
@@ -24,7 +24,7 @@ const CollatorManagement = ({
   refetch,
   onStopSuccess
 }: CollatorManagementProps) => {
-  const { address, currentChainId } = useWalletStatus();
+  const { address } = useWalletStatus();
   const [open, setOpen] = useState(false);
   const [isValidSessionKey, setIsValidSessionKey] = useState(true);
   const [sessionKeyHash, setSessionKeyHash] = useState('');
@@ -34,9 +34,8 @@ const CollatorManagement = ({
   const [commissionValue, setCommissionValue] = useState('');
 
   const { data: collatorByAddress, isLoading: isLoadingCollatorByAddress } = useCollatorByAddress({
-    currentChainId,
     address: address as `0x${string}`,
-    enabled: !!address
+    enabled: true
   });
   const currentCollator = collatorByAddress?.[0];
   const oldKey = currentCollator?.key || '';
@@ -52,7 +51,6 @@ const CollatorManagement = ({
     isRefetching: isRefetchingPrev
   } = useCollatorSetPrev({
     key: oldKey,
-    currentChainId,
     enabled: !!oldKey
   });
 
@@ -60,9 +58,7 @@ const CollatorManagement = ({
     collatorSetPrev?.[0] ? collatorSetPrev?.[0]?.address : DEFAULT_PREV
   ) as `0x${string}`;
 
-  const { isLockPeriod, isLockPeriodLoading, remainingLockTime } = useCommissionLockInfo(
-    address as `0x${string}`
-  );
+  const { isLockPeriod, isLockPeriodLoading, remainingLockTime } = useCommissionLockInfo();
 
   const { setSessionKey, isPending: isPendingSetSessionKey } = useSetSessionKey();
 

@@ -1,12 +1,8 @@
 import { useMemo } from 'react';
 import { useCommissionLocks } from './commissionLocks';
 
-export function useCommissionLockInfo(address?: `0x${string}`) {
-  const {
-    isLockPeriod,
-    isLoading: isLockPeriodLoading,
-    lockEndTime
-  } = useCommissionLocks(address as `0x${string}`);
+export function useCommissionLockInfo() {
+  const { isLockPeriod, isLoading: isLockPeriodLoading, lockEndTime } = useCommissionLocks();
 
   const remainingLockTime = useMemo(() => {
     if (!lockEndTime) return '';

@@ -1,7 +1,6 @@
 import { DEFAULT_PREV } from '@/utils/getPrevNew';
 import useAssetsToVotes, { Operation } from './useAssetsToVotes';
 import { useCollatorSetNewPrev, useCollatorSetPrev } from './useService';
-import useWalletStatus from './useWalletStatus';
 import { genKey } from '@/utils';
 import { CollatorSet } from '@/service/type';
 
@@ -16,8 +15,6 @@ export function useStakeOldAndNewPrev({
   inputAmount,
   operation = 'add'
 }: UseOldAndNewPrevProps) {
-  const { currentChainId } = useWalletStatus();
-
   const commission = BigInt(collator?.commission || 0);
   const totalAmount = BigInt(collator?.assets || 0);
   const collatorAddress = collator?.address || '';
@@ -40,7 +37,6 @@ export function useStakeOldAndNewPrev({
     isRefetching: isRefetchingPrev
   } = useCollatorSetPrev({
     key: oldKey,
-    currentChainId,
     enabled: !!oldKey && !!collatorAddress
   });
 
@@ -53,7 +49,6 @@ export function useStakeOldAndNewPrev({
   } = useCollatorSetNewPrev({
     key: oldKey,
     newKey,
-    currentChainId,
     enabled: !!collatorAddress && !!newKey && !!oldKey
   });
 

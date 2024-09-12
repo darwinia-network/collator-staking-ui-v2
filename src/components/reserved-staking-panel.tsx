@@ -1,14 +1,11 @@
 import { useStakingAccount } from '@/hooks/useService';
 import TooltipFormattedNumber from './tooltip-formatter-number';
-import useWalletStatus from '@/hooks/useWalletStatus';
 import { formatEther } from 'viem';
 import { Skeleton } from '@nextui-org/react';
 
 const ReservedStakingPanel = () => {
-  const { address, currentChainId } = useWalletStatus();
   const { data, isLoading } = useStakingAccount({
-    address,
-    currentChainId
+    enabled: true
   });
   const totalAmount =
     data?.reduce((acc, item) => acc + (item.assets ? BigInt(item.assets) : 0n), 0n) ?? 0n;

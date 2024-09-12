@@ -1,17 +1,15 @@
 import { useCallback } from 'react';
 import useActiveCollators from './useActiveCollators';
 import { useCollatorSet } from './useService';
-import useWalletStatus from './useWalletStatus';
 
 export const useActiveCollatorList = ({ enabled }: { enabled: boolean }) => {
-  const { currentChainId } = useWalletStatus();
   const {
     data: activeCollators,
     isLoading: isActiveCollatorsLoading,
     isRefetching: isActiveCollatorsRefetching,
     refetch: refetchActiveCollators
   } = useActiveCollators({
-    enabled: !!currentChainId && !!enabled
+    enabled
   });
   const {
     data: list,
@@ -19,10 +17,9 @@ export const useActiveCollatorList = ({ enabled }: { enabled: boolean }) => {
     isRefetching: isListRefetching,
     refetch: refetchList
   } = useCollatorSet({
-    currentChainId: currentChainId,
     offset: 0,
     limit: activeCollators?.length || 0,
-    enabled: !!currentChainId && !!activeCollators && !!enabled
+    enabled: !!activeCollators && enabled
   });
 
   const refetch = useCallback(() => {
@@ -49,14 +46,13 @@ export const useWaitingCollatorList = ({
   pageSize: number;
   searchedAddress?: string;
 }) => {
-  const { currentChainId } = useWalletStatus();
   const {
     data: activeCollators,
     isLoading: isActiveCollatorsLoading,
     isRefetching: isActiveCollatorsRefetching,
     refetch: refetchActiveCollators
   } = useActiveCollators({
-    enabled: !!currentChainId && enabled
+    enabled
   });
 
   const activeCollatorsCount = activeCollators?.length || 0;
@@ -68,11 +64,10 @@ export const useWaitingCollatorList = ({
     isRefetching: isWaitingCollatorsRefetching,
     refetch: refetchWaitingCollators
   } = useCollatorSet({
-    currentChainId,
     searchedAddress,
     offset,
     limit: pageSize,
-    enabled: !!currentChainId && !!activeCollators && enabled
+    enabled: !!activeCollators && enabled
   });
 
   const refetch = useCallback(() => {

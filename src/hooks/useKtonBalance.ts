@@ -10,7 +10,7 @@ export const useKtonBalance = () => {
     functionName: 'balanceOf',
     args: [address!],
     query: {
-      enabled: !!address && isEnabled && !!ktonInfo?.address
+      enabled: isEnabled && !!ktonInfo?.address
     }
   });
   return { ...result, formatted: formatEther(result.data ?? BigInt(0)) };

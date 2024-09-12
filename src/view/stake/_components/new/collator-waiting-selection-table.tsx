@@ -17,7 +17,7 @@ import type { CollatorSet } from '@/service/type';
 import { formatEther } from 'viem';
 import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
 import { useWaitingCollatorList } from '@/hooks/useCollatorList';
-import useDebounceState from '@/hooks/useDebounceState';
+import { useDebouncedState } from '@/hooks/useDebouncedState';
 
 interface CollatorWaitingSelectionTableProps {
   symbol: string;
@@ -31,14 +31,22 @@ const CollatorWaitingSelectionTable = ({
   selectedCollator,
   onSelectCollatorChange
 }: CollatorWaitingSelectionTableProps) => {
-  const [keyword, debouncedKeyword, setKeyword] = useDebounceState('');
+  const {
+    value: keyword,
+    debouncedValue: debouncedKeyword,
+    reset: resetKeyword,
+    setValue: setKeyword
+  } = useDebouncedState<string>({
+    initialValue: ''
+  });
+
   const [page, setPage] = useState(1);
   const [isPending, startTransition] = useTransition();
 
-  const handleSearchChange = useCallback(
+  const handleValueChange = useCallback(
     (keyword: string) => {
       startTransition(() => {
-        setKeyword?.(keyword);
+        setKeyword(keyword);
         setPage(1);
       });
     },
@@ -55,10 +63,6 @@ const CollatorWaitingSelectionTable = ({
   const data = useMemo(() => {
     return list || [];
   }, [list]);
-
-  const handleClear = useCallback(() => {
-    setKeyword?.('');
-  }, [setKeyword]);
 
   const renderCell = (item: CollatorSet, columnKey: Key) => {
     const cellValue = item[columnKey as keyof CollatorSet];
@@ -109,8 +113,8 @@ const CollatorWaitingSelectionTable = ({
         startContent={<SearchIcon className="text-foreground/50" />}
         value={keyword}
         aria-label="Search for a collator"
-        onClear={handleClear}
-        onValueChange={handleSearchChange}
+        onClear={resetKeyword}
+        onValueChange={handleValueChange}
       />
       <Table
         isHeaderSticky

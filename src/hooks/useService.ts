@@ -6,11 +6,11 @@ import {
   fetchStakingAccount
 } from '@/service/services';
 import type { CollatorSetQueryParams, StakingAccountQueryParams } from '@/service/type';
+import useWalletStatus from './useWalletStatus';
 
 const toLowerCase = (value: string | undefined) => (value ? value.toLowerCase() : '');
 
 type CollatorSetParams = {
-  currentChainId?: number;
   currentKey?: string;
   enabled?: boolean;
   offset: number;
@@ -18,12 +18,12 @@ type CollatorSetParams = {
   searchedAddress?: string;
 };
 export function useCollatorSet({
-  currentChainId,
   searchedAddress,
   offset,
   limit,
   enabled = true
 }: CollatorSetParams) {
+  const { currentChainId, isEnabled } = useWalletStatus();
   const params: CollatorSetQueryParams = {
     where: {
       chainId: {
@@ -48,16 +48,17 @@ export function useCollatorSet({
       }
       return result;
     },
-    enabled: !!currentChainId && !!enabled
+    enabled: isEnabled && enabled
   });
 }
 
 type CollatorSetPrevParams = {
-  currentChainId?: number;
   key?: string;
   enabled?: boolean;
 };
-export function useCollatorSetPrev({ currentChainId, key, enabled = true }: CollatorSetPrevParams) {
+export function useCollatorSetPrev({ key, enabled = true }: CollatorSetPrevParams) {
+  const { currentChainId, isEnabled } = useWalletStatus();
+
   const params: CollatorSetQueryParams = {
     where: {
       chainId: {
@@ -83,23 +84,18 @@ export function useCollatorSetPrev({ currentChainId, key, enabled = true }: Coll
       }
       return result;
     },
-    enabled: !!currentChainId && !!key && !!enabled,
-    staleTime: 0
+    enabled: isEnabled && !!key && enabled
   });
 }
 
 type CollatorSetNewPrevParams = {
-  currentChainId?: number;
   key?: string;
   newKey?: string;
   enabled?: boolean;
 };
-export function useCollatorSetNewPrev({
-  currentChainId,
-  key,
-  newKey,
-  enabled = true
-}: CollatorSetNewPrevParams) {
+export function useCollatorSetNewPrev({ key, newKey, enabled = true }: CollatorSetNewPrevParams) {
+  const { currentChainId, isEnabled } = useWalletStatus();
+
   const params: CollatorSetQueryParams = {
     where: {
       chainId: {
@@ -132,21 +128,17 @@ export function useCollatorSetNewPrev({
       }
       return result;
     },
-    enabled: !!currentChainId && !!key && !!newKey && !!enabled,
-    staleTime: 0
+    enabled: isEnabled && !!key && !!newKey && !!enabled
   });
 }
 
 type CollatorByAddressParams = {
-  currentChainId?: number;
   address: `0x${string}`;
   enabled?: boolean;
 };
-export function useCollatorByAddress({
-  currentChainId,
-  address,
-  enabled = true
-}: CollatorByAddressParams) {
+export function useCollatorByAddress({ address, enabled = true }: CollatorByAddressParams) {
+  const { currentChainId, isEnabled } = useWalletStatus();
+
   const params: CollatorSetQueryParams = {
     where: {
       chainId: {
@@ -169,21 +161,20 @@ export function useCollatorByAddress({
       }
       return result;
     },
-    enabled: !!currentChainId && !!address && !!enabled,
+    enabled: isEnabled && !!address && enabled,
     staleTime: 0
   });
 }
 
 type CollatorSetByAccountsParams = {
   accounts: `0x${string}`[];
-  currentChainId?: number;
   enabled?: boolean;
 };
 export function useCollatorSetByAccounts({
-  currentChainId,
   accounts,
   enabled = true
 }: CollatorSetByAccountsParams) {
+  const { currentChainId, isEnabled } = useWalletStatus();
   const params: CollatorSetQueryParams = {
     where: {
       chainId: {
@@ -204,15 +195,16 @@ export function useCollatorSetByAccounts({
       }
       return result;
     },
-    enabled: !!currentChainId && !!enabled
+    enabled: isEnabled && enabled
   });
 }
 
-export type StakingAccountParams = {
-  address?: string;
-  currentChainId?: number;
+type StakingAccountParams = {
+  enabled?: boolean;
 };
-export function useStakingAccount({ address, currentChainId }: StakingAccountParams) {
+export function useStakingAccount({ enabled = true }: StakingAccountParams) {
+  const { currentChainId, address, isEnabled } = useWalletStatus();
+
   const params: StakingAccountQueryParams = {
     where: {
       account: {
@@ -233,7 +225,7 @@ export function useStakingAccount({ address, currentChainId }: StakingAccountPar
       }
       return result;
     },
-    enabled: !!address && !!currentChainId
+    enabled: isEnabled && enabled
   });
 
   return { ...result, queryKey };

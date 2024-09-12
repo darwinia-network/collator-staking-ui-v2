@@ -3,19 +3,20 @@ import { useDebounce } from 'react-use';
 
 interface UseDebouncedStateProps<T> {
   initialValue: T;
-  delay: number;
+  delay?: number;
 }
 
 interface UseDebouncedStateReturn<T> {
   value: T;
   debouncedValue: T;
+  setValue: (value: T) => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   reset: () => void;
 }
 
 export function useDebouncedState<T>({
   initialValue,
-  delay
+  delay = 500
 }: UseDebouncedStateProps<T>): UseDebouncedStateReturn<T> {
   const [value, setValue] = useState<T>(initialValue);
   const [debouncedValue, setDebouncedValue] = useState<T>(initialValue);
@@ -40,5 +41,5 @@ export function useDebouncedState<T>({
     setValue(initialValue);
     setDebouncedValue(initialValue);
   }, [initialValue]);
-  return { value, debouncedValue, handleChange, reset };
+  return { value, debouncedValue, setValue, handleChange, reset };
 }

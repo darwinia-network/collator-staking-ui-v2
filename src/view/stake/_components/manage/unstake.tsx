@@ -1,13 +1,13 @@
+import { useCallback, useState } from 'react';
+import { parseEther } from 'viem';
 import { Button, Divider, Modal, ModalBody, ModalContent, ModalHeader } from '@nextui-org/react';
 import { X } from 'lucide-react';
 import AmountInputWithBalance from '@/components/amount-input-with-balance';
 import TransactionStatus from '@/components/transaction-status';
-import { useCallback, useState } from 'react';
-import { parseEther } from 'viem';
-import { useUnstakeRING } from '../../_hooks/unstake';
-import { CollatorSet } from '@/service/type';
-import useDebounceState from '@/hooks/useDebounceState';
 import { error } from '@/components/toast';
+import { useDebouncedState } from '@/hooks/useDebouncedState';
+import { useUnstakeRING } from '../../_hooks/unstake';
+import type { CollatorSet } from '@/service/type';
 
 interface EditStakeProps {
   isOpen: boolean;
@@ -28,18 +28,19 @@ const Unstake = ({
   onOk
 }: EditStakeProps) => {
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
-  const [amount, debouncedAmount, setAmount] = useDebounceState<string>('0');
-  const { unstakeRING, isPending, isLoadingOldAndNewPrev } = useUnstakeRING({
-    collator,
-    inputAmount: parseEther(debouncedAmount)
+  const {
+    value: amount,
+    debouncedValue: debounceAmount,
+    handleChange: handleAmountChange,
+    reset: resetAmount
+  } = useDebouncedState<string>({
+    initialValue: '0'
   });
 
-  const handleAmountChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setAmount(e.target.value);
-    },
-    [setAmount]
-  );
+  const { unstakeRING, isPending, isLoadingOldAndNewPrev } = useUnstakeRING({
+    collator,
+    inputAmount: parseEther(debounceAmount)
+  });
 
   const handleUnstake = useCallback(async () => {
     const tx = await unstakeRING()?.catch((e) => {
@@ -56,8 +57,9 @@ const Unstake = ({
 
   const handleSuccess = useCallback(() => {
     setHash(undefined);
+    resetAmount();
     onOk?.();
-  }, [onOk]);
+  }, [onOk, resetAmount]);
   return (
     <>
       <Modal

@@ -7,8 +7,8 @@ import { useRingStake } from '@/view/stake/_hooks/stake';
 import type { CollatorSet } from '@/service/type';
 import { parseEther } from 'viem';
 import TransactionStatus from '@/components/transaction-status';
-import useDebounceState from '@/hooks/useDebounceState';
 import { error } from '@/components/toast';
+import { useDebouncedState } from '@/hooks/useDebouncedState';
 
 interface StakeMoreProps {
   isOpen: boolean;
@@ -19,13 +19,21 @@ interface StakeMoreProps {
 
 const StakeMore = ({ isOpen, onClose, collator, onOk }: StakeMoreProps) => {
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
-  const [amount, debouncedAmount, setAmount] = useDebounceState<string | undefined>('0');
+
+  const {
+    value: amount,
+    debouncedValue: debounceAmount,
+    handleChange: handleAmountChange,
+    reset: resetAmount
+  } = useDebouncedState<string>({
+    initialValue: '0'
+  });
 
   const { formatted, isLoading, data: balance, refetch: refetchBalance } = useBalance();
 
   const { handleStake, isPending, isLoadingOldAndNewPrev } = useRingStake({
     collator,
-    assets: parseEther(debouncedAmount || '0')
+    assets: parseEther(debounceAmount || '0')
   });
 
   const handleStakeMore = useCallback(async () => {
@@ -37,13 +45,6 @@ const StakeMore = ({ isOpen, onClose, collator, onOk }: StakeMoreProps) => {
     }
   }, [handleStake]);
 
-  const handleAmountChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setAmount(e.target.value);
-    },
-    [setAmount]
-  );
-
   const handleFail = useCallback(() => {
     setHash(undefined);
   }, []);
@@ -51,8 +52,9 @@ const StakeMore = ({ isOpen, onClose, collator, onOk }: StakeMoreProps) => {
   const handleSuccess = useCallback(() => {
     setHash(undefined);
     refetchBalance();
+    resetAmount();
     onOk?.();
-  }, [onOk, refetchBalance]);
+  }, [onOk, refetchBalance, resetAmount]);
 
   return (
     <>

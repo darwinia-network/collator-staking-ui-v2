@@ -19,7 +19,6 @@ import StakeMoreDeposits from './stake-more-deposits';
 import UnstakeDeposits from './unstake-deposts';
 import { useStaked } from '../../_hooks/staked';
 import { useCollatorByAddress } from '@/hooks/useService';
-import useWalletStatus from '@/hooks/useWalletStatus';
 
 interface StakeManagementModalProps {
   isOpen: boolean;
@@ -36,7 +35,6 @@ const StakeManagementModal = ({
   onClose,
   onSuccess
 }: StakeManagementModalProps) => {
-  const { currentChainId } = useWalletStatus();
   const [isStakeMoreOpen, setIsStakeMoreOpen] = useState(false);
   const [isUnstakeOpen, setIsUnstakeOpen] = useState(false);
   const [isStakeMoreDepositsOpen, setIsStakeMoreDepositsOpen] = useState(false);
@@ -48,7 +46,6 @@ const StakeManagementModal = ({
     isRefetching: isCollatorRefetching,
     refetch: refetchCollator
   } = useCollatorByAddress({
-    currentChainId: currentChainId,
     address: collatorAddress,
     enabled: !!collatorAddress && isOpen
   });

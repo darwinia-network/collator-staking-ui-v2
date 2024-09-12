@@ -24,8 +24,7 @@ const Deposit = () => {
     handleChange: handleAmountChange,
     reset: resetAmount
   } = useDebouncedState<string>({
-    initialValue: '0',
-    delay: 500
+    initialValue: '0'
   });
   const [selectedMonthPeriod, setSelectedMonthPeriod] = useState<SharedSelection>(new Set());
   const { isEnabled, ktonInfo } = useWalletStatus();

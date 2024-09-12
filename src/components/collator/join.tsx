@@ -6,7 +6,6 @@ import TransactionStatus from '../transaction-status';
 import { useSetSessionKey } from './_hooks/set-session-key';
 import { useCreateCollator, useCreateAndCollator } from './_hooks/collator';
 import { validSessionKey } from '@/utils';
-import useWalletStatus from '@/hooks/useWalletStatus';
 import { useCommissionLockInfo } from './_hooks/commissionLockInfo';
 import { error } from '../toast';
 
@@ -18,7 +17,6 @@ interface CollatorJoinProps {
 }
 
 const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJoinProps) => {
-  const { address } = useWalletStatus();
   const [isValidSessionKey, setIsValidSessionKey] = useState(true);
   const [sessionKeyHash, setSessionKeyHash] = useState('');
   const [commissionHash, setCommissionHash] = useState('');
@@ -31,9 +29,7 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
     return commissionValue ? BigInt(commissionValue) : 0n;
   }, [commissionValue]);
 
-  const { isLockPeriod, isLockPeriodLoading, remainingLockTime } = useCommissionLockInfo(
-    address as `0x${string}`
-  );
+  const { isLockPeriod, isLockPeriodLoading, remainingLockTime } = useCommissionLockInfo();
 
   const {
     createCollator,
