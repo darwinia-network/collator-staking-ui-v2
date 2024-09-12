@@ -1,5 +1,4 @@
 import { toast } from 'sonner';
-import { CircleAlert } from 'lucide-react';
 
 export function success(message: string) {
   toast.success(message, {
@@ -20,7 +19,6 @@ export function error(message: string) {
         'flex items-center gap-[0.31rem] !bg-background  px-[0.62rem] py-[0.5rem] rounded-medium',
       title: 'text-danger text-[0.75rem] font-normal',
       icon: 'mr-0 size-4 text-danger'
-    },
-    icon: <CircleAlert className="size-4" size={16} strokeWidth={1.5} />
+    }
   });
 }

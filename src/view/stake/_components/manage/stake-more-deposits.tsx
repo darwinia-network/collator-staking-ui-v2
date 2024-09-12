@@ -49,7 +49,7 @@ const StakeMoreDeposits = ({ isOpen, collator, onClose, onOk }: EditStakeProps) 
   }, [handleApprovalForAll]);
 
   const handleDepositStakeStart = useCallback(async () => {
-    await refetchIsApprovedForAll();
+    refetchIsApprovedForAll();
     const tx = await handleDepositStake()?.catch((e) => {
       error(e.shortMessage);
     });
