@@ -47,7 +47,6 @@ export const config = getDefaultConfig({
     }
   ],
   chains: getChains(),
-  ssr: true,
   storage: createStorage({
     storage: cookieStorage
   })

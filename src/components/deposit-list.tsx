@@ -44,6 +44,14 @@ const DepositList = forwardRef<DepositListRef, DepositListProps>(
       refetch();
     }, [refetch]);
 
+    const handleDepositChange = useCallback((deposit: DepositInfo) => {
+      setCheckedDeposits((prevDeposits) =>
+        prevDeposits.includes(deposit)
+          ? prevDeposits.filter((prevDeposit) => prevDeposit.tokenId !== deposit.tokenId)
+          : [...prevDeposits, deposit]
+      );
+    }, []);
+
     useImperativeHandle(
       ref,
       () => ({
@@ -52,13 +60,6 @@ const DepositList = forwardRef<DepositListRef, DepositListProps>(
       }),
       [refetch, resetAndRefetch]
     );
-    function handleDepositChange(deposit: DepositInfo) {
-      setCheckedDeposits((prevDeposits) =>
-        prevDeposits.includes(deposit)
-          ? prevDeposits.filter((prevDeposit) => prevDeposit.tokenId !== deposit.tokenId)
-          : [...prevDeposits, deposit]
-      );
-    }
 
     useEffect(() => {
       onCheckedDepositsChange(checkedDeposits);

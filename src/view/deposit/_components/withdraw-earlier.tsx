@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, memo } from 'react';
 import { Button, Divider, Modal, ModalBody, ModalContent, ModalHeader } from '@nextui-org/react';
 import { formatEther } from 'viem';
 import { X } from 'lucide-react';
@@ -168,4 +168,4 @@ const WithdrawEarlier = ({ tokenId, isOpen, onClose, symbol, onSuccess }: Withdr
     </>
   );
 };
-export default WithdrawEarlier;
+export default memo(WithdrawEarlier);
