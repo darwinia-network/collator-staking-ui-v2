@@ -140,9 +140,10 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
           >
             RingDAO governance
           </Link>
+          .
         </div>
         <p className="m-0 text-[0.75rem] font-normal text-foreground/50">
-          Please note that gRING is non-transferable
+          Please note that gRING is non-transferable.
         </p>
         <Button
           color="primary"
