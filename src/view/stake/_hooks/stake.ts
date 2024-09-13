@@ -28,6 +28,11 @@ export const useRingStake = ({ collator, assets }: UseRingStakeProps) => {
   const handleStake = useCallback(async () => {
     if (!collatorAddress || !oldPrev || !newPrev || !assets) return;
 
+    console.log('%cCalling stakeRING function', 'color: #4CAF50; font-weight: bold;');
+    console.log('%cAddress:', 'color: #2196F3;', collatorAddress);
+    console.log('%coldPrev:', 'color: #FFC107;', oldPrev);
+    console.log('%cnewPrev:', 'color: #FF5722;', newPrev);
+    console.log('%cAssets:', 'color: #9C27B0;', assets.toString());
     return result.writeContractAsync({
       address,
       abi,
@@ -90,6 +95,12 @@ export const useDepositStake = ({ collator, deposits }: UseDepositStakeProps) =>
 
   const handleStake = useCallback(async () => {
     if (!collatorAddress || !oldPrev || !newPrev || !assets) return;
+
+    console.log('%cCalling stakeRING function', 'color: #4CAF50; font-weight: bold;');
+    console.log('%cAddress:', 'color: #2196F3;', collatorAddress);
+    console.log('%coldPrev:', 'color: #FFC107;', oldPrev);
+    console.log('%cnewPrev:', 'color: #FF5722;', newPrev);
+    console.log('%cAssets:', 'color: #9C27B0;', assets.toString());
 
     return result.writeContractAsync({
       address,
