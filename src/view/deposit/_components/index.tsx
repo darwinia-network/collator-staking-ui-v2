@@ -78,7 +78,7 @@ const Deposit = () => {
           classNames={{
             trigger:
               'p-[0.62rem] h-[4.3125rem] bg-secondary hover:opacity-[var(--nextui-hover-opacity)] hover:bg-secondary transition-opacity',
-            label: 'text-[0.75rem] font-normal !text-foreground/50',
+            label: 'text-[0.875rem] font-normal !text-foreground/50',
             value: 'text-[0.875rem] font-bold text-foreground',
             innerWrapper: 'pt-[1.56rem]',
             listbox: 'text-foreground'
