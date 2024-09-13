@@ -65,14 +65,14 @@ const Deposit = () => {
           balance={formatted}
           isLoading={isLoading}
           value={amount}
-          isDisabled={computeInterest.isLoading}
+          min="1"
           onChange={(e) => setAmount(e.target.value)}
         />
         <Select
           label="Deposit term"
           placeholder="Select"
           className="w-full"
-          isDisabled={!isEnabled || computeInterest.isLoading}
+          isDisabled={!isEnabled}
           selectedKeys={selectedMonthPeriod}
           onSelectionChange={handleSelectionChange}
           classNames={{
