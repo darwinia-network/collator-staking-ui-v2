@@ -140,7 +140,12 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
       <p className="text-[0.75rem] font-normal text-foreground/50">
         Note that you need to complete two steps in sequence, setup [Session Key] and setup
         [Commission] before becoming a collator. Please{' '}
-        <Link href="/" className="text-[#0094FF]">
+        <Link
+          href="https://docs.darwinia.network/node-operators/run-collator-node/#set-session-key-and-commission-rate"
+          className="text-[#0094FF]"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           Run A Node
         </Link>{' '}
         first and get the session key of your running node.

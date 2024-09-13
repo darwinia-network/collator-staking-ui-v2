@@ -57,7 +57,7 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
 
   const handleStake = useCallback(async () => {
     const tx = await handleRingStake()?.catch((e) => {
-      error(e.shortMessage);
+      error(e.shortMessage || 'Failed to stake');
     });
     if (tx) {
       setHash(tx);
