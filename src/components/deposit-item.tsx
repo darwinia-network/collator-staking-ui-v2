@@ -46,7 +46,7 @@ const DepositItem = ({ item, isChecked, symbol, onChange }: DepositItemProps) =>
           label={
             <div className="flex w-full items-center justify-between">
               <span className="text-[0.875rem] font-normal text-foreground">
-                ID# {item?.tokenId?.toString()}
+                Token ID [{item?.tokenId?.toString()}]
               </span>
               <div className="flex items-center gap-2">
                 <span className="text-[0.875rem] font-normal text-foreground">
