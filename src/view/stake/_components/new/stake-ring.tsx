@@ -151,7 +151,7 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
           isLoading={isLoading}
           className="w-full font-bold"
         >
-          Staking
+          Stake
         </Button>
       </div>
       <TransactionStatus

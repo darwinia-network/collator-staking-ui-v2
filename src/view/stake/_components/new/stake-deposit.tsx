@@ -108,7 +108,7 @@ const StakeDeposit = ({ selectedCollator, onSuccess }: StakeDepositProps) => {
     if (!isApprovedForAll) {
       return 'Approve';
     }
-    return 'Staking';
+    return 'Stake';
   }, [isApprovedForAll]);
 
   useEffect(() => {

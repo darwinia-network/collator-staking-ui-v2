@@ -15,7 +15,7 @@ export const defiTabs = [
 
 export const stakeTabs = [
   {
-    label: 'Stake Ring',
+    label: 'Stake RING',
     key: 'stake-ring'
   },
   {

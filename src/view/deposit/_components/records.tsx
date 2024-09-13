@@ -135,7 +135,9 @@ const DepositRecordsModal = ({
       switch (columnKey) {
         case 'tokenId':
           return (
-            <div className="text-[0.875rem] font-bold text-primary">ID #{cellValue.toString()}</div>
+            <div className="text-[0.875rem] font-bold text-primary">
+              Token ID [{cellValue.toString()}]
+            </div>
           );
 
         case 'value':
@@ -235,7 +237,7 @@ const DepositRecordsModal = ({
             >
               <TableHeader>
                 <TableColumn className="w-[9.375rem] bg-secondary" key="tokenId">
-                  No.
+                  ERC-721
                 </TableColumn>
                 <TableColumn className="w-[10.625rem] bg-secondary" key="value">
                   Amount
