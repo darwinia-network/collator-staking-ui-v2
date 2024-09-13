@@ -9,7 +9,6 @@ import TransactionStatus from '@/components/transaction-status';
 import { useRingStake } from '../../_hooks/stake';
 import type { CollatorSet } from '@/service/type';
 import { error } from '@/components/toast';
-import { useDebouncedState } from '@/hooks/useDebouncedState';
 
 interface StakeRingProps {
   selectedCollator?: CollatorSet;
@@ -19,15 +18,7 @@ interface StakeRingProps {
 const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
 
-  const {
-    value: amount,
-    debouncedValue: debouncedAmount,
-    reset: resetAmount,
-    handleChange: handleAmountChange,
-    isLoading: isLoadingAmount
-  } = useDebouncedState<string>({
-    initialValue: '0'
-  });
+  const [amount, setAmount] = useState<string>('0');
 
   const { watchAsset, isPending: isPendingWatchAsset } = useWatchAsset();
   const { ringDAOGovernanceUrl, gringTokenInfo } = useWalletStatus();
@@ -39,13 +30,13 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
   } = useBalance();
 
   const assets = useMemo(() => {
-    return !!debouncedAmount && debouncedAmount !== '0' ? parseEther(debouncedAmount) : 0n;
-  }, [debouncedAmount]);
+    return !!amount && amount !== '0' ? parseEther(amount) : 0n;
+  }, [amount]);
 
   const resetBalanceAndAmount = useCallback(() => {
-    resetAmount();
+    setAmount('0');
     refetchBalance();
-  }, [resetAmount, refetchBalance]);
+  }, [refetchBalance]);
 
   const {
     handleStake: handleRingStake,
@@ -57,9 +48,15 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
   });
 
   const handleStake = useCallback(async () => {
+    console.log('handleStake');
+
     const tx = await handleRingStake()?.catch((e) => {
+      console.log('error', e);
+
       error(e.shortMessage || 'Failed to stake');
     });
+    console.log('tx', tx);
+
     if (tx) {
       setHash(tx);
     }
@@ -88,9 +85,9 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
 
   useEffect(() => {
     return () => {
-      resetAmount();
+      setAmount('0');
     };
-  }, [resetAmount]);
+  }, []);
 
   const handleAddToken = useCallback(() => {
     watchAsset({
@@ -107,7 +104,7 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
           balance={formatted}
           isLoading={isLoadingBalance}
           value={amount}
-          onChange={handleAmountChange}
+          onChange={(e) => setAmount(e.target.value)}
         />
         <Divider />
         <div className="m-0 text-[0.75rem] font-normal text-foreground/50">
@@ -151,10 +148,10 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
           color="primary"
           isDisabled={isDisabled}
           onClick={handleStake}
-          isLoading={isLoading || isLoadingAmount}
+          isLoading={isLoading}
           className="w-full font-bold"
         >
-          Staking
+          Staking2
         </Button>
       </div>
       <TransactionStatus

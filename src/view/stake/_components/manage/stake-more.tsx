@@ -8,7 +8,6 @@ import type { CollatorSet } from '@/service/type';
 import { parseEther } from 'viem';
 import TransactionStatus from '@/components/transaction-status';
 import { error } from '@/components/toast';
-import { useDebouncedState } from '@/hooks/useDebouncedState';
 
 interface StakeMoreProps {
   isOpen: boolean;
@@ -20,21 +19,12 @@ interface StakeMoreProps {
 const StakeMore = ({ isOpen, onClose, collator, onOk }: StakeMoreProps) => {
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
 
-  const {
-    value: amount,
-    debouncedValue: debounceAmount,
-    handleChange: handleAmountChange,
-    reset: resetAmount,
-    isLoading: isLoadingAmount
-  } = useDebouncedState<string>({
-    initialValue: '0'
-  });
-
+  const [amount, setAmount] = useState<string>('0');
   const { formatted, isLoading, data: balance, refetch: refetchBalance } = useBalance();
 
   const { handleStake, isPending, isLoadingOldAndNewPrev } = useRingStake({
     collator,
-    assets: parseEther(debounceAmount || '0')
+    assets: parseEther(amount || '0')
   });
 
   const handleStakeMore = useCallback(async () => {
@@ -53,9 +43,9 @@ const StakeMore = ({ isOpen, onClose, collator, onOk }: StakeMoreProps) => {
   const handleSuccess = useCallback(() => {
     setHash(undefined);
     refetchBalance();
-    resetAmount();
+    setAmount('0');
     onOk?.();
-  }, [onOk, refetchBalance, resetAmount]);
+  }, [onOk, refetchBalance]);
 
   return (
     <>
@@ -84,7 +74,7 @@ const StakeMore = ({ isOpen, onClose, collator, onOk }: StakeMoreProps) => {
               balance={formatted}
               isLoading={isLoading}
               value={amount}
-              onChange={handleAmountChange}
+              onChange={(e) => setAmount(e.target.value)}
             />
             <Divider />
             <Button
@@ -92,7 +82,7 @@ const StakeMore = ({ isOpen, onClose, collator, onOk }: StakeMoreProps) => {
               className="w-full"
               onClick={handleStakeMore}
               isDisabled={amount === '0'}
-              isLoading={isLoadingOldAndNewPrev || isPending || isLoadingAmount}
+              isLoading={isLoadingOldAndNewPrev || isPending || isLoading}
             >
               Stake
             </Button>
