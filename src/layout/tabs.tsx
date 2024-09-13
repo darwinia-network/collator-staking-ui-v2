@@ -29,7 +29,7 @@ export default function DefiTabs({ children }: { children: React.ReactNode }) {
         classNames={{
           tabList: 'gap-5 w-full relative rounded-none p-0 border-b border-divider',
           cursor: 'w-full bg-foreground',
-          tab: 'max-w-fit px-0 h-12',
+          tab: 'max-w-fit px-0 h-12 !outline-none',
           tabContent: 'group-data-[selected=true]:text-foreground'
         }}
         selectedKey={selectKey}
@@ -42,6 +42,7 @@ export default function DefiTabs({ children }: { children: React.ReactNode }) {
         {defiTabs.map((tab) => (
           <Tab
             key={tab.key}
+            as="div"
             title={
               <div className="flex items-center space-x-2">
                 <span>{tab.label}</span>

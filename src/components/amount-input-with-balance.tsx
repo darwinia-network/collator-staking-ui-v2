@@ -79,7 +79,7 @@ const AmountInputWithBalance = ({
 
   return (
     <div className={cn('flex w-full flex-col gap-[0.31rem]', className)}>
-      <div className="relative flex flex-col gap-[0.69rem] rounded-medium bg-secondary p-[0.62rem] transition-opacity focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-secondary hover:opacity-[var(--nextui-hover-opacity)]">
+      <div className="focus-within: relative flex flex-col gap-[0.69rem] rounded-medium bg-secondary p-[0.62rem] transition-opacity focus-within:outline-none focus-within:ring-2 focus-within:ring-[hsl(var(--nextui-focus))] focus-within:ring-offset-2 focus-within:ring-offset-background hover:opacity-[var(--nextui-hover-opacity)]">
         <div className="text-[0.75rem] font-normal text-foreground/50">Amount</div>
         <div className="relative flex h-6 items-center justify-between">
           <input
