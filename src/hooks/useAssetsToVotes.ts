@@ -14,13 +14,14 @@ interface AssetsToVotesProps {
 
 function useAssetsToVotes({ commission, totalAmount, inputAmount, operation }: AssetsToVotesProps) {
   const { isEnabled } = useWalletStatus();
+
   const result = useReadContract({
     abi,
     address,
     functionName: 'assetsToVotes',
     args: [commission, calculateAssets(totalAmount, inputAmount, operation)],
     query: {
-      enabled: isEnabled && !isNil(totalAmount) && !isNil(inputAmount) && !!commission
+      enabled: isEnabled && !isNil(totalAmount) && !isNil(inputAmount)
     }
   });
 

@@ -1,8 +1,12 @@
 import React, { useCallback, useMemo } from 'react';
 import { Button, cn } from '@nextui-org/react';
 import { BigNumber } from 'bignumber.js';
-
 import BalanceDescription from './balance-description';
+
+BigNumber.config({
+  EXPONENTIAL_AT: [-1000, 1000],
+  DECIMAL_PLACES: 1000
+});
 
 interface AmountInputWithBalanceProps {
   symbol?: string;
@@ -39,22 +43,39 @@ const AmountInputWithBalance = ({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (isDisabled) return;
       const newValue = e.target.value;
-      const numValue = new BigNumber(newValue);
-
-      if (newValue === '' || numValue.isNaN()) {
-        onChange?.(e);
-      } else {
-        const minValue = new BigNumber(min);
-        const result = BigNumber.max(BigNumber.min(numValue, maxValue), minValue);
-        onChange?.({ target: { value: result.toString() } } as React.ChangeEvent<HTMLInputElement>);
+      // // 允许输入小数点和数字
+      if (newValue === '' || /^[0-9]*\.?[0-9]*$/.test(newValue)) {
+        onChange?.({
+          target: { value: newValue }
+        } as React.ChangeEvent<HTMLInputElement>);
       }
     },
-    [onChange, min, maxValue, isDisabled]
+    [isDisabled, onChange]
   );
 
+  const handleInputBlur = useCallback(() => {
+    if (value === '' || value === '.') {
+      onChange?.({
+        target: { value: '0' }
+      } as React.ChangeEvent<HTMLInputElement>);
+      return;
+    }
+
+    const numValue = new BigNumber(value || '0');
+    const minValue = new BigNumber(min);
+    const result = BigNumber.max(BigNumber.min(numValue, maxValue), minValue);
+    const formattedResult = result.decimalPlaces(18, BigNumber.ROUND_DOWN);
+
+    onChange?.({
+      target: { value: formattedResult?.toString() }
+    } as React.ChangeEvent<HTMLInputElement>);
+  }, [value, onChange, min, maxValue]);
+
   const handleMaxClick = useCallback(() => {
-    onChange?.({ target: { value: balance || '0' } } as React.ChangeEvent<HTMLInputElement>);
-  }, [balance, onChange]);
+    onChange?.({
+      target: { value: maxValue?.toString() }
+    } as React.ChangeEvent<HTMLInputElement>);
+  }, [maxValue, onChange]);
 
   return (
     <div className={cn('flex w-full flex-col gap-[0.31rem]', className)}>
@@ -67,6 +88,7 @@ const AmountInputWithBalance = ({
             placeholder="0"
             className="w-full appearance-none bg-transparent pr-16 text-[1rem] font-bold text-foreground placeholder:text-[0.875rem] placeholder:font-bold placeholder:text-[#c6c6c6] hover:bg-transparent focus-visible:outline-none"
             onChange={handleInputChange}
+            onBlur={handleInputBlur}
             step="any"
             disabled={isDisabled}
           />

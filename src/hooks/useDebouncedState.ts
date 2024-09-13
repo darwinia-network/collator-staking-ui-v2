@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useDebounce } from 'react-use';
 
 interface UseDebouncedStateProps<T> {
@@ -23,7 +23,7 @@ export function useDebouncedState<T>({
   const [debouncedValue, setDebouncedValue] = useState<T>(initialValue);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [, cancel] = useDebounce(
+  useDebounce(
     () => {
       setDebouncedValue(value);
       setIsLoading(false);
@@ -32,14 +32,15 @@ export function useDebouncedState<T>({
     [value]
   );
 
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      cancel();
+  useEffect(() => {
+    if (value !== debouncedValue) {
       setIsLoading(true);
-      setValue(e.target.value as unknown as T);
-    },
-    [cancel]
-  );
+    }
+  }, [value, debouncedValue]);
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value as unknown as T);
+  }, []);
 
   const reset = useCallback(() => {
     setValue(initialValue);
