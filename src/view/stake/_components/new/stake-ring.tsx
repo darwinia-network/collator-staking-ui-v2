@@ -23,7 +23,8 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
     value: amount,
     debouncedValue: debouncedAmount,
     reset: resetAmount,
-    handleChange: handleAmountChange
+    handleChange: handleAmountChange,
+    isLoading: isLoadingAmount
   } = useDebouncedState<string>({
     initialValue: '0'
   });
@@ -150,7 +151,7 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
           color="primary"
           isDisabled={isDisabled}
           onClick={handleStake}
-          isLoading={isLoading}
+          isLoading={isLoading || isLoadingAmount}
           className="w-full font-bold"
         >
           Staking

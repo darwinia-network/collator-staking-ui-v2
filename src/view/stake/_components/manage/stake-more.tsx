@@ -24,7 +24,8 @@ const StakeMore = ({ isOpen, onClose, collator, onOk }: StakeMoreProps) => {
     value: amount,
     debouncedValue: debounceAmount,
     handleChange: handleAmountChange,
-    reset: resetAmount
+    reset: resetAmount,
+    isLoading: isLoadingAmount
   } = useDebouncedState<string>({
     initialValue: '0'
   });
@@ -91,7 +92,7 @@ const StakeMore = ({ isOpen, onClose, collator, onOk }: StakeMoreProps) => {
               className="w-full"
               onClick={handleStakeMore}
               isDisabled={amount === '0'}
-              isLoading={isLoadingOldAndNewPrev || isPending}
+              isLoading={isLoadingOldAndNewPrev || isPending || isLoadingAmount}
             >
               Stake
             </Button>

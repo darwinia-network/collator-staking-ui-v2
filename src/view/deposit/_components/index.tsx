@@ -22,7 +22,8 @@ const Deposit = () => {
     value: amount,
     debouncedValue: debounceAmount,
     handleChange: handleAmountChange,
-    reset: resetAmount
+    reset: resetAmount,
+    isLoading: isLoadingAmount
   } = useDebouncedState<string>({
     initialValue: '0'
   });
@@ -107,7 +108,7 @@ const Deposit = () => {
           <Button
             className="w-full font-bold"
             color="primary"
-            isLoading={isPendingDeposit}
+            isLoading={isPendingDeposit || isLoadingAmount}
             isDisabled={isDisabledDeposit}
             onClick={handleConfirmDeposit}
           >

@@ -32,7 +32,8 @@ const Unstake = ({
     value: amount,
     debouncedValue: debounceAmount,
     handleChange: handleAmountChange,
-    reset: resetAmount
+    reset: resetAmount,
+    isLoading: isLoadingAmount
   } = useDebouncedState<string>({
     initialValue: '0'
   });
@@ -92,7 +93,7 @@ const Unstake = ({
               color="primary"
               className="w-full"
               isDisabled={amount === '0'}
-              isLoading={isPending || isLoadingOldAndNewPrev}
+              isLoading={isPending || isLoadingOldAndNewPrev || isLoadingAmount}
               onClick={handleUnstake}
             >
               Unstake
