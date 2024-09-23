@@ -28,10 +28,34 @@ export const KTON_TOKEN_INFO_MAP = new Map<
   ]
 ]);
 
-export const RING_DAO_GOVERNANCE_URL_MAP = new Map<ChainId, string>([
-  [ChainId.CRAB, 'http://crab-vote.ringdao.com'],
-  [ChainId.DARWINIA, 'http://vote.ringdao.com'],
-  [ChainId.KOI, 'http://koi-vote.ringdao.com']
+export const RING_DAO_GOVERNANCE_MAP = new Map<
+  ChainId,
+  {
+    url: string;
+    name: string;
+  }
+>([
+  [
+    ChainId.CRAB,
+    {
+      url: "'http://crab-vote.ringdao.com'",
+      name: 'CrabDAO governance'
+    }
+  ],
+  [
+    ChainId.DARWINIA,
+    {
+      url: "'http://vote.ringdao.com'",
+      name: 'RingDAO governance'
+    }
+  ],
+  [
+    ChainId.KOI,
+    {
+      url: "'http://koi-vote.ringdao.com'",
+      name: 'RingDAO test version governance'
+    }
+  ]
 ]);
 
 export const GRING_TOKEN_ADDRESS_MAP = new Map<

@@ -4,7 +4,7 @@ import { getChainById, getChains } from '@/utils/chain';
 import {
   GRING_TOKEN_ADDRESS_MAP,
   KTON_TOKEN_INFO_MAP,
-  RING_DAO_GOVERNANCE_URL_MAP
+  RING_DAO_GOVERNANCE_MAP
 } from '@/config/chains';
 import { ChainId } from '@/types/chains';
 
@@ -18,7 +18,7 @@ function useWalletStatus() {
   const ktonInfo =
     KTON_TOKEN_INFO_MAP.get(currentChainId as ChainId) ?? KTON_TOKEN_INFO_MAP.get(ChainId.DARWINIA);
 
-  const ringDAOGovernanceUrl = RING_DAO_GOVERNANCE_URL_MAP.get(currentChainId as ChainId);
+  const ringDAOGovernance = RING_DAO_GOVERNANCE_MAP.get(currentChainId as ChainId);
 
   const gringTokenInfo = GRING_TOKEN_ADDRESS_MAP.get(currentChainId as ChainId);
   return {
@@ -28,7 +28,7 @@ function useWalletStatus() {
     currentChainId,
     currentChain,
     ktonInfo,
-    ringDAOGovernanceUrl,
+    ringDAOGovernance,
     gringTokenInfo
   };
 }

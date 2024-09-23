@@ -1,5 +1,5 @@
 import { useCallback, memo, useEffect, useState, useMemo } from 'react';
-import { Button, Divider, Link, Spinner } from '@nextui-org/react';
+import { Button, Divider, Spinner } from '@nextui-org/react';
 import { useWatchAsset } from 'wagmi';
 import { parseEther } from 'viem';
 import AmountInputWithBalance from '@/components/amount-input-with-balance';
@@ -21,7 +21,7 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
   const [amount, setAmount] = useState<string>('0');
 
   const { watchAsset, isPending: isPendingWatchAsset } = useWatchAsset();
-  const { ringDAOGovernanceUrl, gringTokenInfo } = useWalletStatus();
+  const { ringDAOGovernance, gringTokenInfo } = useWalletStatus();
   const {
     formatted,
     isLoading: isLoadingBalance,
@@ -132,15 +132,7 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
             <img src="/images/common/metamask.svg" alt="metamask" className="inline size-4" />
           </div>
           , which allows you to participate in{' '}
-          <Link
-            href={ringDAOGovernanceUrl}
-            className="text-[0.75rem] text-[#0094FF]"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            RingDAO governance
-          </Link>
-          .
+          <span className="text-[0.75rem]">{ringDAOGovernance?.name}</span>.
         </div>
         <p className="m-0 text-[0.75rem] font-normal text-foreground/50">
           Please note that gRING is non-transferable.
