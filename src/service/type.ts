@@ -155,6 +155,6 @@ export interface StakingAccountQueryParams {
   distinct_on?: StakingAccountSelectColumn[];
   limit?: number;
   offset?: number;
-  order_by?: StakingAccountOrderBy[];
+  orderBy?: StakingAccountOrderBy[];
   where?: StakingAccountBoolExp;
 }
