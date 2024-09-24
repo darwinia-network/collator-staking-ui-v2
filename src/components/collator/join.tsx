@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router';
 import { Button, Tooltip } from '@nextui-org/react';
 import { CircleHelp } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -140,14 +139,14 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
       <p className="text-[0.75rem] font-normal text-foreground/50">
         Note that you need to complete two steps in sequence, setup [Session Key] and setup
         [Commission] before becoming a collator. Please{' '}
-        <Link
-          href="https://docs.darwinia.network/node-operators/run-collator-node/#set-session-key-and-commission-rate"
+        <a
+          href="https://docs.darwinia.network/node-operators/run-collator-node"
           className="text-[#0094FF]"
           target="_blank"
           rel="noopener noreferrer"
         >
           Run A Node
-        </Link>{' '}
+        </a>{' '}
         first and get the session key of your running node.
       </p>
       <div className="space-y-[0.62rem]">

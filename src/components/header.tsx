@@ -8,7 +8,7 @@ const Header = () => {
       <div className="mx-auto flex h-full w-full items-center justify-between px-[var(--container-padding-x)]">
         <Link
           href="/"
-          title="darwinia"
+          title="Collator staking"
           className="relative h-[1.375rem] w-[6.78156rem] object-contain md:inline"
         >
           <img src={'/images/common/logo.svg'} alt="darwinia logo" className="absolute shrink-0" />
