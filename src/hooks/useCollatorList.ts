@@ -56,7 +56,7 @@ export const useWaitingCollatorList = ({
   });
 
   const activeCollatorsCount = activeCollators?.length || 0;
-  const offset = activeCollatorsCount + (page - 1) * pageSize;
+  const offset = searchedAddress ? 0 : activeCollatorsCount + (page - 1) * pageSize;
 
   const {
     data: waitingCollators,
