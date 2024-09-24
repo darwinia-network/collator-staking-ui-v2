@@ -64,11 +64,16 @@ const Claim = () => {
     setHash(undefined);
   }, []);
 
+  // filter data
+  const stakingAccountWithRewardsFiltered = stakingAccountWithRewards?.length
+    ? stakingAccountWithRewards.filter((item) => item?.reward > 0n)
+    : [];
+
   return (
     <>
       <ClaimList
-        data={stakingAccountWithRewards as ClaimableReward[]}
-        isLoading={isStakingAccountLoading}
+        data={stakingAccountWithRewardsFiltered as ClaimableReward[]}
+        isLoading={isStakingAccountLoading || isRewardsLoading}
         rewardIsLoading={isRewardsLoading || isRewardsRefetching}
         onClick={handleClick}
       />

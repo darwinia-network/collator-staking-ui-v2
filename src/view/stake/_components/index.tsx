@@ -53,11 +53,16 @@ const StakePage = () => {
     };
   }, []);
 
+  // filter data
+  const stakingAccountFiltered = stakingAccount?.length
+    ? stakingAccount.filter((item) => BigInt(item?.assets ?? '0') > 0n)
+    : [];
+
   return (
     <>
       <div className="flex flex-col gap-[1.25rem]">
         <StakeList
-          data={stakingAccount}
+          data={stakingAccountFiltered}
           isLoading={isStakingAccountLoading}
           onClick={handleClick}
         />
