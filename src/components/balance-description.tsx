@@ -15,7 +15,7 @@ const BalanceDescription = ({
   balance,
   symbol,
   isLoading,
-  fractionDigits = 2,
+  fractionDigits = 3,
   text = 'Balance'
 }: BalanceDescriptionProps) => {
   const balanceBN = new BigNumber(balance || '0');

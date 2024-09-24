@@ -16,7 +16,7 @@ const Rewards = ({ symbol, isLoading, data }: RewardsProps) => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-[0.625rem] rounded-medium bg-secondary p-[0.625rem] backdrop-blur-[20px]">
-      <p className="m-0 text-[0.75rem] font-bold text-foreground/50">Reward you’ll receive</p>
+      <p className="m-0 text-[0.75rem] font-bold text-foreground/50">Rewards you’ll receive</p>
       <div className="flex items-center gap-[0.625rem]">
         {isLoading ? (
           <Spinner

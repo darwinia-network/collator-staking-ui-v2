@@ -27,7 +27,7 @@ const useUpdateCommission = ({
     functionName: 'assetsToVotes',
     args: [totalAssets, newCommission],
     query: {
-      enabled: !!newCommission && !isNil(totalAssets)
+      enabled: !isNil(totalAssets)
     }
   });
 

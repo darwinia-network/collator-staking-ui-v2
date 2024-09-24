@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, Divider, Button } from '@nextui-org/react';
+import { Divider, Button } from '@nextui-org/react';
 import DepositList, { DepositListRef } from '@/components/deposit-list';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import TransactionStatus from '@/components/transaction-status';
@@ -18,7 +18,7 @@ const StakeDeposit = ({ selectedCollator, onSuccess }: StakeDepositProps) => {
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
   const [approvalHash, setApprovalHash] = useState<`0x${string}` | undefined>(undefined);
   const [checkedDeposits, setCheckedDeposits] = useState<DepositInfo[]>([]);
-  const { ringDAOGovernanceUrl } = useWalletStatus();
+  const { ringDAOGovernance } = useWalletStatus();
 
   const {
     data: isApprovedForAll,
@@ -108,7 +108,7 @@ const StakeDeposit = ({ selectedCollator, onSuccess }: StakeDepositProps) => {
     if (!isApprovedForAll) {
       return 'Approve';
     }
-    return 'Staking';
+    return 'Stake';
   }, [isApprovedForAll]);
 
   useEffect(() => {
@@ -124,15 +124,7 @@ const StakeDeposit = ({ selectedCollator, onSuccess }: StakeDepositProps) => {
         <Divider />
         <p className="m-0 text-[0.75rem] font-normal text-foreground/50">
           Both staked Deposit and Deposit can be used to participate in{' '}
-          <Link
-            href={ringDAOGovernanceUrl}
-            className="text-[0.75rem] text-[#0094FF]"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            RingDAO governance
-          </Link>
-          .
+          <span className="text-[0.75rem]">{ringDAOGovernance?.name}</span>.
         </p>
         <Button
           color="primary"

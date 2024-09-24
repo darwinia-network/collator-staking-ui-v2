@@ -22,13 +22,13 @@ import { formatEther } from 'viem';
 
 import type { DepositInfo } from '@/hooks/useUserDepositDetails';
 import useWalletStatus from '@/hooks/useWalletStatus';
-import { formatNumericValue } from '@/utils';
 import { checkIsClaimRequirePenalty } from '@/view/deposit/service';
 import WithdrawEarlier from './withdraw-earlier';
 import { useWithdraw } from '@/view/deposit/_hooks/withdraw';
 import TransactionStatus from '@/components/transaction-status';
 import AsyncButton from '@/components/async-button';
 import { error } from '@/components/toast';
+import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
 
 const PAGE_SIZE = 10;
 interface DepositRecordsModalProps {
@@ -130,18 +130,21 @@ const DepositRecordsModal = ({
     (item: DepositInfo, columnKey: Key) => {
       const cellValue = item[columnKey as keyof DepositInfo];
 
-      const formattedValue = formatNumericValue(formatEther(item?.value), 3);
-
       switch (columnKey) {
         case 'tokenId':
           return (
-            <div className="text-[0.875rem] font-bold text-primary">ID #{cellValue.toString()}</div>
+            <div className="text-[0.875rem] font-bold text-primary">
+              Token ID [{cellValue.toString()}]
+            </div>
           );
 
         case 'value':
           return (
-            <span>
-              {formattedValue.fixed} {currentChain?.nativeCurrency?.symbol}
+            <span className="flex items-center gap-1">
+              <FormattedNumberTooltip value={formatEther(item?.value)}>
+                {(formattedValue) => formattedValue}
+              </FormattedNumberTooltip>
+              {currentChain?.nativeCurrency?.symbol}
             </span>
           );
 
@@ -235,7 +238,7 @@ const DepositRecordsModal = ({
             >
               <TableHeader>
                 <TableColumn className="w-[9.375rem] bg-secondary" key="tokenId">
-                  No.
+                  ERC-721
                 </TableColumn>
                 <TableColumn className="w-[10.625rem] bg-secondary" key="value">
                   Amount

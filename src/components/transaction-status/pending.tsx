@@ -5,7 +5,7 @@ const TransactionPending = () => {
         <div className="rolling-square"></div>
       </div>
       <p className="text-center text-[1.125rem] font-bold text-foreground">
-        Transaction is being processing
+        Transaction is being processed
       </p>
     </div>
   );

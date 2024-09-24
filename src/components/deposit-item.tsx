@@ -1,9 +1,8 @@
 import { Checkbox, Progress, Tooltip } from '@nextui-org/react';
-
-import type { DepositInfo } from '@/hooks/useUserDepositDetails';
-import { formatNumericValue } from '@/utils';
-import { formatEther } from 'viem';
 import dayjs from 'dayjs';
+import { formatEther } from 'viem';
+import FormattedNumberTooltip from './formatted-number-tooltip';
+import type { DepositInfo } from '@/hooks/useUserDepositDetails';
 
 interface DepositItemProps {
   item: DepositInfo;
@@ -13,7 +12,7 @@ interface DepositItemProps {
 }
 
 const DepositItem = ({ item, isChecked, symbol, onChange }: DepositItemProps) => {
-  const formattedValue = formatNumericValue(formatEther(item?.value || 0n), 3);
+  const value = formatEther(item?.value || 0n);
   const startAtDate = dayjs(item?.startAt * 1000).format('YYYY-MM-DD');
   const endAtDate = dayjs(item?.endAt * 1000).format('YYYY-MM-DD');
   const now = dayjs().unix();
@@ -46,12 +45,17 @@ const DepositItem = ({ item, isChecked, symbol, onChange }: DepositItemProps) =>
           label={
             <div className="flex w-full items-center justify-between">
               <span className="text-[0.875rem] font-normal text-foreground">
-                ID# {item?.tokenId?.toString()}
+                Token ID [{item?.tokenId?.toString()}]
               </span>
               <div className="flex items-center gap-2">
-                <span className="text-[0.875rem] font-normal text-foreground">
-                  {formattedValue.fixed}
-                </span>
+                <FormattedNumberTooltip value={value}>
+                  {(formattedValue) => (
+                    <span className="text-[0.875rem] font-normal text-foreground">
+                      {formattedValue}
+                    </span>
+                  )}
+                </FormattedNumberTooltip>
+
                 <span className="text-[0.875rem] font-normal text-foreground">{symbol || ''}</span>
               </div>
             </div>

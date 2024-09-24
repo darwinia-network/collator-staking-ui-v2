@@ -43,11 +43,13 @@ export function useCollatorSet({
     queryKey: ['collatorSet', params],
     queryFn: async () => {
       const result = await fetchCollatorSet(params);
+
       if (result === null) {
         throw new Error('Failed to fetch collator set');
       }
       return result;
     },
+    placeholderData: (prevData) => prevData,
     enabled: isEnabled && enabled
   });
 }

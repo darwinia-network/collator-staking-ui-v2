@@ -73,8 +73,12 @@ const CollatorWaitingSelectionTable = ({
       case 'balance': {
         const formattedBalance = formatEther(item.assets ? BigInt(item.assets) : 0n);
         return (
-          <FormattedNumberTooltip value={formattedBalance}>
-            {(formattedValue) => <span className="line-clamp-1">{formattedValue}</span>}
+          <FormattedNumberTooltip value={formattedBalance} className="line-clamp-1">
+            {(formattedValue) => (
+              <div className="w-full overflow-hidden">
+                <span className="block truncate">{formattedValue}</span>
+              </div>
+            )}
           </FormattedNumberTooltip>
         );
       }
@@ -159,7 +163,7 @@ const CollatorWaitingSelectionTable = ({
           <TableColumn className="w-[10rem] bg-secondary" key="collator" width={100}>
             Collator
           </TableColumn>
-          <TableColumn className="w-[6rem] bg-secondary" key="balance" width={50}>
+          <TableColumn className="w-[8rem] bg-secondary" key="balance" width={50}>
             Staked {symbol}
           </TableColumn>
           <TableColumn className="w-[4.43rem] bg-secondary" key="commission" width={40}>

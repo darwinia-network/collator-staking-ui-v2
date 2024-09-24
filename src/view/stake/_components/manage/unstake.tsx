@@ -5,7 +5,6 @@ import { X } from 'lucide-react';
 import AmountInputWithBalance from '@/components/amount-input-with-balance';
 import TransactionStatus from '@/components/transaction-status';
 import { error } from '@/components/toast';
-import { useDebouncedState } from '@/hooks/useDebouncedState';
 import { useUnstakeRING } from '../../_hooks/unstake';
 import type { CollatorSet } from '@/service/type';
 
@@ -28,18 +27,11 @@ const Unstake = ({
   onOk
 }: EditStakeProps) => {
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
-  const {
-    value: amount,
-    debouncedValue: debounceAmount,
-    handleChange: handleAmountChange,
-    reset: resetAmount
-  } = useDebouncedState<string>({
-    initialValue: '0'
-  });
+  const [amount, setAmount] = useState<string>('0');
 
   const { unstakeRING, isPending, isLoadingOldAndNewPrev } = useUnstakeRING({
     collator,
-    inputAmount: parseEther(debounceAmount)
+    inputAmount: parseEther(amount)
   });
 
   const handleUnstake = useCallback(async () => {
@@ -57,9 +49,9 @@ const Unstake = ({
 
   const handleSuccess = useCallback(() => {
     setHash(undefined);
-    resetAmount();
+    setAmount('0');
     onOk?.();
-  }, [onOk, resetAmount]);
+  }, [onOk]);
   return (
     <>
       <Modal
@@ -85,7 +77,7 @@ const Unstake = ({
               balance={totalAmount}
               text="Staking"
               value={amount}
-              onChange={handleAmountChange}
+              onChange={(e) => setAmount(e.target.value)}
             />
             <Divider />
             <Button

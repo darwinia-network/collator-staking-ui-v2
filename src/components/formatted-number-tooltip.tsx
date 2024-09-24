@@ -10,7 +10,7 @@ interface FormattedNumberTooltipProps {
 }
 
 const FormattedNumberTooltip = React.forwardRef<HTMLDivElement, FormattedNumberTooltipProps>(
-  ({ value, fractionDigits = 2, className, children }, ref) => {
+  ({ value, fractionDigits = 3, className, children }, ref) => {
     const formattedValue = formatNumericValue(value, fractionDigits);
     const renderContent = children || ((formattedValue: string) => formattedValue);
 

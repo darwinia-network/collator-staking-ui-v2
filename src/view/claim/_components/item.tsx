@@ -3,8 +3,9 @@ import { Button, Skeleton } from '@nextui-org/react';
 
 import Avatar from '@/components/avatar';
 import { StakingAccountWithStatus } from '@/hooks/useStakingAccountWithStatus';
-import { formatNumericValue, toShortAddress } from '@/utils';
+import { toShortAddress } from '@/utils';
 import { formatEther } from 'viem';
+import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
 
 export interface ClaimableReward extends StakingAccountWithStatus {
   reward: bigint;
@@ -36,10 +37,7 @@ function ClaimableRewardCard({
     }
   }, [onClick]);
 
-  const formattedBalance = formatNumericValue(
-    reward?.reward ? formatEther(reward?.reward) : '0',
-    2
-  );
+  const formattedBalance = reward?.reward ? formatEther(reward?.reward) : '0';
 
   return (
     <div style={style}>
@@ -61,9 +59,11 @@ function ClaimableRewardCard({
             {rewardIsLoading ? (
               <Skeleton className="h-[0.875rem] w-[0.875rem] rounded-medium" />
             ) : (
-              <span className="text-[0.875rem] font-bold text-primary">
-                {formattedBalance.fixed}
-              </span>
+              <FormattedNumberTooltip value={formattedBalance}>
+                {(formattedValue) => (
+                  <span className="text-[0.875rem] font-bold text-primary">{formattedValue}</span>
+                )}
+              </FormattedNumberTooltip>
             )}
           </div>
           <Button

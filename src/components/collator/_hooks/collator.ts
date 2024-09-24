@@ -77,7 +77,7 @@ export const useCreateCollator = ({
     functionName: 'assetsToVotes',
     args: [stakedOf ?? 0n, commission],
     query: {
-      enabled: isEnabled && !!commission && !!stakedOf && enabled
+      enabled: isEnabled && !!stakedOf && enabled
     }
   });
 
