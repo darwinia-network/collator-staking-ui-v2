@@ -12,7 +12,7 @@ import { ChevronDown } from 'lucide-react';
 import { getChains } from '@/utils';
 
 import type { Chain } from '@rainbow-me/rainbowkit';
-import type { ChainId } from '@/types/chains';
+import { ChainId } from '@/types/chains';
 
 interface ChainSwitcherProps {
   activeChain: Chain;
@@ -59,6 +59,7 @@ const DesktopChainSwitcher = ({ activeChain, onChainChange, isMobile }: ChainSwi
       <DropdownMenu
         selectedKeys={[String(activeChain.id)]}
         selectionMode="single"
+        disabledKeys={[String(ChainId.DARWINIA)]}
         onSelectionChange={(keys) => {
           onChainChange?.(Number(keys.currentKey) as ChainId);
         }}
