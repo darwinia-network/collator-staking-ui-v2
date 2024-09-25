@@ -1,5 +1,7 @@
 import { useReadContract } from 'wagmi';
 import { abi, address } from '@/config/abi/hub';
+import { readContract } from '@wagmi/core';
+import { config } from '@/config/wagmi';
 
 export type Operation = 'add' | 'subtract';
 
@@ -22,6 +24,20 @@ function useAssetsToVotes({ commission, totalAmount, inputAmount, operation }: A
   });
 
   return result;
+}
+
+export async function assetsToVotes(
+  commission: bigint,
+  totalAmount: bigint,
+  inputAmount: bigint,
+  operation: Operation
+): Promise<bigint> {
+  return await readContract(config, {
+    abi,
+    address,
+    functionName: 'assetsToVotes',
+    args: [commission, calculateAssets(totalAmount, inputAmount, operation)]
+  });
 }
 
 function calculateAssets(totalAmount: bigint, inputAmount: bigint, operation: Operation): bigint {

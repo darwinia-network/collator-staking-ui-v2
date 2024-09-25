@@ -1,6 +1,10 @@
 import { DEFAULT_PREV } from '@/utils/getPrevNew';
-import useAssetsToVotes, { Operation } from './useAssetsToVotes';
-import { fetchCollatorSetNewPrev, fetchCollatorSetPrev } from './useService';
+import { assetsToVotes, Operation } from './useAssetsToVotes';
+import {
+  fetchCollatorByAddress,
+  fetchCollatorSetNewPrev,
+  fetchCollatorSetPrev
+} from './useService';
 import { genKey } from '@/utils';
 import { CollatorSet } from '@/service/type';
 import { useCallback, useState } from 'react';
@@ -22,41 +26,41 @@ export function useStakeOldAndNewPrev({
   operation = 'add'
 }: UseOldAndNewPrevProps) {
   const { currentChainId } = useWalletStatus();
-  const commission = BigInt(collator?.commission || 0);
-  const totalAmount = BigInt(collator?.assets || 0);
   const collatorAddress = collator?.address || '';
-  const oldKey = collator?.key || '';
 
   const [isLoading, setIsLoading] = useState(false);
-  const { refetch: refetchAssetsToVotes, data } = useAssetsToVotes({
-    commission,
-    totalAmount,
-    inputAmount,
-    operation
-  });
-
-  console.log('data', data);
 
   const getPrevAndNewPrev: () => Promise<PrevResult> = useCallback(async () => {
-    setIsLoading(true);
-
-    if (!oldKey || !collatorAddress) {
-      setIsLoading(true);
+    if (!collatorAddress) {
       return {
         oldPrev: DEFAULT_PREV,
         newPrev: DEFAULT_PREV
       };
     }
+    setIsLoading(true);
+    const newCollator = await fetchCollatorByAddress({
+      address: collatorAddress as `0x${string}`,
+      currentChainId: currentChainId!
+    });
+    if (!newCollator) {
+      setIsLoading(false);
+      return { oldPrev: DEFAULT_PREV, newPrev: DEFAULT_PREV };
+    }
+
+    const commission = BigInt(newCollator?.[0]?.commission || 0);
+    const totalAmount = BigInt(newCollator?.[0]?.assets || 0);
+    const oldKey = newCollator?.[0]?.key || '';
 
     const [assetsToVotesResult, collatorSetPrev] = await Promise.all([
-      refetchAssetsToVotes(),
-      fetchCollatorSetPrev({ key: oldKey, collatorAddress, currentChainId: currentChainId! })
+      assetsToVotes(commission, totalAmount, inputAmount, operation),
+      fetchCollatorSetPrev({
+        key: oldKey,
+        collatorAddress,
+        currentChainId: currentChainId!
+      })
     ]);
-    console.log('assetsToVotesResult?.data ', assetsToVotesResult?.data);
 
-    const newKey = genKey({ address: collatorAddress, votes: assetsToVotesResult?.data ?? 0n });
-
-    console.log('newKey', newKey);
+    const newKey = genKey({ address: collatorAddress, votes: assetsToVotesResult ?? 0n });
 
     if (!newKey) {
       setIsLoading(false);
@@ -78,7 +82,7 @@ export function useStakeOldAndNewPrev({
         ? (collatorSetNewPrev?.[0]?.address as `0x${string}`)
         : DEFAULT_PREV
     };
-  }, [refetchAssetsToVotes, collatorAddress, oldKey, currentChainId]);
+  }, [collatorAddress, currentChainId, inputAmount, operation]);
 
   return {
     getPrevAndNewPrev,
