@@ -3,11 +3,16 @@ import useAssetsToVotes, { Operation } from './useAssetsToVotes';
 import { useCollatorSetNewPrev, useCollatorSetPrev } from './useService';
 import { genKey } from '@/utils';
 import { CollatorSet } from '@/service/type';
+import { useCallback, useState } from 'react';
 
 type UseOldAndNewPrevProps = {
   inputAmount: bigint;
   collator?: CollatorSet;
   operation?: Operation;
+};
+type PrevResult = {
+  oldPrev: `0x${string}`;
+  newPrev: `0x${string}`;
 };
 
 export function useStakeOldAndNewPrev({
@@ -15,15 +20,16 @@ export function useStakeOldAndNewPrev({
   inputAmount,
   operation = 'add'
 }: UseOldAndNewPrevProps) {
+  const [newKey, setNewKey] = useState<`0x${string}` | undefined>();
   const commission = BigInt(collator?.commission || 0);
   const totalAmount = BigInt(collator?.assets || 0);
   const collatorAddress = collator?.address || '';
   const oldKey = collator?.key || '';
 
   const {
-    data: assetsToVotesResult,
     isLoading: isLoadingAssetsToVotes,
-    isRefetching: isRefetchingAssetsToVotes
+    isRefetching: isRefetchingAssetsToVotes,
+    refetch: refetchAssetsToVotes
   } = useAssetsToVotes({
     commission,
     totalAmount,
@@ -32,36 +38,52 @@ export function useStakeOldAndNewPrev({
   });
 
   const {
-    data: collatorSetPrev,
     isLoading: isLoadingPrev,
-    isRefetching: isRefetchingPrev
+    isRefetching: isRefetchingPrev,
+    refetch: refetchPrev
   } = useCollatorSetPrev({
     key: oldKey,
-    enabled: !!oldKey && !!collatorAddress
+    enabled: false
   });
 
-  const newKey = genKey({ address: collatorAddress, votes: assetsToVotesResult ?? 0n });
-
   const {
-    data: collatorSetNewPrev,
     isLoading: isLoadingNewPrev,
-    isRefetching: isRefetchingNewPrev
+    isRefetching: isRefetchingNewPrev,
+    refetch: refetchNewPrev
   } = useCollatorSetNewPrev({
     key: oldKey,
     newKey,
-    enabled: !!collatorAddress && !!newKey && !!oldKey
+    enabled: false
   });
 
-  const oldPrev = (
-    collatorSetPrev?.[0] ? collatorSetPrev?.[0]?.address : DEFAULT_PREV
-  ) as `0x${string}`;
-  const newPrev = (
-    collatorSetNewPrev?.[0] ? collatorSetNewPrev?.[0]?.address : DEFAULT_PREV
-  ) as `0x${string}`;
+  const getPrevAndNewPrev: () => Promise<PrevResult> = useCallback(async () => {
+    if (!oldKey || !collatorAddress)
+      return {
+        oldPrev: DEFAULT_PREV,
+        newPrev: DEFAULT_PREV
+      };
+    const [assetsToVotesResult, collatorSetPrev] = await Promise.all([
+      refetchAssetsToVotes(),
+      refetchPrev()
+    ]);
+
+    const newKey = genKey({ address: collatorAddress, votes: assetsToVotesResult?.data ?? 0n });
+    setNewKey(newKey as `0x${string}`);
+    if (!newKey) return { oldPrev: DEFAULT_PREV, newPrev: DEFAULT_PREV };
+    const collatorSetNewPrev = await refetchNewPrev();
+
+    return {
+      oldPrev: collatorSetPrev?.[0]?.address
+        ? (collatorSetPrev?.[0]?.address as `0x${string}`)
+        : DEFAULT_PREV,
+      newPrev: collatorSetNewPrev?.[0]?.address
+        ? (collatorSetNewPrev?.[0]?.address as `0x${string}`)
+        : DEFAULT_PREV
+    };
+  }, [collatorAddress, oldKey, refetchAssetsToVotes, refetchNewPrev, refetchPrev]);
 
   return {
-    oldPrev,
-    newPrev,
+    getPrevAndNewPrev,
     isLoading:
       isLoadingAssetsToVotes ||
       isLoadingPrev ||
