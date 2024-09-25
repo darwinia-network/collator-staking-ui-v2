@@ -1,6 +1,7 @@
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { DAppProvider } from './providers/dapp-provider';
 import { routeTree } from './routeTree.gen';
+import { WaitingIndexingProvider } from './components/waiting-indexing/context';
 
 const router = createRouter({ routeTree });
 
@@ -12,7 +13,9 @@ declare module '@tanstack/react-router' {
 function App() {
   return (
     <DAppProvider>
-      <RouterProvider router={router} />
+      <WaitingIndexingProvider>
+        <RouterProvider router={router} />
+      </WaitingIndexingProvider>
     </DAppProvider>
   );
 }
