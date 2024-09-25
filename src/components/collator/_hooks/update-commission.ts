@@ -9,7 +9,6 @@ import { genKey } from '@/utils';
 type UpdateCommissionProps = {
   newCommission: bigint;
   oldKey: string;
-  oldPrev: `0x${string}`;
   collatorAddress: `0x${string}`;
   totalAssets: bigint;
 };
@@ -17,7 +16,6 @@ type UpdateCommissionProps = {
 const useUpdateCommission = ({
   newCommission,
   oldKey,
-  oldPrev,
   collatorAddress,
   totalAssets
 }: UpdateCommissionProps) => {
@@ -34,29 +32,35 @@ const useUpdateCommission = ({
   const newKey = genKey({ address: collatorAddress, votes: votes ?? 0n });
 
   const {
-    data: collatorSetNewPrev,
     isLoading: isLoadingNewPrev,
-    isRefetching: isRefetchingNewPrev
+    isRefetching: isRefetchingNewPrev,
+    refetch: refetchNewPrev
   } = useCollatorSetNewPrev({
     key: newKey,
     newKey,
     enabled: !!collatorAddress && !!newKey && !!oldKey
   });
 
-  const newPrev = (
-    collatorSetNewPrev?.[0] ? collatorSetNewPrev?.[0]?.address : DEFAULT_PREV
-  ) as `0x${string}`;
-
   const { writeContractAsync, isPending } = useWriteContract();
 
-  const updateCommission = useCallback(async () => {
-    return writeContractAsync({
-      abi: hubAbi,
-      address: hubAddress,
-      functionName: 'updateCommission',
-      args: [newCommission, oldPrev, newPrev]
-    });
-  }, [newCommission, oldPrev, newPrev, writeContractAsync]);
+  const updateCommission = useCallback(
+    async ({ oldPrev }) => {
+      if (!collatorAddress || !newKey || !oldKey) {
+        return;
+      }
+      const { data } = await refetchNewPrev();
+      const newPrev =
+        data && data?.[0]?.address ? (data?.[0]?.address as `0x${string}`) : DEFAULT_PREV;
+
+      return writeContractAsync({
+        abi: hubAbi,
+        address: hubAddress,
+        functionName: 'updateCommission',
+        args: [newCommission, oldPrev, newPrev]
+      });
+    },
+    [newCommission, writeContractAsync, refetchNewPrev, collatorAddress, newKey, oldKey]
+  );
 
   return {
     updateCommission,

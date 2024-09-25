@@ -14,20 +14,19 @@ export const useCreateAndCollator = ({ enabled }: { enabled: boolean }) => {
   const { writeContractAsync, ...rest } = useWriteContract();
   const oldKey = genKey({ address: address as `0x${string}`, votes: 0n });
   const {
-    data: collatorSetPrev,
     isLoading: isLoadingPrev,
-    isRefetching: isRefetchingPrev
+    isRefetching: isRefetchingPrev,
+    refetch: refetchPrev
   } = useCollatorSetPrev({
     key: oldKey,
-    enabled: isEnabled && !!oldKey && enabled
+    enabled: false
   });
-
-  const prev = (
-    collatorSetPrev?.[0] ? collatorSetPrev?.[0]?.address : DEFAULT_PREV
-  ) as `0x${string}`;
 
   const createAndCollator = useCallback(
     async ({ commission }: CreateAndCollatorProps) => {
+      if (!isEnabled || !oldKey || !enabled) return;
+      const { data } = await refetchPrev();
+      const prev = data && data?.[0] ? (data[0]?.address as `0x${string}`) : DEFAULT_PREV;
       return await writeContractAsync({
         address: hubAddress,
         abi: hubAbi,
@@ -35,7 +34,7 @@ export const useCreateAndCollator = ({ enabled }: { enabled: boolean }) => {
         args: [prev, commission]
       });
     },
-    [writeContractAsync, prev]
+    [writeContractAsync, refetchPrev, isEnabled, oldKey, enabled]
   );
 
   return {
@@ -86,20 +85,20 @@ export const useCreateCollator = ({
   const oldKey = genKey({ address: address as `0x${string}`, votes: votes ?? 0n });
 
   const {
-    data: collatorSetPrev,
     isLoading: isLoadingPrev,
-    isRefetching: isRefetchingPrev
+    isRefetching: isRefetchingPrev,
+    refetch: refetchPrev
   } = useCollatorSetPrev({
     key: oldKey,
-    enabled: isEnabled && !!oldKey && enabled
+    enabled: false
   });
-
-  const prev = (
-    collatorSetPrev?.[0] ? collatorSetPrev?.[0]?.address : DEFAULT_PREV
-  ) as `0x${string}`;
 
   const createCollator = useCallback(
     async ({ commission }: CreateAndCollatorProps) => {
+      if (!isEnabled || !oldKey || !enabled) return;
+      const { data } = await refetchPrev();
+      const prev = data && data?.[0] ? (data[0]?.address as `0x${string}`) : DEFAULT_PREV;
+
       return await writeContractAsync({
         address: hubAddress,
         abi: hubAbi,
@@ -107,7 +106,7 @@ export const useCreateCollator = ({
         args: [prev, commission]
       });
     },
-    [writeContractAsync, prev]
+    [writeContractAsync, refetchPrev, isEnabled, oldKey, enabled]
   );
 
   return {

@@ -12,6 +12,7 @@ import { useSetSessionKey } from './_hooks/set-session-key';
 import useUpdateCommission from './_hooks/update-commission';
 import { useCommissionLockInfo } from './_hooks/commissionLockInfo';
 import { error } from '../toast';
+
 interface CollatorManagementProps {
   sessionKey: string;
   commissionOf: bigint;
@@ -46,17 +47,29 @@ const CollatorManagement = ({
   }, [currentCollator]);
 
   const {
-    data: collatorSetPrev,
     isLoading: isLoadingPrev,
-    isRefetching: isRefetchingPrev
+    isRefetching: isRefetchingPrev,
+    refetch: refetchPrev
   } = useCollatorSetPrev({
     key: oldKey,
-    enabled: !!oldKey
+    enabled: false
   });
 
-  const oldPrev = (
-    collatorSetPrev?.[0] ? collatorSetPrev?.[0]?.address : DEFAULT_PREV
-  ) as `0x${string}`;
+  const getPrevAddress = useCallback(async (): Promise<`0x${string}` | undefined> => {
+    if (!oldKey) {
+      error('Previous key is missing. Please verify your collator information.');
+      return undefined;
+    }
+    try {
+      const { data } = await refetchPrev();
+      const prev = (data?.[0]?.address as `0x${string}`) || DEFAULT_PREV;
+      return prev;
+    } catch (e) {
+      console.error('error when get prev address:', e);
+      error('error when get prev address');
+      return undefined;
+    }
+  }, [refetchPrev, oldKey]);
 
   const { isLockPeriod, isLockPeriodLoading, remainingLockTime } = useCommissionLockInfo();
 
@@ -69,7 +82,6 @@ const CollatorManagement = ({
   } = useUpdateCommission({
     newCommission: BigInt(commissionValue),
     oldKey,
-    oldPrev,
     collatorAddress: collatorAddress as `0x${string}`,
     totalAssets
   });
@@ -121,13 +133,18 @@ const CollatorManagement = ({
   }, []);
 
   const handleSetCommission = useCallback(async () => {
-    const tx = await updateCommission()?.catch((e) => {
+    const oldPrev = await getPrevAddress();
+    if (!oldPrev) {
+      error('Previous key is missing. Please verify your collator information.');
+      return;
+    }
+    const tx = await updateCommission({ oldPrev })?.catch((e) => {
       error(e.shortMessage);
     });
     if (tx) {
       setCommissionHash(tx);
     }
-  }, [updateCommission]);
+  }, [updateCommission, getPrevAddress]);
 
   const handleSetCommissionSuccess = useCallback(() => {
     setCommissionHash('');
@@ -138,13 +155,18 @@ const CollatorManagement = ({
   }, []);
 
   const handleStop = useCallback(async () => {
+    const oldPrev = await getPrevAddress();
+    if (!oldPrev) {
+      error('Previous key is missing. Please verify your collator information.');
+      return;
+    }
     const tx = await stop({ address: oldPrev })?.catch((e) => {
       error(e.shortMessage);
     });
     if (tx) {
       setStopHash(tx);
     }
-  }, [stop, oldPrev]);
+  }, [stop, getPrevAddress]);
 
   const handleStopSuccess = useCallback(() => {
     setStopHash('');
