@@ -13,7 +13,7 @@ const chainIds = getChains().map((chain) => chain.id);
 function useWalletStatus() {
   const result = useAccount();
   const isSupportedChain = result.chainId ? chainIds.includes(result.chainId) : false;
-  const currentChainId = isSupportedChain ? result.chainId : undefined;
+  const currentChainId = isSupportedChain ? (result.chainId as ChainId) : undefined;
   const currentChain = currentChainId ? getChainById(currentChainId) : undefined;
   const ktonInfo =
     KTON_TOKEN_INFO_MAP.get(currentChainId as ChainId) ?? KTON_TOKEN_INFO_MAP.get(ChainId.DARWINIA);

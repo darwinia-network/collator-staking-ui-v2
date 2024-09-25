@@ -2,47 +2,48 @@ import { gql } from 'graphql-request';
 
 export const GET_COLLATOR_SET = gql`
   query GetCollatorSet(
-    $distinctOn: [CollatorSet_select_column!]
-    $limit: Int
-    $offset: Int
-    $orderBy: [CollatorSet_order_by!]
-    $where: CollatorSet_bool_exp
+    $skip: Int
+    $first: Int
+    $orderBy: CollatorSet_orderBy
+    $orderDirection: OrderDirection
+    $where: CollatorSet_filter
   ) {
-    CollatorSet(
-      distinct_on: $distinctOn
-      limit: $limit
-      offset: $offset
-      order_by: $orderBy
+    collatorSets(
+      skip: $skip
+      first: $first
+      orderBy: $orderBy
+      orderDirection: $orderDirection
       where: $where
     ) {
       address
       assets
-      chainId
-      commission
+      blockNumber
       id
+      commission
       inset
+      key
+      logIndex
       pool
       prev
-      votes
       reward
-      key
+      votes
     }
   }
 `;
 
 export const GET_COLLATOR_SET_BY_INSET = gql`
   query GetCollatorSetByAccount(
-    $distinctOn: [CollatorSet_select_column!]
-    $limit: Int
-    $offset: Int
-    $orderBy: [CollatorSet_order_by!]
-    $where: CollatorSet_bool_exp
+    $skip: Int
+    $first: Int
+    $orderBy: CollatorSet_orderBy
+    $orderDirection: OrderDirection
+    $where: CollatorSet_filter
   ) {
-    CollatorSet(
-      distinct_on: $distinctOn
-      limit: $limit
-      offset: $offset
-      order_by: $orderBy
+    collatorSets(
+      skip: $skip
+      first: $first
+      orderBy: $orderBy
+      orderDirection: $orderDirection
       where: $where
     ) {
       address
@@ -53,13 +54,13 @@ export const GET_COLLATOR_SET_BY_INSET = gql`
 
 export const GET_STAKING_ACCOUNT = gql`
   query GetStakingAccount(
-    $distinctOn: [StakingAccount_select_column!]
-    $limit: Int
-    $offset: Int
-    $orderBy: [StakingAccount_order_by!]
-    $where: StakingAccount_bool_exp
+    $skip: Int
+    $first: Int
+    $orderBy: StakingAccount_orderBy
+    $orderDirection: OrderDirection
+    $where: StakingAccount_filter
   ) {
-    StakingAccount(
+    stakingAccounts(
       distinct_on: $distinctOn
       limit: $limit
       offset: $offset
@@ -68,7 +69,6 @@ export const GET_STAKING_ACCOUNT = gql`
     ) {
       account
       assets
-      chainId
       collator
       id
       pool

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Tooltip } from '@nextui-org/react';
 import { CircleHelp } from 'lucide-react';
 import { validSessionKey } from '@/utils';
-import { useCollatorByAddress, useCollatorSetPrev } from '@/hooks/useService';
+import { fetchCollatorSetPrev, useCollatorByAddress } from '@/hooks/useService';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import { DEFAULT_PREV } from '@/utils/getPrevNew';
 import TransactionStatus from '../transaction-status';
@@ -25,7 +25,7 @@ const CollatorManagement = ({
   refetch,
   onStopSuccess
 }: CollatorManagementProps) => {
-  const { address } = useWalletStatus();
+  const { address, currentChainId } = useWalletStatus();
   const [open, setOpen] = useState(false);
   const [isValidSessionKey, setIsValidSessionKey] = useState(true);
   const [sessionKeyHash, setSessionKeyHash] = useState('');
@@ -33,6 +33,7 @@ const CollatorManagement = ({
   const [stopHash, setStopHash] = useState('');
   const [sessionKeyValue, setSessionKeyValue] = useState('');
   const [commissionValue, setCommissionValue] = useState('');
+  const [isLoadingPrev, setIsLoadingPrev] = useState(false);
 
   const { data: collatorByAddress, isLoading: isLoadingCollatorByAddress } = useCollatorByAddress({
     address: address as `0x${string}`,
@@ -46,22 +47,15 @@ const CollatorManagement = ({
     return assets ? BigInt(assets) : BigInt(0);
   }, [currentCollator]);
 
-  const {
-    isLoading: isLoadingPrev,
-    isRefetching: isRefetchingPrev,
-    refetch: refetchPrev
-  } = useCollatorSetPrev({
-    key: oldKey,
-    enabled: false
-  });
-
   const getPrevAddress = useCallback(async (): Promise<`0x${string}` | undefined> => {
     if (!oldKey) {
       error('Previous key is missing. Please verify your collator information.');
       return undefined;
     }
     try {
-      const { data } = await refetchPrev();
+      setIsLoadingPrev(true);
+      const data = await fetchCollatorSetPrev({ key: oldKey, currentChainId: currentChainId! });
+      setIsLoadingPrev(false);
       const prev = (data?.[0]?.address as `0x${string}`) || DEFAULT_PREV;
       return prev;
     } catch (e) {
@@ -69,7 +63,7 @@ const CollatorManagement = ({
       error('error when get prev address');
       return undefined;
     }
-  }, [refetchPrev, oldKey]);
+  }, [oldKey, currentChainId]);
 
   const { isLockPeriod, isLockPeriodLoading, remainingLockTime } = useCommissionLockInfo();
 
@@ -274,7 +268,6 @@ const CollatorManagement = ({
               isLockPeriodLoading ||
               isLoadingUpdateCommission ||
               isLoadingPrev ||
-              isRefetchingPrev ||
               isLoadingCollatorByAddress
             }
           >
@@ -287,7 +280,7 @@ const CollatorManagement = ({
         color="primary"
         className="h-[2.125rem] w-full"
         variant="light"
-        isLoading={isPendingStop}
+        isLoading={isPendingStop || isLoadingPrev}
         onClick={handleStop}
       >
         Stop Collation

@@ -1,10 +1,11 @@
 import { abi as hubAbi, address as hubAddress } from '@/config/abi/hub';
 import { useReadContract, useWriteContract } from 'wagmi';
 import { isNil } from 'lodash-es';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { DEFAULT_PREV } from '@/utils/getPrevNew';
-import { useCollatorSetNewPrev } from '@/hooks/useService';
+import { fetchCollatorSetNewPrev } from '@/hooks/useService';
 import { genKey } from '@/utils';
+import useWalletStatus from '@/hooks/useWalletStatus';
 
 type UpdateCommissionProps = {
   newCommission: bigint;
@@ -19,6 +20,8 @@ const useUpdateCommission = ({
   collatorAddress,
   totalAssets
 }: UpdateCommissionProps) => {
+  const { currentChainId } = useWalletStatus();
+  const [isLoadingNewPrev, setIsLoadingNewPrev] = useState(false);
   const { data: votes, isLoading: isLoadingVotes } = useReadContract({
     abi: hubAbi,
     address: hubAddress,
@@ -31,16 +34,6 @@ const useUpdateCommission = ({
 
   const newKey = genKey({ address: collatorAddress, votes: votes ?? 0n });
 
-  const {
-    isLoading: isLoadingNewPrev,
-    isRefetching: isRefetchingNewPrev,
-    refetch: refetchNewPrev
-  } = useCollatorSetNewPrev({
-    key: newKey,
-    newKey,
-    enabled: !!collatorAddress && !!newKey && !!oldKey
-  });
-
   const { writeContractAsync, isPending } = useWriteContract();
 
   const updateCommission = useCallback(
@@ -48,7 +41,13 @@ const useUpdateCommission = ({
       if (!collatorAddress || !newKey || !oldKey) {
         return;
       }
-      const { data } = await refetchNewPrev();
+      setIsLoadingNewPrev(true);
+      const data = await fetchCollatorSetNewPrev({
+        collatorAddress,
+        newKey,
+        currentChainId: currentChainId!
+      });
+      setIsLoadingNewPrev(false);
       const newPrev =
         data && data?.[0]?.address ? (data?.[0]?.address as `0x${string}`) : DEFAULT_PREV;
 
@@ -59,14 +58,14 @@ const useUpdateCommission = ({
         args: [newCommission, oldPrev, newPrev]
       });
     },
-    [newCommission, writeContractAsync, refetchNewPrev, collatorAddress, newKey, oldKey]
+    [newCommission, writeContractAsync, collatorAddress, newKey, oldKey, currentChainId]
   );
 
   return {
     updateCommission,
     isPending,
     votes,
-    isLoading: isLoadingVotes || isLoadingNewPrev || isRefetchingNewPrev
+    isLoading: isLoadingVotes || isLoadingNewPrev
   };
 };
 
