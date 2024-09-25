@@ -50,7 +50,7 @@ export function useStakeOldAndNewPrev({
 
     const [assetsToVotesResult, collatorSetPrev] = await Promise.all([
       refetchAssetsToVotes(),
-      fetchCollatorSetPrev({ key: oldKey, currentChainId: currentChainId! })
+      fetchCollatorSetPrev({ key: oldKey, collatorAddress, currentChainId: currentChainId! })
     ]);
     console.log('assetsToVotesResult?.data ', assetsToVotesResult?.data);
 

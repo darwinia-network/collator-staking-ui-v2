@@ -52,15 +52,18 @@ export function useCollatorSet({
 
 export const fetchCollatorSetPrev = async ({
   key,
+  collatorAddress,
   currentChainId
 }: {
   key: string;
+  collatorAddress: `0x${string}`;
   currentChainId: number;
 }) => {
   const params: CollatorSetQueryParams = {
     where: {
       inset: 1,
-      key_gt: key
+      key_gt: key,
+      id_not: collatorAddress
     },
     orderBy: 'key',
     orderDirection: 'asc',

@@ -19,7 +19,11 @@ export const useCreateAndCollator = ({ enabled }: { enabled: boolean }) => {
     async ({ commission }: CreateAndCollatorProps) => {
       if (!isEnabled || !oldKey || !enabled) return;
       setIsLoadingPrev(true);
-      const data = await fetchCollatorSetPrev({ key: oldKey, currentChainId: currentChainId! });
+      const data = await fetchCollatorSetPrev({
+        key: oldKey,
+        collatorAddress: address as `0x${string}`,
+        currentChainId: currentChainId!
+      });
       setIsLoadingPrev(false);
       const prev = data && data?.[0] ? (data[0]?.address as `0x${string}`) : DEFAULT_PREV;
       return await writeContractAsync({
@@ -29,7 +33,7 @@ export const useCreateAndCollator = ({ enabled }: { enabled: boolean }) => {
         args: [prev, commission]
       });
     },
-    [writeContractAsync, isEnabled, oldKey, enabled, currentChainId]
+    [writeContractAsync, isEnabled, oldKey, enabled, currentChainId, address]
   );
 
   return {
@@ -85,7 +89,11 @@ export const useCreateCollator = ({
     async ({ commission }: CreateAndCollatorProps) => {
       if (!isEnabled || !oldKey || !enabled) return;
       setIsLoadingPrev(true);
-      const data = await fetchCollatorSetPrev({ key: oldKey, currentChainId: currentChainId! });
+      const data = await fetchCollatorSetPrev({
+        key: oldKey,
+        collatorAddress: address as `0x${string}`,
+        currentChainId: currentChainId!
+      });
       setIsLoadingPrev(false);
       const prev = data && data?.[0] ? (data[0]?.address as `0x${string}`) : DEFAULT_PREV;
 
@@ -96,7 +104,7 @@ export const useCreateCollator = ({
         args: [prev, commission]
       });
     },
-    [writeContractAsync, isEnabled, oldKey, enabled, currentChainId]
+    [writeContractAsync, isEnabled, oldKey, enabled, currentChainId, address]
   );
 
   return {

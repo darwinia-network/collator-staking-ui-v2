@@ -54,7 +54,11 @@ const CollatorManagement = ({
     }
     try {
       setIsLoadingPrev(true);
-      const data = await fetchCollatorSetPrev({ key: oldKey, currentChainId: currentChainId! });
+      const data = await fetchCollatorSetPrev({
+        key: oldKey,
+        collatorAddress: collatorAddress as `0x${string}`,
+        currentChainId: currentChainId!
+      });
       setIsLoadingPrev(false);
       const prev = (data?.[0]?.address as `0x${string}`) || DEFAULT_PREV;
       return prev;
@@ -63,7 +67,7 @@ const CollatorManagement = ({
       error('error when get prev address');
       return undefined;
     }
-  }, [oldKey, currentChainId]);
+  }, [oldKey, currentChainId, collatorAddress]);
 
   const { isLockPeriod, isLockPeriodLoading, remainingLockTime } = useCommissionLockInfo();
 
