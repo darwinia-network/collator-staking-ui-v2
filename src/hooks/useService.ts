@@ -23,26 +23,22 @@ export function useCollatorSet({
   limit,
   enabled = true
 }: CollatorSetParams) {
-  const { currentChainId, isEnabled } = useWalletStatus();
+  const { isEnabled, currentChainId } = useWalletStatus();
   const params: CollatorSetQueryParams = {
     where: {
-      chainId: {
-        _eq: currentChainId
-      },
-      ...(searchedAddress ? { address: { _eq: toLowerCase(searchedAddress) } } : {}),
-      inset: {
-        _eq: 1
-      }
+      ...(searchedAddress ? { address: toLowerCase(searchedAddress) } : {}),
+      inset: 1
     },
-    offset,
-    limit,
-    orderBy: [{ key: 'desc' }]
+    skip: offset,
+    first: limit,
+    orderBy: 'key',
+    orderDirection: 'desc'
   };
 
   return useQuery({
     queryKey: ['collatorSet', params],
     queryFn: async () => {
-      const result = await fetchCollatorSet(params);
+      const result = await fetchCollatorSet(params, currentChainId!);
 
       if (result === null) {
         throw new Error('Failed to fetch collator set');
@@ -54,85 +50,98 @@ export function useCollatorSet({
   });
 }
 
-type CollatorSetPrevParams = {
-  key?: string;
-  enabled?: boolean;
-};
-export function useCollatorSetPrev({ key, enabled = true }: CollatorSetPrevParams) {
-  const { currentChainId, isEnabled } = useWalletStatus();
-
+export const fetchCollatorSetPrev = async ({
+  key,
+  collatorAddress,
+  currentChainId
+}: {
+  key: string;
+  collatorAddress: `0x${string}`;
+  currentChainId: number;
+}) => {
   const params: CollatorSetQueryParams = {
     where: {
-      chainId: {
-        _eq: currentChainId
-      },
-      inset: {
-        _eq: 1
-      },
-      key: {
-        _gt: key
-      }
+      inset: 1,
+      key_gt: key,
+      id_not: collatorAddress
     },
-    orderBy: [{ key: 'asc' }],
-    limit: 1
+    orderBy: 'key',
+    orderDirection: 'asc',
+    first: 1,
+    skip: 0
   };
 
-  return useQuery({
-    queryKey: ['collatorSet', params],
-    queryFn: async () => {
-      const result = await fetchCollatorSet(params);
-      if (result === null) {
-        throw new Error('Failed to fetch collator set');
-      }
-      return result;
-    },
-    enabled: isEnabled && !!key && enabled
-  });
-}
+  const result = await fetchCollatorSet(params, currentChainId!);
+  if (result === null) {
+    throw new Error('Failed to fetch collator set');
+  }
+  return result;
+};
 
 type CollatorSetNewPrevParams = {
-  key?: string;
+  collatorAddress?: `0x${string}`;
   newKey?: string;
   enabled?: boolean;
 };
-export function useCollatorSetNewPrev({ key, newKey, enabled = true }: CollatorSetNewPrevParams) {
+
+export function useCollatorSetNewPrev({
+  collatorAddress,
+  newKey,
+  enabled = true
+}: CollatorSetNewPrevParams) {
   const { currentChainId, isEnabled } = useWalletStatus();
 
   const params: CollatorSetQueryParams = {
     where: {
-      chainId: {
-        _eq: currentChainId
-      },
-      inset: {
-        _eq: 1
-      },
-      key: {
-        _gt: newKey
-      },
-      _and: [
-        {
-          key: {
-            _neq: key
-          }
-        }
-      ]
+      inset: 1,
+      key_gt: newKey,
+      id_not: collatorAddress
     },
-    orderBy: [{ key: 'asc' }],
-    limit: 1
+    orderBy: 'key',
+    orderDirection: 'asc',
+    first: 1,
+    skip: 0
   };
 
   return useQuery({
-    queryKey: ['collatorSet', params],
+    queryKey: ['collatorSetNewPrev', params],
     queryFn: async () => {
-      const result = await fetchCollatorSet(params);
+      const result = await fetchCollatorSet(params, currentChainId!);
       if (result === null) {
         throw new Error('Failed to fetch collator set');
       }
       return result;
     },
-    enabled: isEnabled && !!key && !!newKey && !!enabled
+    enabled: isEnabled && !!collatorAddress && !!newKey && enabled
   });
 }
+export const fetchCollatorSetNewPrev = async ({
+  collatorAddress,
+  newKey,
+  currentChainId
+}: {
+  collatorAddress: `0x${string}`;
+  newKey: string;
+  currentChainId: number;
+}) => {
+  const params: CollatorSetQueryParams = {
+    where: {
+      inset: 1,
+      key_gt: newKey,
+      id_not: collatorAddress
+    },
+    orderBy: 'key',
+    orderDirection: 'asc',
+    first: 1,
+    skip: 0
+  };
+
+  const result = await fetchCollatorSet(params, currentChainId!);
+  if (result === null) {
+    throw new Error('Failed to fetch collator set');
+  }
+  return result;
+};
 
 type CollatorByAddressParams = {
   address: `0x${string}`;
@@ -143,21 +152,19 @@ export function useCollatorByAddress({ address, enabled = true }: CollatorByAddr
 
   const params: CollatorSetQueryParams = {
     where: {
-      chainId: {
-        _eq: currentChainId
-      },
-      ...(address ? { address: { _eq: toLowerCase(address) } } : {}),
-      inset: {
-        _eq: 1
-      }
+      ...(address ? { address: toLowerCase(address) } : {}),
+      inset: 1
     },
-    orderBy: [{ key: 'desc' }]
+    orderBy: 'key',
+    orderDirection: 'desc',
+    skip: 0,
+    first: 1
   };
 
   return useQuery({
-    queryKey: ['collatorSet', params],
+    queryKey: ['collatorByAddress', params],
     queryFn: async () => {
-      const result = await fetchCollatorSet(params);
+      const result = await fetchCollatorSet(params, currentChainId!);
       if (result === null) {
         throw new Error('Failed to fetch collator set');
       }
@@ -179,19 +186,17 @@ export function useCollatorSetByAccounts({
   const { currentChainId, isEnabled } = useWalletStatus();
   const params: CollatorSetQueryParams = {
     where: {
-      chainId: {
-        _eq: currentChainId
-      },
-      id: {
-        _in: accounts?.map((account) => toLowerCase(account))
-      }
+      id_in: accounts?.map((account) => toLowerCase(account))
     },
-    orderBy: [{ key: 'asc' }]
+    orderBy: 'key',
+    orderDirection: 'asc',
+    skip: 0,
+    first: 1000
   };
   return useQuery({
     queryKey: ['collatorSetByAccounts', params],
     queryFn: async () => {
-      const result = await fetchCollatorSetByAccounts(params);
+      const result = await fetchCollatorSetByAccounts(params, currentChainId!);
       if (result === null) {
         throw new Error('Failed to fetch collator set by accounts');
       }
@@ -209,19 +214,14 @@ export function useStakingAccount({ enabled = true }: StakingAccountParams) {
 
   const params: StakingAccountQueryParams = {
     where: {
-      account: {
-        _eq: toLowerCase(address)
-      },
-      chainId: {
-        _eq: currentChainId
-      }
+      account: toLowerCase(address)
     }
   };
-  const queryKey = ['stakingAccount', params];
+  const queryKey = ['stakingAccounts', params];
   const result = useQuery({
     queryKey,
     queryFn: async () => {
-      const result = await fetchStakingAccount(params);
+      const result = await fetchStakingAccount(params, currentChainId!);
       if (result === null) {
         throw new Error('Failed to fetch staking account');
       }

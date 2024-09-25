@@ -14,11 +14,7 @@ type UseRingStakeProps = {
 
 export const useRingStake = ({ collator, assets }: UseRingStakeProps) => {
   const collatorAddress = collator?.address as `0x${string}`;
-  const {
-    oldPrev,
-    newPrev,
-    isLoading: isLoadingOldAndNewPrev
-  } = useStakeOldAndNewPrev({
+  const { getPrevAndNewPrev, isLoading: isLoadingOldAndNewPrev } = useStakeOldAndNewPrev({
     collator,
     inputAmount: assets
   });
@@ -26,6 +22,7 @@ export const useRingStake = ({ collator, assets }: UseRingStakeProps) => {
   const result = useWriteContract();
 
   const handleStake = useCallback(async () => {
+    const { oldPrev, newPrev } = (await getPrevAndNewPrev()) || {};
     if (!collatorAddress || !oldPrev || !newPrev || !assets) return;
 
     console.log('%cCalling stakeRING function', 'color: #4CAF50; font-weight: bold;');
@@ -40,7 +37,7 @@ export const useRingStake = ({ collator, assets }: UseRingStakeProps) => {
       args: [collatorAddress, oldPrev, newPrev],
       value: assets
     });
-  }, [result, collatorAddress, oldPrev, newPrev, assets]);
+  }, [result, collatorAddress, assets, getPrevAndNewPrev]);
 
   return { ...result, handleStake, isLoadingOldAndNewPrev };
 };
@@ -82,11 +79,7 @@ export const useDepositStake = ({ collator, deposits }: UseDepositStakeProps) =>
   const collatorAddress = collator?.address as `0x${string}`;
   const assets = deposits.reduce((acc, deposit) => acc + deposit.value, 0n);
 
-  const {
-    oldPrev,
-    newPrev,
-    isLoading: isLoadingOldAndNewPrev
-  } = useStakeOldAndNewPrev({
+  const { getPrevAndNewPrev, isLoading: isLoadingOldAndNewPrev } = useStakeOldAndNewPrev({
     collator,
     inputAmount: assets
   });
@@ -94,6 +87,7 @@ export const useDepositStake = ({ collator, deposits }: UseDepositStakeProps) =>
   const result = useWriteContract();
 
   const handleStake = useCallback(async () => {
+    const { oldPrev, newPrev } = (await getPrevAndNewPrev()) || {};
     if (!collatorAddress || !oldPrev || !newPrev || !assets) return;
 
     console.log('%cCalling stakeRING function', 'color: #4CAF50; font-weight: bold;');
@@ -108,7 +102,7 @@ export const useDepositStake = ({ collator, deposits }: UseDepositStakeProps) =>
       functionName: 'stakeDeposits',
       args: [collatorAddress, deposits.map((deposit) => BigInt(deposit.tokenId)), oldPrev, newPrev]
     });
-  }, [result, collatorAddress, oldPrev, newPrev, assets, deposits]);
+  }, [result, collatorAddress, assets, deposits, getPrevAndNewPrev]);
 
   return { ...result, handleStake, isLoadingOldAndNewPrev };
 };

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Tooltip } from '@nextui-org/react';
 import { CircleHelp } from 'lucide-react';
 import { validSessionKey } from '@/utils';
-import { useCollatorByAddress, useCollatorSetPrev } from '@/hooks/useService';
+import { fetchCollatorSetPrev, useCollatorByAddress } from '@/hooks/useService';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import { DEFAULT_PREV } from '@/utils/getPrevNew';
 import TransactionStatus from '../transaction-status';
@@ -12,6 +12,7 @@ import { useSetSessionKey } from './_hooks/set-session-key';
 import useUpdateCommission from './_hooks/update-commission';
 import { useCommissionLockInfo } from './_hooks/commissionLockInfo';
 import { error } from '../toast';
+
 interface CollatorManagementProps {
   sessionKey: string;
   commissionOf: bigint;
@@ -24,7 +25,7 @@ const CollatorManagement = ({
   refetch,
   onStopSuccess
 }: CollatorManagementProps) => {
-  const { address } = useWalletStatus();
+  const { address, currentChainId } = useWalletStatus();
   const [open, setOpen] = useState(false);
   const [isValidSessionKey, setIsValidSessionKey] = useState(true);
   const [sessionKeyHash, setSessionKeyHash] = useState('');
@@ -32,6 +33,7 @@ const CollatorManagement = ({
   const [stopHash, setStopHash] = useState('');
   const [sessionKeyValue, setSessionKeyValue] = useState('');
   const [commissionValue, setCommissionValue] = useState('');
+  const [isLoadingPrev, setIsLoadingPrev] = useState(false);
 
   const { data: collatorByAddress, isLoading: isLoadingCollatorByAddress } = useCollatorByAddress({
     address: address as `0x${string}`,
@@ -45,18 +47,27 @@ const CollatorManagement = ({
     return assets ? BigInt(assets) : BigInt(0);
   }, [currentCollator]);
 
-  const {
-    data: collatorSetPrev,
-    isLoading: isLoadingPrev,
-    isRefetching: isRefetchingPrev
-  } = useCollatorSetPrev({
-    key: oldKey,
-    enabled: !!oldKey
-  });
-
-  const oldPrev = (
-    collatorSetPrev?.[0] ? collatorSetPrev?.[0]?.address : DEFAULT_PREV
-  ) as `0x${string}`;
+  const getPrevAddress = useCallback(async (): Promise<`0x${string}` | undefined> => {
+    if (!oldKey) {
+      error('Previous key is missing. Please verify your collator information.');
+      return undefined;
+    }
+    try {
+      setIsLoadingPrev(true);
+      const data = await fetchCollatorSetPrev({
+        key: oldKey,
+        collatorAddress: collatorAddress as `0x${string}`,
+        currentChainId: currentChainId!
+      });
+      setIsLoadingPrev(false);
+      const prev = (data?.[0]?.address as `0x${string}`) || DEFAULT_PREV;
+      return prev;
+    } catch (e) {
+      console.error('error when get prev address:', e);
+      error('error when get prev address');
+      return undefined;
+    }
+  }, [oldKey, currentChainId, collatorAddress]);
 
   const { isLockPeriod, isLockPeriodLoading, remainingLockTime } = useCommissionLockInfo();
 
@@ -69,7 +80,6 @@ const CollatorManagement = ({
   } = useUpdateCommission({
     newCommission: BigInt(commissionValue),
     oldKey,
-    oldPrev,
     collatorAddress: collatorAddress as `0x${string}`,
     totalAssets
   });
@@ -121,13 +131,18 @@ const CollatorManagement = ({
   }, []);
 
   const handleSetCommission = useCallback(async () => {
-    const tx = await updateCommission()?.catch((e) => {
+    const oldPrev = await getPrevAddress();
+    if (!oldPrev) {
+      error('Previous key is missing. Please verify your collator information.');
+      return;
+    }
+    const tx = await updateCommission({ oldPrev })?.catch((e) => {
       error(e.shortMessage);
     });
     if (tx) {
       setCommissionHash(tx);
     }
-  }, [updateCommission]);
+  }, [updateCommission, getPrevAddress]);
 
   const handleSetCommissionSuccess = useCallback(() => {
     setCommissionHash('');
@@ -138,13 +153,18 @@ const CollatorManagement = ({
   }, []);
 
   const handleStop = useCallback(async () => {
+    const oldPrev = await getPrevAddress();
+    if (!oldPrev) {
+      error('Previous key is missing. Please verify your collator information.');
+      return;
+    }
     const tx = await stop({ address: oldPrev })?.catch((e) => {
       error(e.shortMessage);
     });
     if (tx) {
       setStopHash(tx);
     }
-  }, [stop, oldPrev]);
+  }, [stop, getPrevAddress]);
 
   const handleStopSuccess = useCallback(() => {
     setStopHash('');
@@ -252,7 +272,6 @@ const CollatorManagement = ({
               isLockPeriodLoading ||
               isLoadingUpdateCommission ||
               isLoadingPrev ||
-              isRefetchingPrev ||
               isLoadingCollatorByAddress
             }
           >
@@ -265,7 +284,7 @@ const CollatorManagement = ({
         color="primary"
         className="h-[2.125rem] w-full"
         variant="light"
-        isLoading={isPendingStop}
+        isLoading={isPendingStop || isLoadingPrev}
         onClick={handleStop}
       >
         Stop Collation

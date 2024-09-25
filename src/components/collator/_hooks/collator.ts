@@ -1,33 +1,31 @@
 import { address as hubAddress, abi as hubAbi } from '@/config/abi/hub';
-import { useCollatorSetPrev } from '@/hooks/useService';
+import { fetchCollatorSetPrev } from '@/hooks/useService';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import { genKey } from '@/utils';
 import { DEFAULT_PREV } from '@/utils/getPrevNew';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useReadContract, useWriteContract } from 'wagmi';
 
 type CreateAndCollatorProps = {
   commission: bigint;
 };
 export const useCreateAndCollator = ({ enabled }: { enabled: boolean }) => {
-  const { address, isEnabled } = useWalletStatus();
+  const { address, isEnabled, currentChainId } = useWalletStatus();
   const { writeContractAsync, ...rest } = useWriteContract();
+  const [isLoadingPrev, setIsLoadingPrev] = useState(false);
   const oldKey = genKey({ address: address as `0x${string}`, votes: 0n });
-  const {
-    data: collatorSetPrev,
-    isLoading: isLoadingPrev,
-    isRefetching: isRefetchingPrev
-  } = useCollatorSetPrev({
-    key: oldKey,
-    enabled: isEnabled && !!oldKey && enabled
-  });
-
-  const prev = (
-    collatorSetPrev?.[0] ? collatorSetPrev?.[0]?.address : DEFAULT_PREV
-  ) as `0x${string}`;
 
   const createAndCollator = useCallback(
     async ({ commission }: CreateAndCollatorProps) => {
+      if (!isEnabled || !oldKey || !enabled) return;
+      setIsLoadingPrev(true);
+      const data = await fetchCollatorSetPrev({
+        key: oldKey,
+        collatorAddress: address as `0x${string}`,
+        currentChainId: currentChainId!
+      });
+      setIsLoadingPrev(false);
+      const prev = data && data?.[0] ? (data[0]?.address as `0x${string}`) : DEFAULT_PREV;
       return await writeContractAsync({
         address: hubAddress,
         abi: hubAbi,
@@ -35,13 +33,13 @@ export const useCreateAndCollator = ({ enabled }: { enabled: boolean }) => {
         args: [prev, commission]
       });
     },
-    [writeContractAsync, prev]
+    [writeContractAsync, isEnabled, oldKey, enabled, currentChainId, address]
   );
 
   return {
     createAndCollator,
     ...rest,
-    isLoading: isLoadingPrev || isRefetchingPrev || rest.isPending
+    isLoading: isLoadingPrev || rest.isPending
   };
 };
 
@@ -52,7 +50,9 @@ export const useCreateCollator = ({
   commission: bigint;
   enabled: boolean;
 }) => {
-  const { address, isEnabled } = useWalletStatus();
+  const { address, isEnabled, currentChainId } = useWalletStatus();
+  const [isLoadingPrev, setIsLoadingPrev] = useState(false);
+
   const {
     data: stakedOf,
     isLoading: isLoadingStakedOf,
@@ -85,21 +85,18 @@ export const useCreateCollator = ({
 
   const oldKey = genKey({ address: address as `0x${string}`, votes: votes ?? 0n });
 
-  const {
-    data: collatorSetPrev,
-    isLoading: isLoadingPrev,
-    isRefetching: isRefetchingPrev
-  } = useCollatorSetPrev({
-    key: oldKey,
-    enabled: isEnabled && !!oldKey && enabled
-  });
-
-  const prev = (
-    collatorSetPrev?.[0] ? collatorSetPrev?.[0]?.address : DEFAULT_PREV
-  ) as `0x${string}`;
-
   const createCollator = useCallback(
     async ({ commission }: CreateAndCollatorProps) => {
+      if (!isEnabled || !oldKey || !enabled) return;
+      setIsLoadingPrev(true);
+      const data = await fetchCollatorSetPrev({
+        key: oldKey,
+        collatorAddress: address as `0x${string}`,
+        currentChainId: currentChainId!
+      });
+      setIsLoadingPrev(false);
+      const prev = data && data?.[0] ? (data[0]?.address as `0x${string}`) : DEFAULT_PREV;
+
       return await writeContractAsync({
         address: hubAddress,
         abi: hubAbi,
@@ -107,7 +104,7 @@ export const useCreateCollator = ({
         args: [prev, commission]
       });
     },
-    [writeContractAsync, prev]
+    [writeContractAsync, isEnabled, oldKey, enabled, currentChainId, address]
   );
 
   return {
@@ -119,7 +116,6 @@ export const useCreateCollator = ({
       isLoadingVotes ||
       isRefetchingVotes ||
       isLoadingPrev ||
-      isRefetchingPrev ||
       rest.isPending
   };
 };

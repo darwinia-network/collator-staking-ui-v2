@@ -865,6 +865,19 @@ export const abi = [
     type: 'function'
   },
   {
+    inputs: [],
+    name: 'updateTimeStamp',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256'
+      }
+    ],
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
     inputs: [
       {
         internalType: 'address',
