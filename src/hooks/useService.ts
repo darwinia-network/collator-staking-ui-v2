@@ -239,7 +239,9 @@ export function useStakingAccount({ enabled = true }: StakingAccountParams) {
   const params: StakingAccountQueryParams = {
     where: {
       account: toLowerCase(address)
-    }
+    },
+    orderBy: 'latestChangeTimestamp',
+    orderDirection: 'desc'
   };
   const queryKey = ['stakingAccounts', params];
   const result = useQuery({

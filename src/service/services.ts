@@ -46,10 +46,7 @@ export async function fetchStakingAccount(
   params: StakingAccountQueryParams,
   chainId: ChainId
 ): Promise<StakingAccount[] | null> {
-  console.log('fetchStakingAccount', chainId);
-
   const client = getClient(chainId);
-  console.log('client', client);
   try {
     const response = await client.request<{ stakingAccounts: StakingAccount[] }>(
       GET_STAKING_ACCOUNT,
