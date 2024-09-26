@@ -210,7 +210,13 @@ export interface CollatorSetQueryParams {
 
 export type CollatorSetQueryFunction = (params: CollatorSetQueryParams) => Promise<CollatorSet[]>;
 
-export type StakingAccountOrderByField = 'id' | 'pool' | 'collator' | 'account' | 'assets';
+export type StakingAccountOrderByField =
+  | 'id'
+  | 'pool'
+  | 'collator'
+  | 'account'
+  | 'assets'
+  | 'latestChangeTimestamp';
 export interface StakingAccount {
   account: `0x${string}`;
   assets: string;

@@ -175,6 +175,30 @@ export function useCollatorByAddress({ address, enabled = true }: CollatorByAddr
   });
 }
 
+export const fetchCollatorByAddress = async ({
+  address,
+  currentChainId
+}: {
+  address: `0x${string}`;
+  currentChainId: number;
+}) => {
+  const params: CollatorSetQueryParams = {
+    where: {
+      ...(address ? { address: toLowerCase(address) } : {}),
+      inset: 1
+    },
+    orderBy: 'key',
+    orderDirection: 'desc',
+    skip: 0,
+    first: 1
+  };
+  const result = await fetchCollatorSet(params, currentChainId!);
+  if (result === null) {
+    throw new Error('Failed to fetch collator set');
+  }
+  return result;
+};
+
 type CollatorSetByAccountsParams = {
   accounts: `0x${string}`[];
   enabled?: boolean;
@@ -215,7 +239,9 @@ export function useStakingAccount({ enabled = true }: StakingAccountParams) {
   const params: StakingAccountQueryParams = {
     where: {
       account: toLowerCase(address)
-    }
+    },
+    orderBy: 'latestChangeTimestamp',
+    orderDirection: 'desc'
   };
   const queryKey = ['stakingAccounts', params];
   const result = useQuery({
