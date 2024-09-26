@@ -11,6 +11,7 @@ import {
 } from '@nextui-org/react';
 import { ChevronDown, X } from 'lucide-react';
 
+import useWalletStatus from '@/hooks/useWalletStatus';
 import { TransitionPanel } from '@/components/transition-panel';
 import Avatar from '@/components/avatar';
 import { stakeTabs } from '@/config/tabs';
@@ -29,7 +30,8 @@ interface NewStakeModalProps {
   isOpen?: boolean;
 }
 const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
-  const [selected, setSelected] = useState<Key>(stakeTabs[0].key);
+  const { currentChain } = useWalletStatus();
+  const [selected, setSelected] = useState<Key>('stake-ring');
   const [selectedCollator, setSelectedCollator] = useState<CollatorSet | undefined>(undefined);
   const [selectCollatorOpen, setSelectCollatorOpen] = useState(false);
 
@@ -129,7 +131,7 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
                 tabContent: 'group-data-[selected=true]:text-foreground  font-bold'
               }}
             >
-              {stakeTabs.map((tab) => (
+              {stakeTabs(currentChain?.nativeCurrency?.symbol || 'RING').map((tab) => (
                 <Tab
                   key={tab.key}
                   title={

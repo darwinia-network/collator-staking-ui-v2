@@ -1,4 +1,7 @@
 import { ChainId } from '@/types/chains';
+import { nativeTokenIcon as crabNativeTokenIcon } from './crab';
+import { nativeTokenIcon as darwiniaNativeTokenIcon } from './darwinia';
+import { nativeTokenIcon as koiNativeTokenIcon } from './koi';
 
 export { chain as crab, nativeTokenIcon as crabNativeTokenIcon } from './crab';
 export { chain as darwinia, nativeTokenIcon as darwiniaNativeTokenIcon } from './darwinia';
@@ -8,6 +11,12 @@ export const KTON_TOKEN_MAP = new Map<ChainId, string>([
   [ChainId.CRAB, 'CKTON'],
   [ChainId.DARWINIA, 'KTON'],
   [ChainId.KOI, 'PKTON']
+]);
+
+export const NATIVE_TOKEN_ICON_MAP = new Map<ChainId, string>([
+  [ChainId.CRAB, crabNativeTokenIcon],
+  [ChainId.DARWINIA, darwiniaNativeTokenIcon],
+  [ChainId.KOI, koiNativeTokenIcon]
 ]);
 
 export const KTON_TOKEN_INFO_MAP = new Map<

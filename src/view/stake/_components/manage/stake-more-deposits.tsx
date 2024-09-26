@@ -78,6 +78,7 @@ const StakeMoreDeposits = ({ isOpen, collator, onClose, onOk }: EditStakeProps) 
         placement="center"
         isOpen={isOpen}
         onClose={onClose}
+        backdrop="blur"
         className="bg-background"
         classNames={{
           closeButton:

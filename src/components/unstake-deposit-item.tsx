@@ -1,39 +1,48 @@
 import { Checkbox, Progress, Tooltip } from '@nextui-org/react';
 import { formatEther } from 'viem';
-import dayjs from 'dayjs';
 import FormattedNumberTooltip from './formatted-number-tooltip';
 
 import type { StakedDepositInfo } from '@/view/stake/_hooks/staked';
+import { calculateDepositProgress } from '@/utils/date';
 
 interface UnstakeDepositItemProps {
   item: StakedDepositInfo;
   isChecked?: boolean;
+  isDisabled?: boolean;
   symbol?: string;
   onChange: (id: bigint) => void;
 }
 
-const UnstakeDepositItem = ({ item, isChecked, symbol, onChange }: UnstakeDepositItemProps) => {
+const UnstakeDepositItem = ({
+  item,
+  isChecked,
+  isDisabled,
+  symbol,
+  onChange
+}: UnstakeDepositItemProps) => {
   const value = formatEther(item?.amount || 0n);
 
-  const startAtDate = dayjs(item?.startAt * 1000).format('YYYY-MM-DD');
-  const endAtDate = dayjs(item?.endAt * 1000).format('YYYY-MM-DD');
-  const now = dayjs().unix();
-  const totalDuration = item?.endAt - item?.startAt;
-  const elapsedDuration = Math.max(0, Math.min(now - item?.startAt, totalDuration));
-  const progressValue = (elapsedDuration / totalDuration) * 100;
+  const { startAtDate, endAtDate, progressValue } = calculateDepositProgress(
+    item?.startAt,
+    item?.endAt
+  );
+
   return (
     <Tooltip closeDelay={0} content={`${startAtDate} - ${endAtDate}`} placement="bottom">
       <div
         className="flex cursor-pointer items-start gap-[0.31rem]"
         onClick={() => {
+          if (isDisabled) return;
           onChange(item?.tokenId);
         }}
       >
         <Checkbox
           isSelected={isChecked}
+          isDisabled={isDisabled}
           radius="full"
           className="-mt-[3px]"
           onValueChange={() => {
+            if (isDisabled) return;
             onChange(item?.tokenId);
           }}
           classNames={{

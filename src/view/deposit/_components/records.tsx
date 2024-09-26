@@ -6,13 +6,15 @@ import {
   ModalContent,
   ModalHeader,
   Pagination,
+  Progress,
   Spinner,
   Table,
   TableBody,
   TableCell,
   TableColumn,
   TableHeader,
-  TableRow
+  TableRow,
+  Tooltip
 } from '@nextui-org/react';
 import { X } from 'lucide-react';
 import { Key, useCallback, useEffect, useState } from 'react';
@@ -29,6 +31,7 @@ import TransactionStatus from '@/components/transaction-status';
 import AsyncButton from '@/components/async-button';
 import { error } from '@/components/toast';
 import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
+import { calculateDepositProgress } from '@/utils/date';
 
 const PAGE_SIZE = 10;
 interface DepositRecordsModalProps {
@@ -134,19 +137,53 @@ const DepositRecordsModal = ({
         case 'tokenId':
           return (
             <div className="text-[0.875rem] font-bold text-primary">
-              Token ID [{cellValue.toString()}]
+              <a
+                href={`${currentChain?.blockExplorers?.default.url}/token/0x46275d29113f065c2aac262f34C7a3d8a8B7377D/instance/${cellValue.toString()}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Token ID [{cellValue.toString()}]
+              </a>
             </div>
           );
 
-        case 'value':
-          return (
-            <span className="flex items-center gap-1">
-              <FormattedNumberTooltip value={formatEther(item?.value)}>
-                {(formattedValue) => formattedValue}
-              </FormattedNumberTooltip>
-              {currentChain?.nativeCurrency?.symbol}
-            </span>
+        case 'value': {
+          const { startAtDate, endAtDate, progressValue } = calculateDepositProgress(
+            item?.startAt,
+            item?.endAt
           );
+
+          return (
+            <Tooltip closeDelay={0} content={`${startAtDate} - ${endAtDate}`} placement="bottom">
+              <Progress
+                classNames={{
+                  label: 'w-full'
+                }}
+                label={
+                  <div className="flex w-full items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FormattedNumberTooltip value={formatEther(item?.value)}>
+                        {(formattedValue) => (
+                          <span className="text-[0.875rem] font-normal text-foreground">
+                            {formattedValue}
+                          </span>
+                        )}
+                      </FormattedNumberTooltip>
+
+                      <span className="text-[0.875rem] font-normal text-foreground">
+                        {currentChain?.nativeCurrency?.symbol}
+                      </span>
+                    </div>
+                  </div>
+                }
+                value={progressValue}
+                className="w-full gap-1"
+                size="sm"
+                color="primary"
+              />
+            </Tooltip>
+          );
+        }
 
         case 'action': {
           if (item.isClaimRequirePenalty) {
@@ -206,7 +243,7 @@ const DepositRecordsModal = ({
       >
         <ModalContent className="w-[calc(100vw-1.24rem)] px-5 py-0 md:w-[35.625rem]">
           <ModalHeader className="px-0 py-5 text-[1.125rem] font-bold text-foreground">
-            <span>Wallet Deposit</span>
+            <span>Deposit In Wallet</span>
           </ModalHeader>
           <Divider />
           <ModalBody
@@ -249,7 +286,7 @@ const DepositRecordsModal = ({
               </TableHeader>
               <TableBody
                 items={paginatedData || []}
-                emptyContent={<div className="text-center">No active deposit records</div>}
+                emptyContent={<div className="text-center">No deposit in wallet</div>}
                 className="relative"
                 loadingContent={
                   <div className="absolute inset-0 flex w-full items-center justify-center bg-background/50">

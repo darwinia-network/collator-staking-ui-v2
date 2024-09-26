@@ -1,8 +1,8 @@
 import { Checkbox, Progress, Tooltip } from '@nextui-org/react';
-import dayjs from 'dayjs';
 import { formatEther } from 'viem';
 import FormattedNumberTooltip from './formatted-number-tooltip';
 import type { DepositInfo } from '@/hooks/useUserDepositDetails';
+import { calculateDepositProgress } from '@/utils/date';
 
 interface DepositItemProps {
   item: DepositInfo;
@@ -13,12 +13,12 @@ interface DepositItemProps {
 
 const DepositItem = ({ item, isChecked, symbol, onChange }: DepositItemProps) => {
   const value = formatEther(item?.value || 0n);
-  const startAtDate = dayjs(item?.startAt * 1000).format('YYYY-MM-DD');
-  const endAtDate = dayjs(item?.endAt * 1000).format('YYYY-MM-DD');
-  const now = dayjs().unix();
-  const totalDuration = item?.endAt - item?.startAt;
-  const elapsedDuration = Math.max(0, Math.min(now - item?.startAt, totalDuration));
-  const progressValue = (elapsedDuration / totalDuration) * 100;
+
+  const { startAtDate, endAtDate, progressValue } = calculateDepositProgress(
+    item?.startAt,
+    item?.endAt
+  );
+
   return (
     <Tooltip closeDelay={0} content={`${startAtDate} - ${endAtDate}`} placement="bottom">
       <div
