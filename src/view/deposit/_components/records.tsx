@@ -215,7 +215,12 @@ const DepositRecordsModal = ({
           return null;
       }
     },
-    [currentChain?.nativeCurrency?.symbol, handleWithdrawEarlier, handleWithdraw]
+    [
+      currentChain?.nativeCurrency?.symbol,
+      currentChain?.blockExplorers?.default.url,
+      handleWithdrawEarlier,
+      handleWithdraw
+    ]
   );
   const totalPages = Math.ceil((depositList?.length || 0) / PAGE_SIZE);
   const paginatedData = depositList?.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
