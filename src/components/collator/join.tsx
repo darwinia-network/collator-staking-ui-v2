@@ -1,6 +1,7 @@
 import { Button, Tooltip } from '@nextui-org/react';
 import { CircleHelp } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import useCheckWaitingIndexing from '@/hooks/useWaitingIndexing';
 import TransactionStatus from '../transaction-status';
 import { useSetSessionKey } from './_hooks/set-session-key';
 import { useCreateCollator, useCreateAndCollator } from './_hooks/collator';
@@ -21,7 +22,7 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
   const [commissionHash, setCommissionHash] = useState('');
   const [sessionKeyValue, setSessionKeyValue] = useState('');
   const [commissionValue, setCommissionValue] = useState('');
-
+  const { checkWaitingIndexing, isLoading: isLoadingWaitingIndexing } = useCheckWaitingIndexing();
   const { setSessionKey, isPending: isPendingSetSessionKey } = useSetSessionKey();
 
   const commission = useMemo(() => {
@@ -84,6 +85,10 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
   }, []);
 
   const handleSetCommission = useCallback(async () => {
+    const { isDeployed } = await checkWaitingIndexing();
+    if (!isDeployed) {
+      return;
+    }
     if (hasPool) {
       const tx = await createCollator({
         commission
@@ -103,7 +108,7 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
         setCommissionHash(tx);
       }
     }
-  }, [hasPool, commission, createCollator, createAndCollator]);
+  }, [hasPool, commission, createCollator, createAndCollator, checkWaitingIndexing]);
 
   const handleSetCommissionSuccess = useCallback(() => {
     setCommissionHash('');
@@ -239,7 +244,7 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
             className="h-[2.125rem] w-full"
             isDisabled={!hasSessionKey || !commissionValue || commission < 0n}
             onClick={handleSetCommission}
-            isLoading={isSetCommissionLoading || isLockPeriodLoading}
+            isLoading={isSetCommissionLoading || isLockPeriodLoading || isLoadingWaitingIndexing}
           >
             {hasPool ? 'Collate' : 'Create Nomination Pool & Collate'}
           </Button>

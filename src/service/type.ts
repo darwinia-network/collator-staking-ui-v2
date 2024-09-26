@@ -318,3 +318,16 @@ export interface StakingAccountQueryParams {
   orderDirection?: OrderDirection;
   where?: StakingAccount_filter;
 }
+
+export interface DeploymentMetaResponse {
+  _meta: {
+    hasIndexingErrors: boolean;
+    deployment: string;
+    block: {
+      timestamp: string;
+      parentHash: string;
+      number: string;
+      hash: string;
+    };
+  };
+}

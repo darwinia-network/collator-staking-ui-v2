@@ -6,6 +6,7 @@ import AmountInputWithBalance from '@/components/amount-input-with-balance';
 import TransactionStatus from '@/components/transaction-status';
 import { error } from '@/components/toast';
 import { useUnstakeRING } from '../../_hooks/unstake';
+import useCheckWaitingIndexing from '@/hooks/useWaitingIndexing';
 import type { CollatorSet } from '@/service/type';
 
 interface EditStakeProps {
@@ -28,20 +29,24 @@ const Unstake = ({
 }: EditStakeProps) => {
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
   const [amount, setAmount] = useState<string>('0');
-
+  const { checkWaitingIndexing, isLoading: isLoadingWaitingIndexing } = useCheckWaitingIndexing();
   const { unstakeRING, isPending, isLoadingOldAndNewPrev } = useUnstakeRING({
     collator,
     inputAmount: parseEther(amount)
   });
 
   const handleUnstake = useCallback(async () => {
+    const { isDeployed } = await checkWaitingIndexing();
+    if (!isDeployed) {
+      return;
+    }
     const tx = await unstakeRING()?.catch((e) => {
       error(e.shortMessage);
     });
     if (tx) {
       setHash(tx);
     }
-  }, [unstakeRING]);
+  }, [checkWaitingIndexing, unstakeRING]);
 
   const handleFail = useCallback(() => {
     setHash(undefined);
@@ -84,7 +89,7 @@ const Unstake = ({
               color="primary"
               className="w-full"
               isDisabled={amount === '0'}
-              isLoading={isPending || isLoadingOldAndNewPrev}
+              isLoading={isPending || isLoadingOldAndNewPrev || isLoadingWaitingIndexing}
               onClick={handleUnstake}
             >
               Unstake

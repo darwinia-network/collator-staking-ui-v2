@@ -4,6 +4,7 @@ import useStakingAccountWithStatus, {
   StakingAccountWithStatus
 } from '@/hooks/useStakingAccountWithStatus';
 import TransactionStatus from '@/components/transaction-status';
+import useCheckWaitingIndexing from '@/hooks/useWaitingIndexing';
 import { error } from '@/components/toast';
 import { abi as rewardAbi } from '@/config/abi/reward';
 import { ClaimableReward } from './item';
@@ -12,7 +13,7 @@ import ClaimList from './list';
 
 const Claim = () => {
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
-
+  const { checkWaitingIndexing } = useCheckWaitingIndexing();
   const { claim } = useClaim();
 
   const { data: stakingAccount, isLoading: isStakingAccountLoading } =
@@ -45,6 +46,10 @@ const Claim = () => {
 
   const handleClick = useCallback(
     async (item: StakingAccountWithStatus) => {
+      const { isDeployed } = await checkWaitingIndexing();
+      if (!isDeployed) {
+        return;
+      }
       const tx = await claim(item?.collator as `0x${string}`)?.catch((e) => {
         error(e.shortMessage);
       });
@@ -52,7 +57,7 @@ const Claim = () => {
         setHash(tx);
       }
     },
-    [claim]
+    [checkWaitingIndexing, claim]
   );
 
   const handleSuccess = useCallback(() => {

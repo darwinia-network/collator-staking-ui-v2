@@ -4,9 +4,11 @@ import DepositList, { DepositListRef } from '@/components/deposit-list';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import TransactionStatus from '@/components/transaction-status';
 import { useApprovalForAll, useDepositStake, useIsApprovedForAll } from '../../_hooks/stake';
+import { error } from '@/components/toast';
+import useCheckWaitingIndexing from '@/hooks/useWaitingIndexing';
+
 import type { CollatorSet } from '@/service/type';
 import type { DepositInfo } from '@/hooks/useUserDepositDetails';
-import { error } from '@/components/toast';
 
 interface StakeDepositProps {
   selectedCollator?: CollatorSet;
@@ -19,7 +21,7 @@ const StakeDeposit = ({ selectedCollator, onSuccess }: StakeDepositProps) => {
   const [approvalHash, setApprovalHash] = useState<`0x${string}` | undefined>(undefined);
   const [checkedDeposits, setCheckedDeposits] = useState<DepositInfo[]>([]);
   const { ringDAOGovernance } = useWalletStatus();
-
+  const { checkWaitingIndexing, isLoading: isLoadingWaitingIndexing } = useCheckWaitingIndexing();
   const {
     data: isApprovedForAll,
     isLoading: isLoadingIsApprovedForAll,
@@ -38,6 +40,10 @@ const StakeDeposit = ({ selectedCollator, onSuccess }: StakeDepositProps) => {
   });
 
   const handleStake = useCallback(async () => {
+    const { isDeployed } = await checkWaitingIndexing();
+    if (!isDeployed) {
+      return;
+    }
     if (!isApprovedForAll) {
       const tx = await handleApprovalForAll()?.catch((e) => {
         error(e.shortMessage);
@@ -53,7 +59,7 @@ const StakeDeposit = ({ selectedCollator, onSuccess }: StakeDepositProps) => {
         setHash(tx);
       }
     }
-  }, [handleApprovalForAll, isApprovedForAll, handleDepositStake]);
+  }, [checkWaitingIndexing, handleApprovalForAll, isApprovedForAll, handleDepositStake]);
 
   const handleApprovalTransactionSuccess = useCallback(async () => {
     refetchIsApprovedForAll();
@@ -128,7 +134,7 @@ const StakeDeposit = ({ selectedCollator, onSuccess }: StakeDepositProps) => {
         </p>
         <Button
           color="primary"
-          isDisabled={isDisabled}
+          isDisabled={isDisabled || isLoadingWaitingIndexing}
           onClick={handleStake}
           isLoading={isLoading}
           className="w-full font-bold"

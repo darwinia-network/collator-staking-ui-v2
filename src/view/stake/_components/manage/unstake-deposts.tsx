@@ -17,6 +17,7 @@ import TransactionStatus from '@/components/transaction-status';
 import { useUnstakeDeposits } from '../../_hooks/unstake';
 import { CollatorSet } from '@/service/type';
 import { error } from '@/components/toast';
+import useCheckWaitingIndexing from '@/hooks/useWaitingIndexing';
 
 interface EditStakeProps {
   isOpen: boolean;
@@ -41,20 +42,24 @@ const UnstakeDeposits = ({
   const depositListRef = useRef<DepositListRef>(null);
   const [checkedDeposits, setCheckedDeposits] = useState<StakedDepositInfo[]>([]);
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
-
+  const { checkWaitingIndexing, isLoading: isLoadingWaitingIndexing } = useCheckWaitingIndexing();
   const { unstakeDeposits, isLoadingOldAndNewPrev, isPending } = useUnstakeDeposits({
     collator,
     deposits: checkedDeposits
   });
 
   const handleUnstakeStart = useCallback(async () => {
+    const { isDeployed } = await checkWaitingIndexing();
+    if (!isDeployed) {
+      return;
+    }
     const tx = await unstakeDeposits()?.catch((e) => {
       error(e.shortMessage);
     });
     if (tx) {
       setHash(tx);
     }
-  }, [unstakeDeposits]);
+  }, [checkWaitingIndexing, unstakeDeposits]);
 
   const handleSuccess = useCallback(() => {
     setHash(undefined);
@@ -110,7 +115,7 @@ const UnstakeDeposits = ({
                       className="w-full"
                       onClick={handleUnstakeStart}
                       isDisabled
-                      isLoading={isPending || isLoadingOldAndNewPrev}
+                      isLoading={isPending || isLoadingOldAndNewPrev || isLoadingWaitingIndexing}
                     >
                       Unstake
                     </Button>
@@ -123,7 +128,7 @@ const UnstakeDeposits = ({
                 className="w-full"
                 onClick={handleUnstakeStart}
                 isDisabled={!checkedDeposits.length}
-                isLoading={isPending || isLoadingOldAndNewPrev}
+                isLoading={isPending || isLoadingOldAndNewPrev || isLoadingWaitingIndexing}
               >
                 Unstake
               </Button>
