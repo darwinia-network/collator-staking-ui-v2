@@ -25,13 +25,12 @@ function useCheckWaitingIndexing() {
         }),
         fetchDeploymentMeta(currentChainId)
       ]);
-      console.log('updateTimeStamp', updateTimeStamp);
-      console.log('deploymentMeta', deploymentMeta);
 
       if (updateTimeStamp && deploymentMeta?._meta?.block?.timestamp) {
         const contractTimestamp = BigInt(updateTimeStamp.toString());
         const indexedTimestamp = BigInt(deploymentMeta._meta.block.timestamp);
-
+        console.log('contractTimestamp', contractTimestamp);
+        console.log('indexedTimestamp', indexedTimestamp);
         const isDeployed = contractTimestamp <= indexedTimestamp;
         if (!isDeployed) {
           open();
