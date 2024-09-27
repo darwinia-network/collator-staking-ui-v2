@@ -75,3 +75,18 @@ export const GET_STAKING_ACCOUNT = gql`
     }
   }
 `;
+
+export const GET_DEPLOYMENT_META = gql`
+  query GetDeploymentMeta {
+    _meta {
+      hasIndexingErrors
+      deployment
+      block {
+        timestamp
+        parentHash
+        number
+        hash
+      }
+    }
+  }
+`;

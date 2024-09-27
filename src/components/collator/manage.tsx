@@ -4,6 +4,7 @@ import { CircleHelp } from 'lucide-react';
 import { validSessionKey } from '@/utils';
 import { fetchCollatorSetPrev, useCollatorByAddress } from '@/hooks/useService';
 import useWalletStatus from '@/hooks/useWalletStatus';
+import useCheckWaitingIndexing from '@/hooks/useWaitingIndexing';
 import { DEFAULT_PREV } from '@/utils/getPrevNew';
 import TransactionStatus from '../transaction-status';
 import StopCollation from './stop-collation';
@@ -34,7 +35,7 @@ const CollatorManagement = ({
   const [sessionKeyValue, setSessionKeyValue] = useState('');
   const [commissionValue, setCommissionValue] = useState('');
   const [isLoadingPrev, setIsLoadingPrev] = useState(false);
-
+  const { checkWaitingIndexing, isLoading: isLoadingWaitingIndexing } = useCheckWaitingIndexing();
   const { data: collatorByAddress, isLoading: isLoadingCollatorByAddress } = useCollatorByAddress({
     address: address as `0x${string}`,
     enabled: true
@@ -131,6 +132,10 @@ const CollatorManagement = ({
   }, []);
 
   const handleSetCommission = useCallback(async () => {
+    const { isDeployed } = await checkWaitingIndexing();
+    if (!isDeployed) {
+      return;
+    }
     const oldPrev = await getPrevAddress();
     if (!oldPrev) {
       error('Previous key is missing. Please verify your collator information.');
@@ -142,7 +147,7 @@ const CollatorManagement = ({
     if (tx) {
       setCommissionHash(tx);
     }
-  }, [updateCommission, getPrevAddress]);
+  }, [updateCommission, getPrevAddress, checkWaitingIndexing]);
 
   const handleSetCommissionSuccess = useCallback(() => {
     setCommissionHash('');
@@ -153,6 +158,10 @@ const CollatorManagement = ({
   }, []);
 
   const handleStop = useCallback(async () => {
+    const { isDeployed } = await checkWaitingIndexing();
+    if (!isDeployed) {
+      return;
+    }
     const oldPrev = await getPrevAddress();
     if (!oldPrev) {
       error('Previous key is missing. Please verify your collator information.');
@@ -164,7 +173,7 @@ const CollatorManagement = ({
     if (tx) {
       setStopHash(tx);
     }
-  }, [stop, getPrevAddress]);
+  }, [stop, getPrevAddress, checkWaitingIndexing]);
 
   const handleStopSuccess = useCallback(() => {
     setStopHash('');
@@ -272,7 +281,8 @@ const CollatorManagement = ({
               isLockPeriodLoading ||
               isLoadingUpdateCommission ||
               isLoadingPrev ||
-              isLoadingCollatorByAddress
+              isLoadingCollatorByAddress ||
+              isLoadingWaitingIndexing
             }
           >
             Update Commission
@@ -284,7 +294,7 @@ const CollatorManagement = ({
         color="primary"
         className="h-[2.125rem] w-full"
         variant="light"
-        isLoading={isPendingStop || isLoadingPrev}
+        isLoading={isPendingStop || isLoadingPrev || isLoadingWaitingIndexing}
         onClick={handleStop}
       >
         Stop Collation

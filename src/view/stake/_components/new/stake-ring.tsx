@@ -6,9 +6,10 @@ import AmountInputWithBalance from '@/components/amount-input-with-balance';
 import useBalance from '@/hooks/useBalance';
 import useWalletStatus from '@/hooks/useWalletStatus';
 import TransactionStatus from '@/components/transaction-status';
+import { error } from '@/components/toast';
+import useCheckWaitingIndexing from '@/hooks/useWaitingIndexing';
 import { useRingStake } from '../../_hooks/stake';
 import type { CollatorSet } from '@/service/type';
-import { error } from '@/components/toast';
 
 interface StakeRingProps {
   selectedCollator?: CollatorSet;
@@ -19,7 +20,7 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
 
   const [amount, setAmount] = useState<string>('0');
-
+  const { checkWaitingIndexing, isLoading: isLoadingWaitingIndexing } = useCheckWaitingIndexing();
   const { watchAsset, isPending: isPendingWatchAsset } = useWatchAsset();
   const { ringDAOGovernance, gringTokenInfo } = useWalletStatus();
   const {
@@ -48,19 +49,19 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
   });
 
   const handleStake = useCallback(async () => {
-    console.log('handleStake');
+    const { isDeployed } = await checkWaitingIndexing();
 
+    if (!isDeployed) {
+      return;
+    }
     const tx = await handleRingStake()?.catch((e) => {
-      console.log('error', e);
-
       error(e.shortMessage || 'Failed to stake');
     });
-    console.log('tx', tx);
 
     if (tx) {
       setHash(tx);
     }
-  }, [handleRingStake]);
+  }, [handleRingStake, checkWaitingIndexing]);
 
   const handleTransactionSuccess = useCallback(() => {
     resetBalanceAndAmount();
@@ -135,13 +136,13 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
           <span className="text-[0.75rem]">{ringDAOGovernance?.name}</span>.
         </div>
         <p className="m-0 text-[0.75rem] font-normal text-foreground/50">
-          Please note that gRING is non-transferable.
+          Please note that {gringTokenInfo?.symbol} is non-transferable.
         </p>
         <Button
           color="primary"
           isDisabled={isDisabled}
           onClick={handleStake}
-          isLoading={isLoading}
+          isLoading={isLoading || isLoadingWaitingIndexing}
           className="w-full font-bold"
         >
           Stake

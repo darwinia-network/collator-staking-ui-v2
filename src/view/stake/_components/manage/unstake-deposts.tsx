@@ -1,7 +1,15 @@
-import { Button, Divider, Modal, ModalBody, ModalContent, ModalHeader } from '@nextui-org/react';
+import {
+  Button,
+  Divider,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+  Tooltip
+} from '@nextui-org/react';
 import { X } from 'lucide-react';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, ReactNode } from 'react';
 
 import type { StakedDepositInfo } from '../../_hooks/staked';
 import UnstakeDepositList, { DepositListRef } from '@/components/unstake-deposit-list';
@@ -9,34 +17,49 @@ import TransactionStatus from '@/components/transaction-status';
 import { useUnstakeDeposits } from '../../_hooks/unstake';
 import { CollatorSet } from '@/service/type';
 import { error } from '@/components/toast';
+import useCheckWaitingIndexing from '@/hooks/useWaitingIndexing';
 
 interface EditStakeProps {
   isOpen: boolean;
   collator?: CollatorSet;
   symbol: string;
   deposits: StakedDepositInfo[];
+  isLocked?: boolean;
   onClose: () => void;
   onOk: () => void;
+  renderDays?: ReactNode;
 }
 
-const UnstakeDeposits = ({ isOpen, collator, deposits, onClose, onOk }: EditStakeProps) => {
+const UnstakeDeposits = ({
+  isOpen,
+  collator,
+  deposits,
+  isLocked,
+  renderDays,
+  onClose,
+  onOk
+}: EditStakeProps) => {
   const depositListRef = useRef<DepositListRef>(null);
   const [checkedDeposits, setCheckedDeposits] = useState<StakedDepositInfo[]>([]);
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
-
+  const { checkWaitingIndexing, isLoading: isLoadingWaitingIndexing } = useCheckWaitingIndexing();
   const { unstakeDeposits, isLoadingOldAndNewPrev, isPending } = useUnstakeDeposits({
     collator,
     deposits: checkedDeposits
   });
 
   const handleUnstakeStart = useCallback(async () => {
+    const { isDeployed } = await checkWaitingIndexing();
+    if (!isDeployed) {
+      return;
+    }
     const tx = await unstakeDeposits()?.catch((e) => {
       error(e.shortMessage);
     });
     if (tx) {
       setHash(tx);
     }
-  }, [unstakeDeposits]);
+  }, [checkWaitingIndexing, unstakeDeposits]);
 
   const handleSuccess = useCallback(() => {
     setHash(undefined);
@@ -51,6 +74,7 @@ const UnstakeDeposits = ({ isOpen, collator, deposits, onClose, onOk }: EditStak
     <>
       <Modal
         placement="center"
+        backdrop="blur"
         isOpen={isOpen}
         onClose={onClose}
         className="bg-background"
@@ -70,17 +94,45 @@ const UnstakeDeposits = ({ isOpen, collator, deposits, onClose, onOk }: EditStak
               ref={depositListRef}
               onCheckedDepositsChange={setCheckedDeposits}
               deposits={deposits}
+              isDisabled={isLocked}
             />
-
-            <Button
-              color="primary"
-              className="w-full"
-              onClick={handleUnstakeStart}
-              isDisabled={!checkedDeposits.length}
-              isLoading={isPending || isLoadingOldAndNewPrev}
-            >
-              Unstake
-            </Button>
+            {isLocked ? (
+              <Tooltip
+                content={
+                  <div className="max-w-[16.25rem] p-2 text-[0.75rem] font-normal text-foreground">
+                    You can perform the unstake operation {renderDays} after your last stake with
+                    the selected collator. You have {renderDays} remaining before you can unstake.
+                  </div>
+                }
+                closeDelay={0}
+                color="default"
+                showArrow
+              >
+                <div className="w-full">
+                  {
+                    <Button
+                      color="primary"
+                      className="w-full"
+                      onClick={handleUnstakeStart}
+                      isDisabled
+                      isLoading={isPending || isLoadingOldAndNewPrev || isLoadingWaitingIndexing}
+                    >
+                      Unstake
+                    </Button>
+                  }
+                </div>
+              </Tooltip>
+            ) : (
+              <Button
+                color="primary"
+                className="w-full"
+                onClick={handleUnstakeStart}
+                isDisabled={!checkedDeposits.length}
+                isLoading={isPending || isLoadingOldAndNewPrev || isLoadingWaitingIndexing}
+              >
+                Unstake
+              </Button>
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>

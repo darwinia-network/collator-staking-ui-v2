@@ -4,10 +4,11 @@ import AmountInputWithBalance from '@/components/amount-input-with-balance';
 import useBalance from '@/hooks/useBalance';
 import { useCallback, useState } from 'react';
 import { useRingStake } from '@/view/stake/_hooks/stake';
-import type { CollatorSet } from '@/service/type';
 import { parseEther } from 'viem';
 import TransactionStatus from '@/components/transaction-status';
 import { error } from '@/components/toast';
+import useCheckWaitingIndexing from '@/hooks/useWaitingIndexing';
+import type { CollatorSet } from '@/service/type';
 
 interface StakeMoreProps {
   isOpen: boolean;
@@ -21,20 +22,24 @@ const StakeMore = ({ isOpen, onClose, collator, onOk }: StakeMoreProps) => {
 
   const [amount, setAmount] = useState<string>('0');
   const { formatted, isLoading, data: balance, refetch: refetchBalance } = useBalance();
-
+  const { checkWaitingIndexing, isLoading: isLoadingWaitingIndexing } = useCheckWaitingIndexing();
   const { handleStake, isPending, isLoadingOldAndNewPrev } = useRingStake({
     collator,
     assets: parseEther(amount || '0')
   });
 
   const handleStakeMore = useCallback(async () => {
+    const { isDeployed } = await checkWaitingIndexing();
+    if (!isDeployed) {
+      return;
+    }
     const hash = await handleStake()?.catch((e) => {
       error(e.shortMessage);
     });
     if (hash) {
       setHash(hash);
     }
-  }, [handleStake]);
+  }, [checkWaitingIndexing, handleStake]);
 
   const handleFail = useCallback(() => {
     setHash(undefined);
@@ -82,7 +87,9 @@ const StakeMore = ({ isOpen, onClose, collator, onOk }: StakeMoreProps) => {
               className="w-full"
               onClick={handleStakeMore}
               isDisabled={amount === '0'}
-              isLoading={isLoadingOldAndNewPrev || isPending || isLoading}
+              isLoading={
+                isLoadingOldAndNewPrev || isPending || isLoading || isLoadingWaitingIndexing
+              }
             >
               Stake
             </Button>

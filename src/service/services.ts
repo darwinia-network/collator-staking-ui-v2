@@ -1,9 +1,15 @@
 import { ChainId } from '@/types/chains';
 import { getClient } from './client';
-import { GET_COLLATOR_SET, GET_COLLATOR_SET_BY_INSET, GET_STAKING_ACCOUNT } from './queries';
+import {
+  GET_COLLATOR_SET,
+  GET_COLLATOR_SET_BY_INSET,
+  GET_DEPLOYMENT_META,
+  GET_STAKING_ACCOUNT
+} from './queries';
 import type {
   CollatorSet,
   CollatorSetQueryParams,
+  DeploymentMetaResponse,
   StakingAccount,
   StakingAccountQueryParams
 } from './type';
@@ -55,6 +61,20 @@ export async function fetchStakingAccount(
     return response.stakingAccounts;
   } catch (error) {
     console.error('fetchStakingAccount failed:', error);
+    return null;
+  }
+}
+
+export async function fetchDeploymentMeta(
+  chainId: ChainId
+): Promise<DeploymentMetaResponse | null> {
+  const client = getClient(chainId);
+
+  try {
+    const data = await client.request<DeploymentMetaResponse>(GET_DEPLOYMENT_META);
+    return data;
+  } catch (error) {
+    console.error('fetchDeploymentMeta failed:', error);
     return null;
   }
 }

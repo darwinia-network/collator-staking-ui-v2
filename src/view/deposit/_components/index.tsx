@@ -112,7 +112,7 @@ const Deposit = () => {
             variant="light"
             onClick={() => setIsOpen(true)}
           >
-            Wallet Deposit
+            Deposit in Wallet
           </Button>
         </div>
       </div>

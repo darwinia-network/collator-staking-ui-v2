@@ -142,21 +142,6 @@ const StakeManagementModal = ({
     );
   }, [handleUnstakeRingOpen, isLocked]);
 
-  const UnstakeDepositsButton = useMemo(() => {
-    return (
-      <Button
-        variant="flat"
-        size="sm"
-        color="primary"
-        isDisabled={isLocked}
-        className="font-bold"
-        onClick={handleUnstakeDepositsOpen}
-      >
-        Unstake
-      </Button>
-    );
-  }, [handleUnstakeDepositsOpen, isLocked]);
-
   const renderDays = useMemo(() => {
     return (
       <span>
@@ -174,6 +159,21 @@ const StakeManagementModal = ({
     }
     return '0';
   }, [stakedDeposits]);
+
+  const UnstakeDepositsButton = useMemo(() => {
+    return (
+      <Button
+        variant="flat"
+        size="sm"
+        color="primary"
+        className="font-bold"
+        isDisabled={formattedStakedDeposits === '0'}
+        onClick={handleUnstakeDepositsOpen}
+      >
+        Unstake
+      </Button>
+    );
+  }, [handleUnstakeDepositsOpen, formattedStakedDeposits]);
 
   useEffect(() => {
     if (isOpen) {
@@ -274,24 +274,7 @@ const StakeManagementModal = ({
                     )}
                   </FormattedNumberTooltip>
                   <div className="flex items-center gap-[0.62rem]">
-                    {isLocked ? (
-                      <Tooltip
-                        content={
-                          <div className="max-w-[16.25rem] p-2 text-[0.75rem] font-normal text-foreground">
-                            You can perform the unstake operation {renderDays} after your last stake
-                            with the selected collator. You have {renderDays} remaining before you
-                            can unstake.
-                          </div>
-                        }
-                        closeDelay={0}
-                        color="default"
-                        showArrow
-                      >
-                        <div>{UnstakeDepositsButton}</div>
-                      </Tooltip>
-                    ) : (
-                      UnstakeDepositsButton
-                    )}
+                    {UnstakeDepositsButton}
                     <Button
                       size="sm"
                       color="primary"
@@ -332,6 +315,8 @@ const StakeManagementModal = ({
         onClose={handleCloseUnstakeDeposits}
         onOk={handleOkUnstakeDeposits}
         symbol={symbol}
+        isLocked={isLocked}
+        renderDays={renderDays}
         deposits={stakedDeposits}
         collator={collator}
       />

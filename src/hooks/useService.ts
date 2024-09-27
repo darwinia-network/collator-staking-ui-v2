@@ -36,7 +36,7 @@ export function useCollatorSet({
   };
 
   return useQuery({
-    queryKey: ['collatorSet', params],
+    queryKey: ['collatorSet', params, currentChainId],
     queryFn: async () => {
       const result = await fetchCollatorSet(params, currentChainId!);
 
@@ -104,7 +104,7 @@ export function useCollatorSetNewPrev({
   };
 
   return useQuery({
-    queryKey: ['collatorSetNewPrev', params],
+    queryKey: ['collatorSetNewPrev', params, currentChainId],
     queryFn: async () => {
       const result = await fetchCollatorSet(params, currentChainId!);
       if (result === null) {
@@ -162,7 +162,7 @@ export function useCollatorByAddress({ address, enabled = true }: CollatorByAddr
   };
 
   return useQuery({
-    queryKey: ['collatorByAddress', params],
+    queryKey: ['collatorByAddress', params, currentChainId],
     queryFn: async () => {
       const result = await fetchCollatorSet(params, currentChainId!);
       if (result === null) {
@@ -218,7 +218,7 @@ export function useCollatorSetByAccounts({
     first: 1000
   };
   return useQuery({
-    queryKey: ['collatorSetByAccounts', params],
+    queryKey: ['collatorSetByAccounts', params, currentChainId],
     queryFn: async () => {
       const result = await fetchCollatorSetByAccounts(params, currentChainId!);
       if (result === null) {
@@ -243,7 +243,7 @@ export function useStakingAccount({ enabled = true }: StakingAccountParams) {
     orderBy: 'latestChangeTimestamp',
     orderDirection: 'desc'
   };
-  const queryKey = ['stakingAccounts', params];
+  const queryKey = ['stakingAccounts', params, currentChainId];
   const result = useQuery({
     queryKey,
     queryFn: async () => {

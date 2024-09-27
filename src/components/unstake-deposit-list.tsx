@@ -9,13 +9,14 @@ export type DepositListRef = {
   reset: () => void;
 };
 interface DepositListProps {
+  isDisabled?: boolean;
   maxCount?: number;
   deposits: StakedDepositInfo[];
   onCheckedDepositsChange: (deposits: StakedDepositInfo[]) => void;
 }
 
 const UnstakeDepositList = forwardRef<DepositListRef, DepositListProps>(
-  ({ maxCount = 5, deposits, onCheckedDepositsChange }, ref) => {
+  ({ maxCount = 5, deposits, onCheckedDepositsChange, isDisabled = false }, ref) => {
     const [checkedDeposits, setCheckedDeposits] = useState<StakedDepositInfo[]>([]);
 
     const { chain } = useWalletStatus();
@@ -52,6 +53,7 @@ const UnstakeDepositList = forwardRef<DepositListRef, DepositListProps>(
               <UnstakeDepositItem
                 key={deposit.tokenId}
                 item={deposit}
+                isDisabled={isDisabled}
                 isChecked={checkedDeposits.includes(deposit)}
                 symbol={chain?.nativeCurrency?.symbol}
                 onChange={() => handleDepositChange(deposit)}

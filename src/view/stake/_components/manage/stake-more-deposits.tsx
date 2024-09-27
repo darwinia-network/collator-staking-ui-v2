@@ -8,6 +8,7 @@ import { useApprovalForAll, useDepositStake, useIsApprovedForAll } from '../../_
 import { CollatorSet } from '@/service/type';
 import TransactionStatus from '@/components/transaction-status';
 import { error } from '@/components/toast';
+import useCheckWaitingIndexing from '@/hooks/useWaitingIndexing';
 
 interface EditStakeProps {
   isOpen: boolean;
@@ -24,7 +25,7 @@ const StakeMoreDeposits = ({ isOpen, collator, onClose, onOk }: EditStakeProps) 
     refetch: refetchIsApprovedForAll
   } = useIsApprovedForAll();
   const { handleApprovalForAll, isPending: isPendingApprovalForAll } = useApprovalForAll();
-
+  const { checkWaitingIndexing, isLoading: isLoadingWaitingIndexing } = useCheckWaitingIndexing();
   const depositListRef = useRef<DepositListRef>(null);
   const [checkedDeposits, setCheckedDeposits] = useState<DepositInfo[]>([]);
 
@@ -40,15 +41,23 @@ const StakeMoreDeposits = ({ isOpen, collator, onClose, onOk }: EditStakeProps) 
   });
 
   const handleDepositApproval = useCallback(async () => {
+    const { isDeployed } = await checkWaitingIndexing();
+    if (!isDeployed) {
+      return;
+    }
     const tx = await handleApprovalForAll()?.catch((e) => {
       error(e.shortMessage);
     });
     if (tx) {
       setApprovalHash(tx);
     }
-  }, [handleApprovalForAll]);
+  }, [checkWaitingIndexing, handleApprovalForAll]);
 
   const handleDepositStakeStart = useCallback(async () => {
+    const { isDeployed } = await checkWaitingIndexing();
+    if (!isDeployed) {
+      return;
+    }
     refetchIsApprovedForAll();
     const tx = await handleDepositStake()?.catch((e) => {
       error(e.shortMessage);
@@ -57,7 +66,7 @@ const StakeMoreDeposits = ({ isOpen, collator, onClose, onOk }: EditStakeProps) 
       setApprovalHash(undefined);
       setHash(tx);
     }
-  }, [handleDepositStake, refetchIsApprovedForAll]);
+  }, [checkWaitingIndexing, handleDepositStake, refetchIsApprovedForAll]);
 
   const handleDepositFail = useCallback(() => {
     setHash(undefined);
@@ -78,6 +87,7 @@ const StakeMoreDeposits = ({ isOpen, collator, onClose, onOk }: EditStakeProps) 
         placement="center"
         isOpen={isOpen}
         onClose={onClose}
+        backdrop="blur"
         className="bg-background"
         classNames={{
           closeButton:
@@ -102,7 +112,8 @@ const StakeMoreDeposits = ({ isOpen, collator, onClose, onOk }: EditStakeProps) 
                 isLoadingOldAndNewPrevDeposit ||
                 isPendingDepositStake ||
                 isLoadingIsApprovedForAll ||
-                isPendingApprovalForAll
+                isPendingApprovalForAll ||
+                isLoadingWaitingIndexing
               }
             >
               {isApprovedForAll ? 'Stake' : 'Approve'}

@@ -13,9 +13,9 @@ export const defiTabs = [
   }
 ];
 
-export const stakeTabs = [
+export const stakeTabs = (tokenName: string) => [
   {
-    label: 'Stake RING',
+    label: `Stake ${tokenName}`,
     key: 'stake-ring'
   },
   {
