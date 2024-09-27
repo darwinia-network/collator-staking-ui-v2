@@ -145,7 +145,7 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
         Note that you need to complete two steps in sequence, setup [Session Key] and setup
         [Commission] before becoming a collator. Please{' '}
         <a
-          href="https://docs.darwinia.network/node-operators/run-collator-node"
+          href="https://ringdao.notion.site/How-to-become-a-collator-fffaad1d671e81c6b5f0ee4e97c29889"
           className="text-[#0094FF]"
           target="_blank"
           rel="noopener noreferrer"

@@ -105,15 +105,21 @@ const Deposit = () => {
           >
             Deposit
           </Button>
-          <Button
-            className="w-full"
-            color="primary"
-            isDisabled={!isEnabled}
-            variant="light"
-            onClick={() => setIsOpen(true)}
-          >
-            Deposit in Wallet
-          </Button>
+
+          <div className="flex flex-col items-center gap-1">
+            <Button
+              className="w-full"
+              color="primary"
+              isDisabled={!isEnabled}
+              variant="light"
+              onClick={() => setIsOpen(true)}
+            >
+              Deposit in Wallet
+            </Button>
+            <p className="text-xs text-foreground/50">
+              Powered and governed by {ktonInfo?.governanceName}
+            </p>
+          </div>
         </div>
       </div>
       <DepositRecordsModal
