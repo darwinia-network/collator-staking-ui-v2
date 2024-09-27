@@ -248,7 +248,7 @@ const DepositRecordsModal = ({
       >
         <ModalContent className="w-[calc(100vw-1.24rem)] px-5 py-0 md:w-[35.625rem]">
           <ModalHeader className="px-0 py-5 text-[1.125rem] font-bold text-foreground">
-            <span>Deposit In Wallet</span>
+            <span>Deposit in Wallet</span>
           </ModalHeader>
           <Divider />
           <ModalBody

@@ -136,7 +136,7 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
           <span className="text-[0.75rem]">{ringDAOGovernance?.name}</span>.
         </div>
         <p className="m-0 text-[0.75rem] font-normal text-foreground/50">
-          Please note that gRING is non-transferable.
+          Please note that {gringTokenInfo?.symbol} is non-transferable.
         </p>
         <Button
           color="primary"
