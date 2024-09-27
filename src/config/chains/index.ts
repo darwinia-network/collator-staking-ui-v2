@@ -21,19 +21,34 @@ export const NATIVE_TOKEN_ICON_MAP = new Map<ChainId, string>([
 
 export const KTON_TOKEN_INFO_MAP = new Map<
   ChainId,
-  { symbol: string; decimals: number; address: `0x${string}` }
+  { symbol: string; decimals: number; address: `0x${string}`; governanceName: string }
 >([
   [
     ChainId.CRAB,
-    { symbol: 'CKTON', decimals: 18, address: '0x0000000000000000000000000000000000000402' }
+    {
+      symbol: 'CKTON',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000402',
+      governanceName: 'CktonDAO'
+    }
   ],
   [
     ChainId.DARWINIA,
-    { symbol: 'KTON', decimals: 18, address: '0x0000000000000000000000000000000000000402' }
+    {
+      symbol: 'KTON',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000402',
+      governanceName: 'KtonDAO'
+    }
   ],
   [
     ChainId.KOI,
-    { symbol: 'PKTON', decimals: 18, address: '0x0000000000000000000000000000000000000402' }
+    {
+      symbol: 'PKTON',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000402',
+      governanceName: 'PktonDAO'
+    }
   ]
 ]);
 
