@@ -22,7 +22,7 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
   const [amount, setAmount] = useState<string>('0');
   const { checkWaitingIndexing, isLoading: isLoadingWaitingIndexing } = useCheckWaitingIndexing();
   const { watchAsset, isPending: isPendingWatchAsset } = useWatchAsset();
-  const { ringDAOGovernance, gringTokenInfo } = useWalletStatus();
+  const { ringDAOGovernance, gringTokenInfo, currentChain } = useWalletStatus();
   const {
     formatted,
     isLoading: isLoadingBalance,
@@ -110,7 +110,7 @@ const StakeRing = ({ selectedCollator, onSuccess }: StakeRingProps) => {
         <Divider />
         <div className="m-0 text-[0.75rem] font-normal text-foreground/50">
           Please note that staking has a lock-up period, and you can only unstake after 24 hours.
-          Stake RING to automatically receive{' '}
+          Stake {currentChain?.nativeCurrency?.symbol} to automatically receive{' '}
           <div
             className={`relative inline-flex items-center gap-1 text-[0.75rem] text-[#0094FF] transition-opacity hover:opacity-80 ${
               isPendingWatchAsset
