@@ -65,6 +65,7 @@ const CollatorJoin = ({ hasSessionKey, sessionKey, hasPool, refetch }: CollatorJ
   const handleSetSessionKey = useCallback(async () => {
     if (validSessionKey(sessionKeyValue)) {
       const tx = await setSessionKey(sessionKeyValue)?.catch((e) => {
+        console.warn('setSessionKey error: ', e);
         error(e.shortMessage);
       });
       if (tx) {
