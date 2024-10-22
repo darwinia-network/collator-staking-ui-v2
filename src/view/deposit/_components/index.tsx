@@ -12,7 +12,7 @@ import { error } from '@/components/toast';
 
 import type { SharedSelection } from '@nextui-org/react';
 
-const terms = new Array(36).fill(0).map((_, index) => index + 1);
+const terms = new Array(12).fill(0).map((_, index) => index + 1);
 
 const Deposit = () => {
   const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
