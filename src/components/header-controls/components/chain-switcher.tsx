@@ -59,7 +59,6 @@ const DesktopChainSwitcher = ({ activeChain, onChainChange, isMobile }: ChainSwi
       <DropdownMenu
         selectedKeys={[String(activeChain.id)]}
         selectionMode="single"
-        disabledKeys={[String(ChainId.DARWINIA)]}
         onSelectionChange={(keys) => {
           onChainChange?.(Number(keys.currentKey) as ChainId);
         }}
