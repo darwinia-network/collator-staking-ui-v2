@@ -1,13 +1,10 @@
 import { useCallback, useMemo } from 'react';
-import { Modal, ModalBody, ModalContent, Tab, Tabs } from '@nextui-org/react';
+import { Tab, Tabs } from '@nextui-org/react';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 
 import { defiTabs } from '@/config/tabs';
-import useWalletStatus from '@/hooks/useWalletStatus';
-import { ChainId } from '@/types/chains';
 
 export default function DefiTabs({ children }: { children: React.ReactNode }) {
-  const { currentChainId } = useWalletStatus();
   const { pathname } = useLocation();
 
   const navigate = useNavigate();
@@ -55,26 +52,6 @@ export default function DefiTabs({ children }: { children: React.ReactNode }) {
         ))}
       </Tabs>
       <div className="mt-[1.25rem] w-full">{children}</div>
-      {currentChainId === ChainId.DARWINIA && (
-        <Modal backdrop="blur" isOpen hideCloseButton>
-          <ModalContent className="h-[calc(100vw-1.24rem)] max-h-[28rem] w-[calc(100vw-1.24rem)] p-0 md:h-[25rem] md:w-[25rem]">
-            {() => (
-              <>
-                <ModalBody className="flex h-full w-full flex-col items-center justify-center p-5">
-                  <div className="flex h-full w-full flex-col items-center justify-center gap-5">
-                    <img src="/images/common/fail-icon.svg" alt="fail-icon" className="size-20" />
-                    <div className="flex flex-col items-center justify-center gap-[0.62rem]">
-                      <p className="text-center text-[1.125rem] font-bold text-foreground">
-                        This network is not supported yet.
-                      </p>
-                    </div>
-                  </div>
-                </ModalBody>
-              </>
-            )}
-          </ModalContent>
-        </Modal>
-      )}
     </>
   );
 }
