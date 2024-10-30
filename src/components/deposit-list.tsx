@@ -70,17 +70,15 @@ const DepositList = forwardRef<DepositListRef, DepositListProps>(
         {isDepositListLoading ? (
           <Loading />
         ) : depositList?.length ? (
-          depositList
-            .slice(0, maxCount)
-            .map((deposit) => (
-              <DepositItem
-                key={deposit.tokenId}
-                item={deposit}
-                isChecked={checkedDeposits.includes(deposit)}
-                symbol={chain?.nativeCurrency?.symbol}
-                onChange={() => handleDepositChange(deposit)}
-              />
-            ))
+          depositList.map((deposit) => (
+            <DepositItem
+              key={deposit.tokenId}
+              item={deposit}
+              isChecked={checkedDeposits.includes(deposit)}
+              symbol={chain?.nativeCurrency?.symbol}
+              onChange={() => handleDepositChange(deposit)}
+            />
+          ))
         ) : (
           <Empty label="No active deposit records" />
         )}
