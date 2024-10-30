@@ -47,18 +47,16 @@ const UnstakeDepositList = forwardRef<DepositListRef, DepositListProps>(
     const content = (
       <>
         {deposits?.length ? (
-          deposits
-            .slice(0, maxCount)
-            .map((deposit) => (
-              <UnstakeDepositItem
-                key={deposit.tokenId}
-                item={deposit}
-                isDisabled={isDisabled}
-                isChecked={checkedDeposits.includes(deposit)}
-                symbol={chain?.nativeCurrency?.symbol}
-                onChange={() => handleDepositChange(deposit)}
-              />
-            ))
+          deposits.map((deposit) => (
+            <UnstakeDepositItem
+              key={deposit.tokenId}
+              item={deposit}
+              isDisabled={isDisabled}
+              isChecked={checkedDeposits.includes(deposit)}
+              symbol={chain?.nativeCurrency?.symbol}
+              onChange={() => handleDepositChange(deposit)}
+            />
+          ))
         ) : (
           <Empty label="No active deposit records" />
         )}
