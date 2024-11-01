@@ -135,9 +135,13 @@ export function useUserDepositDetails({ enabled = true }: UseUserDepositDetailsP
         const startAt = Number(depositInfo?.[1] ?? 0);
         const value = depositInfo?.[2] ?? 0;
 
+        // const endAt = dayjs
+        //   .unix(startAt)
+        //   .add(dayjs.duration({ months: Number(months) }))
+        //   .unix();
         const endAt = dayjs
-          .unix(startAt)
-          .add(dayjs.duration({ months: Number(months) }))
+          .unix(Number(startAt))
+          .add(Number(months) * 30, 'day')
           .unix();
 
         return {

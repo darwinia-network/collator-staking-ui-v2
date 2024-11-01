@@ -80,9 +80,14 @@ export const useStakedDepositsOf = ({ account, enabled = true }: StakedDepositsO
 
         const months = depositOf?.[0] ?? 0n;
         const startAt = Number(depositOf?.[1] ?? 0);
+        // const endAt = dayjs
+        //   .unix(Number(startAt))
+        //   .add(dayjs.duration({ months: Number(months) }))
+        //   .unix();
+
         const endAt = dayjs
           .unix(Number(startAt))
-          .add(dayjs.duration({ months: Number(months) }))
+          .add(Number(months) * 30, 'day')
           .unix();
 
         return {
