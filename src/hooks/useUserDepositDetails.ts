@@ -129,7 +129,7 @@ export function useUserDepositDetails({ enabled = true }: UseUserDepositDetailsP
     if (validTokenIds && combinedInfos) {
       const newDepositList = validTokenIds.map((tokenId, index) => {
         const depositInfo = combinedInfos?.[index * 2]?.result || [];
-        const isClaimRequirePenalty = !!combinedInfos?.[index * 2 + 1]?.result || true;
+        const isClaimRequirePenalty = !!combinedInfos?.[index * 2 + 1]?.result;
 
         const months = depositInfo?.[0] ?? 0;
         const startAt = Number(depositInfo?.[1] ?? 0);
