@@ -32,6 +32,25 @@ export const useUnstakeRING = ({ collator, inputAmount }: UnstakeRINGParams) => 
   return { unstakeRING, ...rest, isLoadingOldAndNewPrev };
 };
 
+export const useUnstakeRINGFromInactiveCollator = ({
+  collator,
+  inputAmount
+}: UnstakeRINGParams) => {
+  const { writeContractAsync, ...rest } = useWriteContract();
+  const collatorAddress = collator?.address as `0x${string}`;
+
+  const unstakeRINGFromInactiveCollator = useCallback(async () => {
+    return writeContractAsync({
+      address: address,
+      abi: abi,
+      functionName: 'unstakeRINGFromInactiveCollator',
+      args: [collatorAddress, inputAmount]
+    });
+  }, [writeContractAsync, collatorAddress, inputAmount]);
+
+  return { unstakeRINGFromInactiveCollator, ...rest };
+};
+
 type UnstakeDepositsParams = {
   collator?: CollatorSet;
   deposits: StakedDepositInfo[];
@@ -59,4 +78,23 @@ export const useUnstakeDeposits = ({ collator, deposits }: UnstakeDepositsParams
   }, [writeContractAsync, collatorAddress, deposits, getPrevAndNewPrev]);
 
   return { unstakeDeposits, ...rest, isLoadingOldAndNewPrev };
+};
+
+export const useUnstakeDepositsFromInactiveCollator = ({
+  collator,
+  deposits
+}: UnstakeDepositsParams) => {
+  const { writeContractAsync, ...rest } = useWriteContract();
+  const collatorAddress = collator?.address as `0x${string}`;
+
+  const unstakeDepositsFromInactiveCollator = useCallback(async () => {
+    return writeContractAsync({
+      address: address,
+      abi: abi,
+      functionName: 'unstakeDepositsFromInactiveCollator',
+      args: [collatorAddress, deposits.map((deposit) => deposit.tokenId)]
+    });
+  }, [writeContractAsync, collatorAddress, deposits]);
+
+  return { unstakeDepositsFromInactiveCollator, ...rest };
 };

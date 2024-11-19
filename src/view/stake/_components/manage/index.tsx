@@ -302,6 +302,7 @@ const StakeManagementModal = ({
       />
       <Unstake
         isOpen={isUnstakeOpen}
+        isInactive={isInactive}
         onClose={handleCloseUnstake}
         symbol={symbol}
         totalAmount={formattedStakedRING}
@@ -316,6 +317,7 @@ const StakeManagementModal = ({
       />
       <UnstakeDeposits
         isOpen={isUnstakeDepositsOpen}
+        isInactive={isInactive}
         onClose={handleCloseUnstakeDeposits}
         onOk={handleOkUnstakeDeposits}
         symbol={symbol}
