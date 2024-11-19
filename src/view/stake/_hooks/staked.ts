@@ -4,6 +4,7 @@ import useWalletStatus from '@/hooks/useWalletStatus';
 import { useCallback, useMemo } from 'react';
 import { useReadContract, useReadContracts } from 'wagmi';
 import dayjs from 'dayjs';
+import { Abi } from 'viem';
 
 export type StakedDepositsInfo = [account: `0x${string}`, assets: bigint, collator: `0x${string}`];
 export type StakedDepositInfo = {
@@ -24,7 +25,7 @@ export const useStakedDepositsOf = ({ account, enabled = true }: StakedDepositsO
     isLoading: isStakedDepositsOfLoading,
     isRefetching: isStakedDepositsOfRefetching,
     refetch: refetchStakedDepositsOf
-  } = useReadContract({
+  } = useReadContract<typeof hubAbi, 'stakedDepositsOf', bigint[]>({
     address,
     abi: hubAbi,
     functionName: 'stakedDepositsOf',
@@ -43,7 +44,7 @@ export const useStakedDepositsOf = ({ account, enabled = true }: StakedDepositsO
     refetch: refetchCombinedInfo
   } = useReadContracts({
     contracts:
-      stakedDepositsOf?.flatMap((deposit) => [
+      ((stakedDepositsOf as bigint[])?.flatMap((deposit) => [
         {
           address: address as `0x${string}`,
           abi: hubAbi,
@@ -56,9 +57,15 @@ export const useStakedDepositsOf = ({ account, enabled = true }: StakedDepositsO
           functionName: 'depositOf',
           args: [deposit]
         }
-      ]) ?? [],
+      ]) as unknown as readonly {
+        abi?: Abi | undefined;
+        functionName?: string | undefined;
+        args?: readonly unknown[] | undefined;
+        address?: `0x${string}` | undefined;
+        chainId?: number | undefined;
+      }[]) ?? [],
     query: {
-      enabled: !!account && !!stakedDepositsOf?.length,
+      enabled: !!account && !!(stakedDepositsOf as bigint[])?.length,
       retry: true,
       retryDelay: 1000,
       refetchOnWindowFocus: false,
@@ -74,7 +81,7 @@ export const useStakedDepositsOf = ({ account, enabled = true }: StakedDepositsO
   const processedData = useMemo(() => {
     if (!combinedInfo) return [];
     return (
-      stakedDepositsOf?.map((tokenId, index) => {
+      (stakedDepositsOf as bigint[])?.map((tokenId, index) => {
         const depositInfo = combinedInfo[index * 2]?.result as unknown as StakedDepositsInfo;
         const depositOf = combinedInfo[index * 2 + 1]?.result;
 

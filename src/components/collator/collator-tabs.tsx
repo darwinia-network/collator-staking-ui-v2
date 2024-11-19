@@ -119,12 +119,12 @@ const CollatorTabs = ({ onClose, isOpen }: CollatorTabsProps) => {
                 />
               )}
               {selected === 'overview' && (
-                <CollatorOverview sessionKey={sessionKey} commissionOf={commissionOf} />
+                <CollatorOverview sessionKey={sessionKey} commissionOf={commissionOf as bigint} />
               )}
               {selected === 'manage' && (
                 <CollatorManagement
                   sessionKey={sessionKey}
-                  commissionOf={commissionOf}
+                  commissionOf={commissionOf as bigint}
                   refetch={refetch}
                   onStopSuccess={handleStopSuccess}
                 />

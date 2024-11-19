@@ -16,7 +16,7 @@ export const useCommissionLocks = () => {
   });
 
   const isLockPeriod = useMemo(() => {
-    const locked = result?.data ?? 0n;
+    const locked = (result?.data as bigint) ?? 0n;
     const now = BigInt(Math.floor(Date.now() / 1000));
 
     return locked > now;
