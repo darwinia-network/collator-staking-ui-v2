@@ -83,7 +83,7 @@ export const useCreateCollator = ({
 
   const { writeContractAsync, ...rest } = useWriteContract();
 
-  const oldKey = genKey({ address: address as `0x${string}`, votes: votes ?? 0n });
+  const oldKey = genKey({ address: address as `0x${string}`, votes: (votes as bigint) ?? 0n });
 
   const createCollator = useCallback(
     async ({ commission }: CreateAndCollatorProps) => {

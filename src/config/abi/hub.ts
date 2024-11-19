@@ -298,6 +298,25 @@ export const abi = [
   {
     inputs: [
       {
+        internalType: 'address',
+        name: 'c',
+        type: 'address'
+      }
+    ],
+    name: '_isInactiveCollator',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool'
+      }
+    ],
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    inputs: [
+      {
         internalType: 'uint256',
         name: 'commission',
         type: 'uint256'
@@ -821,6 +840,24 @@ export const abi = [
         type: 'address'
       },
       {
+        internalType: 'uint256[]',
+        name: 'depositIds',
+        type: 'uint256[]'
+      }
+    ],
+    name: 'unstakeDepositsFromInactiveCollator',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'collator',
+        type: 'address'
+      },
+      {
         internalType: 'uint256',
         name: 'assets',
         type: 'uint256'
@@ -837,6 +874,24 @@ export const abi = [
       }
     ],
     name: 'unstakeRING',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'collator',
+        type: 'address'
+      },
+      {
+        internalType: 'uint256',
+        name: 'assets',
+        type: 'uint256'
+      }
+    ],
+    name: 'unstakeRINGFromInactiveCollator',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function'

@@ -39,7 +39,6 @@ const StakeManagementModal = ({
   const [isUnstakeOpen, setIsUnstakeOpen] = useState(false);
   const [isStakeMoreDepositsOpen, setIsStakeMoreDepositsOpen] = useState(false);
   const [isUnstakeDepositsOpen, setIsUnstakeDepositsOpen] = useState(false);
-
   const {
     data: collators,
     isLoading: isCollatorLoading,
@@ -53,6 +52,8 @@ const StakeManagementModal = ({
   const collator = useMemo(() => {
     return collators?.[0];
   }, [collators]);
+
+  const isInactive = collator?.inset === 0;
 
   const { stakedRING, stakingLocks, stakedDeposits, isLoading, refetch } = useStaked({
     collatorAddress: collatorAddress,
@@ -250,15 +251,16 @@ const StakeManagementModal = ({
                     ) : (
                       UnstakeButton
                     )}
-
-                    <Button
-                      size="sm"
-                      color="primary"
-                      onClick={handleStakeMoreOpen}
-                      className="font-bold"
-                    >
-                      Stake
-                    </Button>
+                    {!isInactive && (
+                      <Button
+                        size="sm"
+                        color="primary"
+                        onClick={handleStakeMoreOpen}
+                        className="font-bold"
+                      >
+                        Stake
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -275,14 +277,16 @@ const StakeManagementModal = ({
                   </FormattedNumberTooltip>
                   <div className="flex items-center gap-[0.62rem]">
                     {UnstakeDepositsButton}
-                    <Button
-                      size="sm"
-                      color="primary"
-                      className="font-bold"
-                      onClick={handleStakeMoreDepositsOpen}
-                    >
-                      Stake
-                    </Button>
+                    {!isInactive && (
+                      <Button
+                        size="sm"
+                        color="primary"
+                        className="font-bold"
+                        onClick={handleStakeMoreDepositsOpen}
+                      >
+                        Stake
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -298,6 +302,7 @@ const StakeManagementModal = ({
       />
       <Unstake
         isOpen={isUnstakeOpen}
+        isInactive={isInactive}
         onClose={handleCloseUnstake}
         symbol={symbol}
         totalAmount={formattedStakedRING}
@@ -312,6 +317,7 @@ const StakeManagementModal = ({
       />
       <UnstakeDeposits
         isOpen={isUnstakeDepositsOpen}
+        isInactive={isInactive}
         onClose={handleCloseUnstakeDeposits}
         onOk={handleOkUnstakeDeposits}
         symbol={symbol}

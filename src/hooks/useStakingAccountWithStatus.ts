@@ -41,7 +41,9 @@ function useStakingAccountWithStatus() {
 
     return data.map((account) => {
       const collatorAddress = account.collator.toLowerCase().trim();
-      const collatorSet = collatorSetByAccounts?.[collatorAddress];
+      const collatorSet = collatorSetByAccounts?.find(
+        (c) => c.address?.toLowerCase() === collatorAddress
+      );
 
       let status: CollatorStatus | undefined = undefined;
       if (isLoadingActiveCollators || isRefetchingActiveCollators) {

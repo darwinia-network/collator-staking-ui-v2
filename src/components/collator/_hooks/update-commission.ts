@@ -32,7 +32,7 @@ const useUpdateCommission = ({
     }
   });
 
-  const newKey = genKey({ address: collatorAddress, votes: votes ?? 0n });
+  const newKey = genKey({ address: collatorAddress, votes: (votes as bigint) ?? 0n });
 
   const { writeContractAsync, isPending } = useWriteContract();
 

@@ -5,13 +5,14 @@ import { X } from 'lucide-react';
 import AmountInputWithBalance from '@/components/amount-input-with-balance';
 import TransactionStatus from '@/components/transaction-status';
 import { error } from '@/components/toast';
-import { useUnstakeRING } from '../../_hooks/unstake';
+import { useUnstakeRING, useUnstakeRINGFromInactiveCollator } from '../../_hooks/unstake';
 import useCheckWaitingIndexing from '@/hooks/useWaitingIndexing';
 import type { CollatorSet } from '@/service/type';
 
 interface EditStakeProps {
   isOpen: boolean;
   symbol: string;
+  isInactive: boolean;
   collator?: CollatorSet;
   totalAmount: string;
   onClose: () => void;
@@ -20,7 +21,7 @@ interface EditStakeProps {
 
 const Unstake = ({
   isOpen,
-
+  isInactive,
   symbol,
   collator,
   totalAmount,
@@ -34,19 +35,31 @@ const Unstake = ({
     collator,
     inputAmount: parseEther(amount)
   });
+  const { unstakeRINGFromInactiveCollator, isPending: isPendingFromInactiveCollator } =
+    useUnstakeRINGFromInactiveCollator({
+      collator,
+      inputAmount: parseEther(amount)
+    });
 
   const handleUnstake = useCallback(async () => {
     const { isDeployed } = await checkWaitingIndexing();
     if (!isDeployed) {
       return;
     }
-    const tx = await unstakeRING()?.catch((e) => {
-      error(e.shortMessage);
-    });
+    let tx;
+    if (isInactive) {
+      tx = await unstakeRINGFromInactiveCollator()?.catch((e) => {
+        error(e.shortMessage);
+      });
+    } else {
+      tx = await unstakeRING()?.catch((e) => {
+        error(e.shortMessage);
+      });
+    }
     if (tx) {
       setHash(tx);
     }
-  }, [checkWaitingIndexing, unstakeRING]);
+  }, [checkWaitingIndexing, unstakeRING, unstakeRINGFromInactiveCollator, isInactive]);
 
   const handleFail = useCallback(() => {
     setHash(undefined);
@@ -89,7 +102,12 @@ const Unstake = ({
               color="primary"
               className="w-full"
               isDisabled={amount === '0'}
-              isLoading={isPending || isLoadingOldAndNewPrev || isLoadingWaitingIndexing}
+              isLoading={
+                isPending ||
+                isPendingFromInactiveCollator ||
+                isLoadingOldAndNewPrev ||
+                isLoadingWaitingIndexing
+              }
               onClick={handleUnstake}
             >
               Unstake

@@ -14,7 +14,7 @@ import { useCallback, useRef, useState, ReactNode } from 'react';
 import type { StakedDepositInfo } from '../../_hooks/staked';
 import UnstakeDepositList, { DepositListRef } from '@/components/unstake-deposit-list';
 import TransactionStatus from '@/components/transaction-status';
-import { useUnstakeDeposits } from '../../_hooks/unstake';
+import { useUnstakeDeposits, useUnstakeDepositsFromInactiveCollator } from '../../_hooks/unstake';
 import { CollatorSet } from '@/service/type';
 import { error } from '@/components/toast';
 import useCheckWaitingIndexing from '@/hooks/useWaitingIndexing';
@@ -25,6 +25,7 @@ interface EditStakeProps {
   symbol: string;
   deposits: StakedDepositInfo[];
   isLocked?: boolean;
+  isInactive: boolean;
   onClose: () => void;
   onOk: () => void;
   renderDays?: ReactNode;
@@ -32,6 +33,7 @@ interface EditStakeProps {
 
 const UnstakeDeposits = ({
   isOpen,
+  isInactive,
   collator,
   deposits,
   isLocked,
@@ -47,19 +49,31 @@ const UnstakeDeposits = ({
     collator,
     deposits: checkedDeposits
   });
+  const { unstakeDepositsFromInactiveCollator, isPending: isPendingFromInactiveCollator } =
+    useUnstakeDepositsFromInactiveCollator({
+      collator,
+      deposits: checkedDeposits
+    });
 
   const handleUnstakeStart = useCallback(async () => {
     const { isDeployed } = await checkWaitingIndexing();
     if (!isDeployed) {
       return;
     }
-    const tx = await unstakeDeposits()?.catch((e) => {
-      error(e.shortMessage);
-    });
+    let tx;
+    if (isInactive) {
+      tx = await unstakeDepositsFromInactiveCollator()?.catch((e) => {
+        error(e.shortMessage);
+      });
+    } else {
+      tx = await unstakeDeposits()?.catch((e) => {
+        error(e.shortMessage);
+      });
+    }
     if (tx) {
       setHash(tx);
     }
-  }, [checkWaitingIndexing, unstakeDeposits]);
+  }, [checkWaitingIndexing, unstakeDeposits, unstakeDepositsFromInactiveCollator, isInactive]);
 
   const handleSuccess = useCallback(() => {
     setHash(undefined);
@@ -115,7 +129,12 @@ const UnstakeDeposits = ({
                       className="w-full"
                       onClick={handleUnstakeStart}
                       isDisabled
-                      isLoading={isPending || isLoadingOldAndNewPrev || isLoadingWaitingIndexing}
+                      isLoading={
+                        isPending ||
+                        isPendingFromInactiveCollator ||
+                        isLoadingOldAndNewPrev ||
+                        isLoadingWaitingIndexing
+                      }
                     >
                       Unstake
                     </Button>
@@ -128,7 +147,12 @@ const UnstakeDeposits = ({
                 className="w-full"
                 onClick={handleUnstakeStart}
                 isDisabled={!checkedDeposits.length}
-                isLoading={isPending || isLoadingOldAndNewPrev || isLoadingWaitingIndexing}
+                isLoading={
+                  isPending ||
+                  isPendingFromInactiveCollator ||
+                  isLoadingOldAndNewPrev ||
+                  isLoadingWaitingIndexing
+                }
               >
                 Unstake
               </Button>

@@ -74,7 +74,7 @@ export const useStakedDepositsOf = ({ account, enabled = true }: StakedDepositsO
   const processedData = useMemo(() => {
     if (!combinedInfo) return [];
     return (
-      stakedDepositsOf?.map((tokenId, index) => {
+      (stakedDepositsOf as bigint[])?.map((tokenId, index) => {
         const depositInfo = combinedInfo[index * 2]?.result as unknown as StakedDepositsInfo;
         const depositOf = combinedInfo[index * 2 + 1]?.result;
 
