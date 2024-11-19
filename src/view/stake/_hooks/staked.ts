@@ -4,7 +4,6 @@ import useWalletStatus from '@/hooks/useWalletStatus';
 import { useCallback, useMemo } from 'react';
 import { useReadContract, useReadContracts } from 'wagmi';
 import dayjs from 'dayjs';
-import { Abi } from 'viem';
 
 export type StakedDepositsInfo = [account: `0x${string}`, assets: bigint, collator: `0x${string}`];
 export type StakedDepositInfo = {
@@ -25,7 +24,7 @@ export const useStakedDepositsOf = ({ account, enabled = true }: StakedDepositsO
     isLoading: isStakedDepositsOfLoading,
     isRefetching: isStakedDepositsOfRefetching,
     refetch: refetchStakedDepositsOf
-  } = useReadContract<typeof hubAbi, 'stakedDepositsOf', bigint[]>({
+  } = useReadContract({
     address,
     abi: hubAbi,
     functionName: 'stakedDepositsOf',
@@ -44,7 +43,7 @@ export const useStakedDepositsOf = ({ account, enabled = true }: StakedDepositsO
     refetch: refetchCombinedInfo
   } = useReadContracts({
     contracts:
-      ((stakedDepositsOf as bigint[])?.flatMap((deposit) => [
+      stakedDepositsOf?.flatMap((deposit) => [
         {
           address: address as `0x${string}`,
           abi: hubAbi,
@@ -57,15 +56,9 @@ export const useStakedDepositsOf = ({ account, enabled = true }: StakedDepositsO
           functionName: 'depositOf',
           args: [deposit]
         }
-      ]) as unknown as readonly {
-        abi?: Abi | undefined;
-        functionName?: string | undefined;
-        args?: readonly unknown[] | undefined;
-        address?: `0x${string}` | undefined;
-        chainId?: number | undefined;
-      }[]) ?? [],
+      ]) ?? [],
     query: {
-      enabled: !!account && !!(stakedDepositsOf as bigint[])?.length,
+      enabled: !!account && !!stakedDepositsOf?.length,
       retry: true,
       retryDelay: 1000,
       refetchOnWindowFocus: false,

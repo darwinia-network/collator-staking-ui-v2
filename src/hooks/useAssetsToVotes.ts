@@ -32,12 +32,12 @@ export async function assetsToVotes(
   inputAmount: bigint,
   operation: Operation
 ): Promise<bigint> {
-  return (await readContract(config, {
+  return await readContract(config, {
     abi,
     address,
     functionName: 'assetsToVotes',
     args: [commission, calculateAssets(totalAmount, inputAmount, operation)]
-  })) as unknown as bigint;
+  });
 }
 
 function calculateAssets(totalAmount: bigint, inputAmount: bigint, operation: Operation): bigint {
