@@ -146,14 +146,15 @@ export const fetchCollatorSetNewPrev = async ({
 type CollatorByAddressParams = {
   address: `0x${string}`;
   enabled?: boolean;
+  inset?: number;
 };
-export function useCollatorByAddress({ address, enabled = true }: CollatorByAddressParams) {
+export function useCollatorByAddress({ address, enabled = true, inset }: CollatorByAddressParams) {
   const { currentChainId, isEnabled } = useWalletStatus();
 
   const params: CollatorSetQueryParams = {
     where: {
       ...(address ? { address: toLowerCase(address) } : {}),
-      inset: 1
+      ...(inset !== undefined ? { inset } : {})
     },
     orderBy: 'key',
     orderDirection: 'desc',
