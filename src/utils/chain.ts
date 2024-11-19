@@ -1,23 +1,11 @@
-import { darwinia, crab, koi } from "@/config/chains";
-import { DEPLOYMENT_MODE } from "@/types/deploy";
-import { ChainId } from "@/types/chains";
+import { darwinia, crab } from '@/config/chains';
+import { ChainId } from '@/types/chains';
 
-import type { Chain } from "@rainbow-me/rainbowkit";
-
-const chainDeployMode: DEPLOYMENT_MODE =
-  import.meta.env.VITE_DEPLOYMENT_MODE === "mainnet"
-    ? DEPLOYMENT_MODE.MAINNET
-    : DEPLOYMENT_MODE.TESTNET;
-
-const defaultChainForMode: Record<DEPLOYMENT_MODE, ChainId> = {
-  [DEPLOYMENT_MODE.MAINNET]: ChainId.DARWINIA,
-  [DEPLOYMENT_MODE.TESTNET]: ChainId.KOI,
-};
+import type { Chain } from '@rainbow-me/rainbowkit';
 
 const chainConfigMap: Record<ChainId, Chain> = {
   [ChainId.DARWINIA]: darwinia,
-  [ChainId.CRAB]: crab,
-  [ChainId.KOI]: koi,
+  [ChainId.CRAB]: crab
 };
 
 // Helper function to filter chains based on deployment mode
@@ -32,7 +20,7 @@ function filterChainsByDeploymentMode(chains: Record<ChainId, Chain>): Chain[] {
 export function getChains(): [Chain, ...Chain[]] {
   const filteredChains: Chain[] = filterChainsByDeploymentMode(chainConfigMap);
   if (filteredChains.length === 0) {
-    throw new Error("No suitable chain configurations are available.");
+    throw new Error('No suitable chain configurations are available.');
   }
   return filteredChains as [Chain, ...Chain[]];
 }
@@ -47,14 +35,12 @@ export function getDefaultChain(): Chain {
   const filteredChains = filterChainsByDeploymentMode(chainConfigMap);
   if (filteredChains.length === 0) {
     throw new Error(
-      "No suitable chain configurations are available for the current deployment mode."
+      'No suitable chain configurations are available for the current deployment mode.'
     );
   }
 
-  const defaultChainId = defaultChainForMode[chainDeployMode];
-  const defaultChain = filteredChains.find(
-    (chain) => chain.id === defaultChainId
-  );
+  const defaultChainId = ChainId.DARWINIA;
+  const defaultChain = filteredChains.find((chain) => chain.id === defaultChainId);
 
   return defaultChain || filteredChains[0];
 }

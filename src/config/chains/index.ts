@@ -1,22 +1,18 @@
 import { ChainId } from '@/types/chains';
 import { nativeTokenIcon as crabNativeTokenIcon } from './crab';
 import { nativeTokenIcon as darwiniaNativeTokenIcon } from './darwinia';
-import { nativeTokenIcon as koiNativeTokenIcon } from './koi';
 
 export { chain as crab, nativeTokenIcon as crabNativeTokenIcon } from './crab';
 export { chain as darwinia, nativeTokenIcon as darwiniaNativeTokenIcon } from './darwinia';
-export { chain as koi, nativeTokenIcon as koiNativeTokenIcon } from './koi';
 
 export const KTON_TOKEN_MAP = new Map<ChainId, string>([
   [ChainId.CRAB, 'CKTON'],
-  [ChainId.DARWINIA, 'KTON'],
-  [ChainId.KOI, 'PKTON']
+  [ChainId.DARWINIA, 'KTON']
 ]);
 
 export const NATIVE_TOKEN_ICON_MAP = new Map<ChainId, string>([
   [ChainId.CRAB, crabNativeTokenIcon],
-  [ChainId.DARWINIA, darwiniaNativeTokenIcon],
-  [ChainId.KOI, koiNativeTokenIcon]
+  [ChainId.DARWINIA, darwiniaNativeTokenIcon]
 ]);
 
 export const KTON_TOKEN_INFO_MAP = new Map<
@@ -40,15 +36,6 @@ export const KTON_TOKEN_INFO_MAP = new Map<
       address: '0x0000000000000000000000000000000000000402',
       governanceName: 'KtonDAO'
     }
-  ],
-  [
-    ChainId.KOI,
-    {
-      symbol: 'PKTON',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000402',
-      governanceName: 'PktonDAO'
-    }
   ]
 ]);
 
@@ -71,13 +58,6 @@ export const RING_DAO_GOVERNANCE_MAP = new Map<
     {
       url: "'http://vote.ringdao.com'",
       name: 'RingDAO governance'
-    }
-  ],
-  [
-    ChainId.KOI,
-    {
-      url: "'http://koi-vote.ringdao.com'",
-      name: 'RingDAO test version governance'
     }
   ]
 ]);
@@ -103,14 +83,6 @@ export const GRING_TOKEN_ADDRESS_MAP = new Map<
     {
       address: '0xdafa555e2785DC8834F4Ea9D1ED88B6049142999',
       symbol: 'gRING',
-      decimals: 18
-    }
-  ],
-  [
-    ChainId.KOI,
-    {
-      address: '0xdafa555e2785DC8834F4Ea9D1ED88B6049142999',
-      symbol: 'gKRING',
       decimals: 18
     }
   ]

@@ -7,8 +7,7 @@ const getData = (sessionKey: string, chainId: ChainId) => {
     case ChainId.DARWINIA:
     case ChainId.CRAB:
       return `0x0d00${sessionKey}00`;
-    case ChainId.KOI:
-      return `0x0a00${sessionKey}00`;
+
     default:
       return '';
   }
