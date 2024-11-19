@@ -13,240 +13,238 @@ export const abi = [
         type: 'address'
       }
     ],
-    type: 'error',
-    name: 'AddressInsufficientBalance'
+    name: 'AddressInsufficientBalance',
+    type: 'error'
   },
   {
     inputs: [],
-    type: 'error',
-    name: 'FailedInnerCall'
+    name: 'FailedInnerCall',
+    type: 'error'
   },
   {
     inputs: [],
-    type: 'error',
-    name: 'InvalidInitialization'
+    name: 'InvalidInitialization',
+    type: 'error'
   },
   {
     inputs: [],
-    type: 'error',
-    name: 'NotInitializing'
+    name: 'NotInitializing',
+    type: 'error'
   },
   {
     inputs: [],
-    type: 'error',
-    name: 'ReentrancyGuardReentrantCall'
+    name: 'ReentrancyGuardReentrantCall',
+    type: 'error'
   },
   {
+    anonymous: false,
     inputs: [
       {
+        indexed: true,
         internalType: 'address',
         name: 'cur',
-        type: 'address',
-        indexed: true
+        type: 'address'
       },
       {
+        indexed: false,
         internalType: 'uint256',
         name: 'votes',
-        type: 'uint256',
-        indexed: false
+        type: 'uint256'
       },
       {
+        indexed: false,
         internalType: 'address',
         name: 'prev',
-        type: 'address',
-        indexed: false
+        type: 'address'
       }
     ],
-    type: 'event',
     name: 'AddCollator',
-    anonymous: false
+    type: 'event'
   },
   {
+    anonymous: false,
     inputs: [
       {
+        indexed: true,
         internalType: 'address',
         name: 'collator',
-        type: 'address',
-        indexed: true
+        type: 'address'
       },
       {
+        indexed: false,
         internalType: 'uint256',
         name: 'commission',
-        type: 'uint256',
-        indexed: false
+        type: 'uint256'
       }
     ],
-    type: 'event',
     name: 'CommissionUpdated',
-    anonymous: false
+    type: 'event'
   },
   {
+    anonymous: false,
     inputs: [
       {
+        indexed: false,
         internalType: 'uint64',
         name: 'version',
-        type: 'uint64',
-        indexed: false
+        type: 'uint64'
       }
     ],
-    type: 'event',
     name: 'Initialized',
-    anonymous: false
+    type: 'event'
   },
   {
+    anonymous: false,
     inputs: [
       {
+        indexed: true,
         internalType: 'address',
         name: 'pool',
-        type: 'address',
-        indexed: true
+        type: 'address'
       },
       {
+        indexed: false,
         internalType: 'address',
         name: 'collator',
-        type: 'address',
-        indexed: false
+        type: 'address'
       }
     ],
-    type: 'event',
     name: 'NominationPoolCreated',
-    anonymous: false
+    type: 'event'
   },
   {
+    anonymous: false,
     inputs: [
       {
+        indexed: true,
         internalType: 'address',
         name: 'cur',
-        type: 'address',
-        indexed: true
+        type: 'address'
       },
       {
+        indexed: false,
         internalType: 'address',
         name: 'prev',
-        type: 'address',
-        indexed: false
+        type: 'address'
       }
     ],
-    type: 'event',
     name: 'RemoveCollator',
-    anonymous: false
+    type: 'event'
   },
   {
+    anonymous: false,
     inputs: [
       {
+        indexed: true,
         internalType: 'address',
         name: 'collator',
-        type: 'address',
-        indexed: true
+        type: 'address'
       },
       {
+        indexed: false,
         internalType: 'uint256',
         name: 'reward',
-        type: 'uint256',
-        indexed: false
+        type: 'uint256'
       }
     ],
-    type: 'event',
     name: 'RewardDistributed',
-    anonymous: false
+    type: 'event'
   },
   {
+    anonymous: false,
     inputs: [
       {
+        indexed: true,
         internalType: 'address',
         name: 'pool',
-        type: 'address',
-        indexed: true
+        type: 'address'
       },
       {
+        indexed: false,
         internalType: 'address',
         name: 'collator',
-        type: 'address',
-        indexed: false
+        type: 'address'
       },
       {
+        indexed: false,
         internalType: 'address',
         name: 'account',
-        type: 'address',
-        indexed: false
+        type: 'address'
       },
       {
+        indexed: false,
         internalType: 'uint256',
         name: 'assets',
-        type: 'uint256',
-        indexed: false
+        type: 'uint256'
       }
     ],
-    type: 'event',
     name: 'Staked',
-    anonymous: false
+    type: 'event'
   },
   {
+    anonymous: false,
     inputs: [
       {
+        indexed: true,
         internalType: 'address',
         name: 'pool',
-        type: 'address',
-        indexed: true
+        type: 'address'
       },
       {
+        indexed: false,
         internalType: 'address',
         name: 'collator',
-        type: 'address',
-        indexed: false
+        type: 'address'
       },
       {
+        indexed: false,
         internalType: 'address',
         name: 'account',
-        type: 'address',
-        indexed: false
+        type: 'address'
       },
       {
+        indexed: false,
         internalType: 'uint256',
         name: 'assets',
-        type: 'uint256',
-        indexed: false
+        type: 'uint256'
       }
     ],
-    type: 'event',
     name: 'Unstaked',
-    anonymous: false
+    type: 'event'
   },
   {
+    anonymous: false,
     inputs: [
       {
+        indexed: true,
         internalType: 'address',
         name: 'cur',
-        type: 'address',
-        indexed: true
+        type: 'address'
       },
       {
+        indexed: false,
         internalType: 'uint256',
         name: 'votes',
-        type: 'uint256',
-        indexed: false
+        type: 'uint256'
       },
       {
+        indexed: false,
         internalType: 'address',
         name: 'oldPrev',
-        type: 'address',
-        indexed: false
+        type: 'address'
       },
       {
+        indexed: false,
         internalType: 'address',
         name: 'newPrev',
-        type: 'address',
-        indexed: false
+        type: 'address'
       }
     ],
-    type: 'event',
     name: 'UpdateCollator',
-    anonymous: false
+    type: 'event'
   },
   {
     inputs: [],
-    stateMutability: 'view',
-    type: 'function',
     name: 'COMMISSION_LOCK_PERIOD',
     outputs: [
       {
@@ -254,12 +252,12 @@ export const abi = [
         name: '',
         type: 'uint256'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [],
-    stateMutability: 'view',
-    type: 'function',
     name: 'DEPOSIT',
     outputs: [
       {
@@ -267,12 +265,12 @@ export const abi = [
         name: '',
         type: 'address'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [],
-    stateMutability: 'view',
-    type: 'function',
     name: 'STAKING_LOCK_PERIOD',
     outputs: [
       {
@@ -280,12 +278,12 @@ export const abi = [
         name: '',
         type: 'uint256'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [],
-    stateMutability: 'view',
-    type: 'function',
     name: 'SYSTEM_PALLET',
     outputs: [
       {
@@ -293,7 +291,9 @@ export const abi = [
         name: '',
         type: 'address'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -303,8 +303,6 @@ export const abi = [
         type: 'address'
       }
     ],
-    stateMutability: 'view',
-    type: 'function',
     name: '_isInactiveCollator',
     outputs: [
       {
@@ -312,7 +310,9 @@ export const abi = [
         name: '',
         type: 'bool'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -327,8 +327,6 @@ export const abi = [
         type: 'uint256'
       }
     ],
-    stateMutability: 'pure',
-    type: 'function',
     name: 'assetsToVotes',
     outputs: [
       {
@@ -336,7 +334,9 @@ export const abi = [
         name: '',
         type: 'uint256'
       }
-    ]
+    ],
+    stateMutability: 'pure',
+    type: 'function'
   },
   {
     inputs: [
@@ -346,9 +346,10 @@ export const abi = [
         type: 'address'
       }
     ],
+    name: 'claim',
+    outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-    name: 'claim'
+    type: 'function'
   },
   {
     inputs: [
@@ -363,9 +364,10 @@ export const abi = [
         type: 'uint256'
       }
     ],
+    name: 'collate',
+    outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-    name: 'collate'
+    type: 'function'
   },
   {
     inputs: [
@@ -375,8 +377,6 @@ export const abi = [
         type: 'address'
       }
     ],
-    stateMutability: 'view',
-    type: 'function',
     name: 'collators',
     outputs: [
       {
@@ -384,7 +384,9 @@ export const abi = [
         name: '',
         type: 'address'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -394,8 +396,6 @@ export const abi = [
         type: 'address'
       }
     ],
-    stateMutability: 'view',
-    type: 'function',
     name: 'commissionLocks',
     outputs: [
       {
@@ -403,7 +403,9 @@ export const abi = [
         name: '',
         type: 'uint256'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -413,8 +415,6 @@ export const abi = [
         type: 'address'
       }
     ],
-    stateMutability: 'view',
-    type: 'function',
     name: 'commissionOf',
     outputs: [
       {
@@ -422,12 +422,12 @@ export const abi = [
         name: '',
         type: 'uint256'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [],
-    stateMutability: 'view',
-    type: 'function',
     name: 'count',
     outputs: [
       {
@@ -435,7 +435,9 @@ export const abi = [
         name: '',
         type: 'uint256'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -450,8 +452,6 @@ export const abi = [
         type: 'uint256'
       }
     ],
-    stateMutability: 'nonpayable',
-    type: 'function',
     name: 'createAndCollate',
     outputs: [
       {
@@ -459,12 +459,12 @@ export const abi = [
         name: 'pool',
         type: 'address'
       }
-    ]
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function'
   },
   {
     inputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
     name: 'createNominationPool',
     outputs: [
       {
@@ -472,7 +472,9 @@ export const abi = [
         name: 'pool',
         type: 'address'
       }
-    ]
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function'
   },
   {
     inputs: [
@@ -482,8 +484,6 @@ export const abi = [
         type: 'uint256'
       }
     ],
-    stateMutability: 'view',
-    type: 'function',
     name: 'depositInfos',
     outputs: [
       {
@@ -501,7 +501,9 @@ export const abi = [
         name: 'collator',
         type: 'address'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -511,14 +513,13 @@ export const abi = [
         type: 'address'
       }
     ],
+    name: 'distributeReward',
+    outputs: [],
     stateMutability: 'payable',
-    type: 'function',
-    name: 'distributeReward'
+    type: 'function'
   },
   {
     inputs: [],
-    stateMutability: 'view',
-    type: 'function',
     name: 'gRING',
     outputs: [
       {
@@ -526,7 +527,9 @@ export const abi = [
         name: '',
         type: 'address'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -536,8 +539,6 @@ export const abi = [
         type: 'uint256'
       }
     ],
-    stateMutability: 'view',
-    type: 'function',
     name: 'getTopCollators',
     outputs: [
       {
@@ -545,7 +546,9 @@ export const abi = [
         name: '',
         type: 'address[]'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -560,9 +563,10 @@ export const abi = [
         type: 'address'
       }
     ],
+    name: 'initialize',
+    outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-    name: 'initialize'
+    type: 'function'
   },
   {
     inputs: [
@@ -572,8 +576,6 @@ export const abi = [
         type: 'address'
       }
     ],
-    stateMutability: 'view',
-    type: 'function',
     name: 'poolOf',
     outputs: [
       {
@@ -581,7 +583,9 @@ export const abi = [
         name: '',
         type: 'address'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -606,9 +610,10 @@ export const abi = [
         type: 'address'
       }
     ],
+    name: 'stakeDeposits',
+    outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-    name: 'stakeDeposits'
+    type: 'function'
   },
   {
     inputs: [
@@ -628,9 +633,10 @@ export const abi = [
         type: 'address'
       }
     ],
+    name: 'stakeRING',
+    outputs: [],
     stateMutability: 'payable',
-    type: 'function',
-    name: 'stakeRING'
+    type: 'function'
   },
   {
     inputs: [
@@ -645,8 +651,6 @@ export const abi = [
         type: 'uint256'
       }
     ],
-    stateMutability: 'view',
-    type: 'function',
     name: 'stakedDepositsAt',
     outputs: [
       {
@@ -654,7 +658,9 @@ export const abi = [
         name: '',
         type: 'uint256'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -669,8 +675,6 @@ export const abi = [
         type: 'uint256'
       }
     ],
-    stateMutability: 'view',
-    type: 'function',
     name: 'stakedDepositsContains',
     outputs: [
       {
@@ -678,7 +682,9 @@ export const abi = [
         name: '',
         type: 'bool'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -688,8 +694,6 @@ export const abi = [
         type: 'address'
       }
     ],
-    stateMutability: 'view',
-    type: 'function',
     name: 'stakedDepositsLength',
     outputs: [
       {
@@ -697,7 +701,9 @@ export const abi = [
         name: '',
         type: 'uint256'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -707,8 +713,6 @@ export const abi = [
         type: 'address'
       }
     ],
-    stateMutability: 'view',
-    type: 'function',
     name: 'stakedDepositsOf',
     outputs: [
       {
@@ -716,7 +720,9 @@ export const abi = [
         name: '',
         type: 'uint256[]'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -726,8 +732,6 @@ export const abi = [
         type: 'address'
       }
     ],
-    stateMutability: 'view',
-    type: 'function',
     name: 'stakedOf',
     outputs: [
       {
@@ -735,7 +739,9 @@ export const abi = [
         name: '',
         type: 'uint256'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -750,8 +756,6 @@ export const abi = [
         type: 'address'
       }
     ],
-    stateMutability: 'view',
-    type: 'function',
     name: 'stakedRINGOf',
     outputs: [
       {
@@ -759,7 +763,9 @@ export const abi = [
         name: '',
         type: 'uint256'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -774,8 +780,6 @@ export const abi = [
         type: 'address'
       }
     ],
-    stateMutability: 'view',
-    type: 'function',
     name: 'stakingLocks',
     outputs: [
       {
@@ -783,7 +787,9 @@ export const abi = [
         name: '',
         type: 'uint256'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -793,9 +799,10 @@ export const abi = [
         type: 'address'
       }
     ],
+    name: 'stopCollation',
+    outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-    name: 'stopCollation'
+    type: 'function'
   },
   {
     inputs: [
@@ -820,9 +827,10 @@ export const abi = [
         type: 'address'
       }
     ],
+    name: 'unstakeDeposits',
+    outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-    name: 'unstakeDeposits'
+    type: 'function'
   },
   {
     inputs: [
@@ -837,9 +845,10 @@ export const abi = [
         type: 'uint256[]'
       }
     ],
+    name: 'unstakeDepositsFromInactiveCollator',
+    outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-    name: 'unstakeDepositsFromInactiveCollator'
+    type: 'function'
   },
   {
     inputs: [
@@ -864,9 +873,10 @@ export const abi = [
         type: 'address'
       }
     ],
+    name: 'unstakeRING',
+    outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-    name: 'unstakeRING'
+    type: 'function'
   },
   {
     inputs: [
@@ -881,9 +891,10 @@ export const abi = [
         type: 'uint256'
       }
     ],
+    name: 'unstakeRINGFromInactiveCollator',
+    outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-    name: 'unstakeRINGFromInactiveCollator'
+    type: 'function'
   },
   {
     inputs: [
@@ -903,14 +914,13 @@ export const abi = [
         type: 'address'
       }
     ],
+    name: 'updateCommission',
+    outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-    name: 'updateCommission'
+    type: 'function'
   },
   {
     inputs: [],
-    stateMutability: 'view',
-    type: 'function',
     name: 'updateTimeStamp',
     outputs: [
       {
@@ -918,7 +928,9 @@ export const abi = [
         name: '',
         type: 'uint256'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   },
   {
     inputs: [
@@ -928,8 +940,6 @@ export const abi = [
         type: 'address'
       }
     ],
-    stateMutability: 'view',
-    type: 'function',
     name: 'votesOf',
     outputs: [
       {
@@ -937,6 +947,8 @@ export const abi = [
         name: '',
         type: 'uint256'
       }
-    ]
+    ],
+    stateMutability: 'view',
+    type: 'function'
   }
 ] as const;
