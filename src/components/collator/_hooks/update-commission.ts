@@ -26,7 +26,7 @@ const useUpdateCommission = ({
     abi: hubAbi,
     address: hubAddress,
     functionName: 'assetsToVotes',
-    args: [totalAssets, newCommission],
+    args: [newCommission, totalAssets],
     query: {
       enabled: !isNil(totalAssets)
     }
