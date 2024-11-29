@@ -28,7 +28,7 @@ function useCheckWaitingIndexing() {
       if (!deploymentMeta?._meta?.block?.timestamp) {
         openError();
         setIsLoading(false);
-        return;
+        return { isDeployed: false, error: null };
       }
       if (deploymentMeta?._meta?.block?.timestamp) {
         const contractTimestamp = updateTimeStamp ? BigInt(updateTimeStamp.toString()) : 0n;
