@@ -75,7 +75,7 @@ export const useCreateCollator = ({
     abi: hubAbi,
     address: hubAddress,
     functionName: 'assetsToVotes',
-    args: [stakedOf ?? 0n, commission],
+    args: [commission, stakedOf ?? 0n],
     query: {
       enabled: isEnabled && !!stakedOf && enabled
     }

@@ -8,7 +8,7 @@ import useWalletStatus from './useWalletStatus';
 
 function useCheckWaitingIndexing() {
   const { currentChainId } = useWalletStatus();
-  const { open } = useWaitingIndexing();
+  const { open, openError } = useWaitingIndexing();
   const [isLoading, setIsLoading] = useState(false);
 
   const checkWaitingIndexing = useCallback(async () => {
@@ -25,7 +25,11 @@ function useCheckWaitingIndexing() {
         }),
         fetchDeploymentMeta(currentChainId)
       ]);
-
+      if (!deploymentMeta?._meta?.block?.timestamp) {
+        openError();
+        setIsLoading(false);
+        return;
+      }
       if (deploymentMeta?._meta?.block?.timestamp) {
         const contractTimestamp = updateTimeStamp ? BigInt(updateTimeStamp.toString()) : 0n;
         const indexedTimestamp = BigInt(deploymentMeta._meta.block.timestamp);
@@ -36,7 +40,7 @@ function useCheckWaitingIndexing() {
         return { isDeployed, error: null };
       }
 
-      return { isDeployed: false, error: null };
+      return { isDeployed: false, error: new Error('Indexing service error') };
     } catch (error) {
       return {
         isDeployed: false,
@@ -45,7 +49,7 @@ function useCheckWaitingIndexing() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentChainId, open]);
+  }, [currentChainId, open, openError]);
 
   return { checkWaitingIndexing, isLoading };
 }
