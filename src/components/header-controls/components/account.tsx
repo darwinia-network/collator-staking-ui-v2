@@ -18,9 +18,10 @@ import { success } from '@/components/toast';
 interface DesktopAccountProps {
   address: `0x${string}`;
   isMobile?: boolean;
+  name: 'string' | undefined;
 }
 
-const DesktopAccount = ({ address, isMobile }: DesktopAccountProps) => {
+const DesktopAccount = ({ address, isMobile, name }: DesktopAccountProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const [, copyToClipboard] = useCopyToClipboard();
@@ -52,7 +53,7 @@ const DesktopAccount = ({ address, isMobile }: DesktopAccountProps) => {
           <div className="flex items-center gap-[0.31rem]">
             <Avatar address={address} />
             <span className="text-[0.875rem] font-normal text-foreground">
-              {toShortAddress(address)?.toUpperCase()}
+              {name ? name : toShortAddress(address)?.toUpperCase()}
             </span>
           </div>
 

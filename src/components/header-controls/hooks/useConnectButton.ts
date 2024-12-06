@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useAccount, useSwitchChain } from 'wagmi';
+import { useAccount, useEnsName, useSwitchChain } from 'wagmi';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 
 import { getChainById } from '@/utils';
@@ -12,6 +12,13 @@ export function useConnectButton() {
   const { openConnectModal } = useConnectModal();
   const activeChain = getChainById(chain?.id);
   const { switchChain } = useSwitchChain();
+
+  const { data: name } = useEnsName({
+    address,
+    chainId: chain?.id // resolution always starts from L1
+  });
+
+  console.log('ens name', name);
 
   const handleChainChange = useCallback(
     (chainId: ChainId) => {
@@ -31,6 +38,7 @@ export function useConnectButton() {
     handleChainChange,
     isDrawerOpen,
     openDrawer,
-    closeDrawer
+    closeDrawer,
+    name
   };
 }
