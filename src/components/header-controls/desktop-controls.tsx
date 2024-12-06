@@ -22,7 +22,7 @@ const DesktopControls = () => {
     }
     return (
       <>
-        <AccountButton address={address} />
+        <AccountButton address={address} name={name} />
         <ChainSwitch activeChain={activeChain} onChainChange={handleChainChange} />
       </>
     );

@@ -14,11 +14,12 @@ import { toShortAddress } from '@/utils';
 import { useDisconnectWallet } from '@/hooks/useDisconnectWallet';
 import Avatar from '@/components/avatar';
 import { success } from '@/components/toast';
+import { GetEnsNameReturnType } from 'viem';
 
 interface DesktopAccountProps {
   address: `0x${string}`;
   isMobile?: boolean;
-  name: 'string' | undefined;
+  name: GetEnsNameReturnType | undefined;
 }
 
 const DesktopAccount = ({ address, isMobile, name }: DesktopAccountProps) => {
