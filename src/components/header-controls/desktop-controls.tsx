@@ -9,7 +9,7 @@ import ConnectWallet from './components/connect-wallet';
 import { useConnectButton } from './hooks/useConnectButton';
 
 const DesktopControls = () => {
-  const { isConnected, address, activeChain, openConnectModal, handleChainChange } =
+  const { isConnected, address, activeChain, openConnectModal, handleChainChange, name } =
     useConnectButton();
 
   const buttonsGroup = useMemo(() => {
@@ -22,7 +22,7 @@ const DesktopControls = () => {
     }
     return (
       <>
-        <AccountButton address={address} />
+        <AccountButton address={address} name={name} />
         <ChainSwitch activeChain={activeChain} onChainChange={handleChainChange} />
       </>
     );
