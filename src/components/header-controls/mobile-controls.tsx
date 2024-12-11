@@ -25,7 +25,8 @@ const MobileControls = forwardRef<MobileControlsProps, unknown>((_props, ref) =>
     handleChainChange,
     isDrawerOpen,
     openDrawer,
-    closeDrawer
+    closeDrawer,
+    name
   } = useConnectButton();
 
   const renderConnectButton = useMemo(() => {
@@ -38,7 +39,7 @@ const MobileControls = forwardRef<MobileControlsProps, unknown>((_props, ref) =>
     }
     return (
       <>
-        <AccountButton address={address} isMobile={true} />
+        <AccountButton address={address} isMobile={true} name={name} />
         <ChainSwitch activeChain={activeChain} onChainChange={handleChainChange} isMobile={true} />
       </>
     );

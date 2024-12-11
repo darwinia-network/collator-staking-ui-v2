@@ -19,7 +19,7 @@ import { GetEnsNameReturnType } from 'viem';
 interface DesktopAccountProps {
   address: `0x${string}`;
   isMobile?: boolean;
-  name: GetEnsNameReturnType | undefined;
+  name?: GetEnsNameReturnType | undefined;
 }
 
 const DesktopAccount = ({ address, isMobile, name }: DesktopAccountProps) => {
