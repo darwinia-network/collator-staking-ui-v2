@@ -1,5 +1,4 @@
 import Avatar from '@/components/avatar';
-import { ethers } from 'ethers';
 import ClipboardIconButton from './clipboard-icon-button';
 import { toShortAddress } from '@/utils';
 import { useEffect, useState } from 'react';
@@ -23,7 +22,7 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
 
   useEffect(() => {
     if (address) {
-      getEnsName(address.toString());
+      getEnsName('0x74cAfa4ef28Da1410E1DE6F431B009367945DF66');
     }
   }, [address]);
 
