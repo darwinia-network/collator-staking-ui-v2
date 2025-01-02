@@ -22,7 +22,7 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
 
   useEffect(() => {
     if (address) {
-      getEnsName('0x74cAfa4ef28Da1410E1DE6F431B009367945DF66');
+      getEnsName(address);
     }
   }, [address]);
 
