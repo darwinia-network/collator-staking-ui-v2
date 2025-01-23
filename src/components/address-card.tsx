@@ -22,7 +22,6 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
   };
 
   useEffect(() => {
-    console.log(address);
     if (address) {
       getEnsName(address);
     }
