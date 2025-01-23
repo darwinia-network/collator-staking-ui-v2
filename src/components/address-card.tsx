@@ -17,10 +17,12 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
       setEnsName(name);
     } else {
       console.log('No ENS name available for this address.');
+      setEnsName('noName');
     }
   };
 
   useEffect(() => {
+    console.log(address);
     if (address) {
       getEnsName(address);
     }
@@ -30,7 +32,7 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
     <div className="flex items-center gap-[0.31rem]">
       {address && <Avatar address={address} />}
       <span className="text-[0.875rem] text-foreground" title={address}>
-        {ensName ? ensName : toShortAddress(address)}
+        {ensName ? (ensName === 'noName' ? toShortAddress(address) : ensName) : '...'}
       </span>
       {copyable && (
         <div>
