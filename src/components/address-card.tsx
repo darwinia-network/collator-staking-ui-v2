@@ -8,17 +8,27 @@ interface AddressCardProps {
   address?: `0x${string}`;
   copyable?: boolean;
 }
+
+const ensCache = new Map<string, string>();
+let currentRequestId = 0;
+
 const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
   const [ensName, setEnsName] = useState<string | undefined>();
-  const getEnsName = async (connectedAddress) => {
-    const name = await resolveEnsName(connectedAddress);
-    if (name) {
-      console.log(`ENS name for ${connectedAddress}: ${name}`);
-      setEnsName(name);
-    } else {
-      console.log('No ENS name available for this address.');
-      setEnsName('noName');
+
+  const getEnsName = async (connectedAddress: string): Promise<void> => {
+    if (ensCache.has(connectedAddress)) {
+      setEnsName(ensCache.get(connectedAddress));
+      return;
     }
+
+    const requestId = ++currentRequestId;
+
+    const name = await resolveEnsName(connectedAddress);
+    if (requestId !== currentRequestId) return; // 忽略过时请求
+
+    const resolvedName = name || 'noName';
+    ensCache.set(connectedAddress, resolvedName);
+    setEnsName(resolvedName);
   };
 
   useEffect(() => {
@@ -31,6 +41,7 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
     <div className="flex items-center gap-[0.31rem]">
       {address && <Avatar address={address} />}
       <span className="text-[0.875rem] text-foreground" title={address}>
+        {toShortAddress(address)}
         {ensName ? (ensName === 'noName' ? toShortAddress(address) : ensName) : '...'}
       </span>
       {copyable && (
