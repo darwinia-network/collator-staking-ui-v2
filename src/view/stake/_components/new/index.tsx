@@ -15,7 +15,7 @@ import useWalletStatus from '@/hooks/useWalletStatus';
 import { TransitionPanel } from '@/components/transition-panel';
 import Avatar from '@/components/avatar';
 import { stakeTabs } from '@/config/tabs';
-import { toShortAddress } from '@/utils';
+import { useAddressOrEns } from '@/utils';
 
 import StakeRing from './stake-ring';
 import StakeDeposit from './stake-deposit';
@@ -89,7 +89,7 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
                   <div className="flex items-center gap-[0.62rem]">
                     <Avatar address={selectedCollator.address} className="size-[1.625rem]" />
                     <div className="text-[0.875rem] font-bold text-foreground">
-                      {toShortAddress(selectedCollator.address)}
+                      {useAddressOrEns(selectedCollator.address)}
                     </div>
                   </div>
                 ) : (

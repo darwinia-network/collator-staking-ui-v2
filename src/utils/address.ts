@@ -8,9 +8,38 @@
  * @param {string} address - The address to be shortened.
  * @returns {string} The shortened address or the original address if it's not longer than 16 characters.
  */
+import { useEffect, useState } from 'react';
+import { getEnsName } from '@/utils/ensName';
+
+// Pure utility function for shortening addresses
 export function toShortAddress(address?: string) {
   if (!address) return '';
-  return address?.length > 16 ? `${address?.slice(0, 6)}...${address?.slice(-4)}` : address;
+  return address.length > 16 ? `${address.slice(0, 6)}...${address.slice(-4)}` : address;
+}
+
+// New custom hook for ENS name resolution
+export function useEnsName(address?: string) {
+  const [ensName, setEnsName] = useState<string | undefined>();
+
+  useEffect(() => {
+    if (address) {
+      getEnsName(address).then(name => name && setEnsName(name));
+    }
+  }, [address]);
+
+  return ensName;
+}
+
+/**
+ * Custom hook that returns either an ENS name or shortened address
+ * @param address - Ethereum address to resolve
+ * @returns string - ENS name if available, otherwise shortened address
+ */
+export function useAddressOrEns(address?: string): string {
+  const ensName = useEnsName(address);
+  const shortAddress = toShortAddress(address);
+  
+  return ensName || shortAddress;
 }
 
 type GenKeyParams = {

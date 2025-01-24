@@ -10,7 +10,7 @@ import { ChevronDown, CopyIcon, LogOutIcon } from 'lucide-react';
 import { useCopyToClipboard } from 'react-use';
 import { useCallback, useState } from 'react';
 
-import { toShortAddress } from '@/utils';
+import { useAddressOrEns } from '@/utils';
 import { useDisconnectWallet } from '@/hooks/useDisconnectWallet';
 import Avatar from '@/components/avatar';
 import { success } from '@/components/toast';
@@ -54,7 +54,7 @@ const DesktopAccount = ({ address, isMobile, name }: DesktopAccountProps) => {
           <div className="flex items-center gap-[0.31rem]">
             <Avatar address={address} />
             <span className="text-[0.875rem] font-normal text-foreground">
-              {name ? name : toShortAddress(address)?.toUpperCase()}
+              {name ? name : useAddressOrEns(address)}
             </span>
           </div>
 

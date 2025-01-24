@@ -3,7 +3,7 @@ import { memo } from 'react';
 import TooltipFormattedNumber from '@/components/tooltip-formatter-number';
 import Avatar from '@/components/avatar';
 import CollatorStatus from '@/components/collator-status';
-import { toShortAddress } from '@/utils';
+import { useAddressOrEns } from '@/utils';
 import { formatEther } from 'viem';
 import type { StakingAccountWithStatus } from '@/hooks/useStakingAccountWithStatus';
 
@@ -44,7 +44,7 @@ const Item = ({ item, onClick, style }: ItemProps) => {
               className="line-clamp-1 max-w-40 text-[0.875rem] font-bold text-foreground"
               title={item?.collator}
             >
-              {toShortAddress(item?.collator) || ''}
+              {useAddressOrEns(item?.collator) || ''}
             </span>
           </div>
           <TooltipFormattedNumber

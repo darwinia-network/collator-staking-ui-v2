@@ -7,7 +7,7 @@ const ethereumProvider = new ethers.JsonRpcProvider(
 const ensCache = new Map<string, string>();
 const failedRequests = new Set<string>();
 const RETRY_DELAY = 1000; // 1 second delay
-const REQUEST_DELAY = 500; // 500ms between requests
+const REQUEST_DELAY = 200; // 500ms between requests
 
 // Add a map to track pending promises
 const pendingRequests = new Map<string, Promise<string | null>>();
@@ -32,7 +32,6 @@ async function processQueue() {
 }
 
 export const getEnsName = async (connectedAddress: string) => {
-  console.log("Getting ENS name for:", connectedAddress);
   if (!connectedAddress) return;
 
   // Check cache first
@@ -44,7 +43,6 @@ export const getEnsName = async (connectedAddress: string) => {
 
   // Check if there's already a pending request for this address
   if (pendingRequests.has(connectedAddress)) {
-    console.log("Using existing pending request for:", connectedAddress);
     return pendingRequests.get(connectedAddress);
   }
 
@@ -59,13 +57,11 @@ export const getEnsName = async (connectedAddress: string) => {
       try {
         const name = await resolveEnsName(connectedAddress);
         ensCache.set(connectedAddress, name || 'noName');
-        console.log("ENS Cache updated:", ensCache);
         resolve(name);
       } catch (error: unknown) {
         if (error && typeof error === 'object' && 'message' in error) {
           if (typeof error.message === 'string' && error.message.includes('429')) {
             failedRequests.add(connectedAddress);
-            console.log("Failed Requests:", failedRequests);
             
             setTimeout(() => {
               failedRequests.delete(connectedAddress);
@@ -90,7 +86,5 @@ export const getEnsName = async (connectedAddress: string) => {
 
 export const resolveEnsName = async (address: string) => {
   const ensName = await ethereumProvider.lookupAddress(address);
-  console.log('Address:', address);
-  console.log('ENS Name:', ensName);
   return ensName;
 };

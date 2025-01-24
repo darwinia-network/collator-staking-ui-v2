@@ -3,7 +3,7 @@ import { Button, Skeleton } from '@nextui-org/react';
 
 import Avatar from '@/components/avatar';
 import { StakingAccountWithStatus } from '@/hooks/useStakingAccountWithStatus';
-import { toShortAddress } from '@/utils';
+import { useAddressOrEns } from '@/utils';
 import { formatEther } from 'viem';
 import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
 
@@ -49,7 +49,7 @@ function ClaimableRewardCard({
               className="line-clamp-1 text-[0.875rem] font-bold text-foreground"
               title={reward?.collator}
             >
-              {toShortAddress(reward?.collator) || ''}
+              {useAddressOrEns(reward?.collator) || ''}
             </span>
           </div>
         </div>
