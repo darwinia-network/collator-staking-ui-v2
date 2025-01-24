@@ -7,9 +7,29 @@ const ethereumProvider = new ethers.JsonRpcProvider(
 const ensCache = new Map<string, string>();
 const failedRequests = new Set<string>();
 const RETRY_DELAY = 1000; // 1 second delay
+const REQUEST_DELAY = 500; // 500ms between requests
 
 // Add a map to track pending promises
 const pendingRequests = new Map<string, Promise<string | null>>();
+
+// Add a queue to manage requests
+let requestQueue: (() => Promise<void>)[] = [];
+let isProcessingQueue = false;
+
+// Function to process the queue
+async function processQueue() {
+  if (isProcessingQueue || requestQueue.length === 0) return;
+  
+  isProcessingQueue = true;
+  while (requestQueue.length > 0) {
+    const request = requestQueue.shift();
+    if (request) {
+      await request();
+      await new Promise(resolve => setTimeout(resolve, REQUEST_DELAY));
+    }
+  }
+  isProcessingQueue = false;
+}
 
 export const getEnsName = async (connectedAddress: string) => {
   console.log("Getting ENS name for:", connectedAddress);
@@ -29,33 +49,38 @@ export const getEnsName = async (connectedAddress: string) => {
   }
 
   // Create new promise for this request
-  const promise = (async () => {
-    if (failedRequests.has(connectedAddress)) {
-      return null;
-    }
-
-    try {
-      const name = await resolveEnsName(connectedAddress);
-      ensCache.set(connectedAddress, name || 'noName');
-      console.log("ENS Cache updated:", ensCache);
-      return name;
-    } catch (error: unknown) {
-      if (error && typeof error === 'object' && 'message' in error) {
-        if (typeof error.message === 'string' && error.message.includes('429')) {
-          failedRequests.add(connectedAddress);
-          console.log("Failed Requests:", failedRequests);
-          
-          setTimeout(() => {
-            failedRequests.delete(connectedAddress);
-          }, RETRY_DELAY);
-        }
+  const promise = new Promise<string | null>((resolve) => {
+    const queuedRequest = async () => {
+      if (failedRequests.has(connectedAddress)) {
+        resolve(null);
+        return;
       }
-      return null;
-    } finally {
-      // Clean up the pending request
-      pendingRequests.delete(connectedAddress);
-    }
-  })();
+
+      try {
+        const name = await resolveEnsName(connectedAddress);
+        ensCache.set(connectedAddress, name || 'noName');
+        console.log("ENS Cache updated:", ensCache);
+        resolve(name);
+      } catch (error: unknown) {
+        if (error && typeof error === 'object' && 'message' in error) {
+          if (typeof error.message === 'string' && error.message.includes('429')) {
+            failedRequests.add(connectedAddress);
+            console.log("Failed Requests:", failedRequests);
+            
+            setTimeout(() => {
+              failedRequests.delete(connectedAddress);
+            }, RETRY_DELAY);
+          }
+        }
+        resolve(null);
+      } finally {
+        pendingRequests.delete(connectedAddress);
+      }
+    };
+
+    requestQueue.push(queuedRequest);
+    processQueue();
+  });
 
   // Store the promise
   pendingRequests.set(connectedAddress, promise);
