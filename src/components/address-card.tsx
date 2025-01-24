@@ -20,7 +20,6 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
 
   const getEnsName = async (connectedAddress: string): Promise<void> => {
     if (failedRequests.has(connectedAddress)) {
-      setEnsName('noName');
       return;
     }
 
