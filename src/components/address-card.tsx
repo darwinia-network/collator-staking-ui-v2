@@ -16,11 +16,11 @@ const RETRY_DELAY = 1000; // 1 second delay
 
 const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
   const [ensName, setEnsName] = useState<string | undefined>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const getEnsName = async (connectedAddress: string): Promise<void> => {
-    // Don't retry failed requests immediately
     if (failedRequests.has(connectedAddress)) {
-      setEnsName('noName');
+      setEnsName(undefined);
       return;
     }
 
@@ -30,28 +30,31 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
     }
 
     const requestId = ++currentRequestId;
+    setIsLoading(true);
 
     try {
       const name = await resolveEnsName(connectedAddress);
       if (requestId !== currentRequestId) return;
 
-      const resolvedName = name || 'noName';
-      ensCache.set(connectedAddress, resolvedName);
-      setEnsName(resolvedName);
+      if (name) {
+        ensCache.set(connectedAddress, name);
+        setEnsName(name);
+      } else {
+        setEnsName(undefined);
+      }
     } catch (error: unknown) {
-      // Type guard for error object with message property
       if (error && typeof error === 'object' && 'message' in error) {
         if (typeof error.message === 'string' && error.message.includes('429')) {
-          // Rate limit exceeded
           failedRequests.add(connectedAddress);
-          setEnsName('noName');
+          setEnsName(undefined);
           
-          // Retry after delay
           setTimeout(() => {
             failedRequests.delete(connectedAddress);
           }, RETRY_DELAY);
         }
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -65,8 +68,7 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
     <div className="flex items-center gap-[0.31rem]">
       {address && <Avatar address={address} />}
       <span className="text-[0.875rem] text-foreground" title={address}>
-        {toShortAddress(address)}
-        {ensName ? (ensName === 'noName' ? toShortAddress(address) : ensName) : '...'}
+        {isLoading ? '...' : (ensName || toShortAddress(address))}
       </span>
       {copyable && (
         <div>
