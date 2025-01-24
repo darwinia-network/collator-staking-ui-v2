@@ -15,7 +15,7 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
   useEffect(() => {
     if (address) {
       getEnsName(address).then(
-        name => setEnsName(name)
+        name => name && setEnsName(name)
       );
     }
   }, [address]);
