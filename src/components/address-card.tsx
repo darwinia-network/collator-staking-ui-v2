@@ -10,9 +10,9 @@ interface AddressCardProps {
 }
 
 const ensCache = new Map<string, string>();
-const failedRequests = new Set<string>(); // Track failed requests
 let currentRequestId = 0;
-const RETRY_DELAY = 1000; // 1 second delay between retries
+const failedRequests = new Set<string>();
+const RETRY_DELAY = 1000; // 1 second delay
 
 const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
   const [ensName, setEnsName] = useState<string | undefined>();
@@ -38,16 +38,19 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
       const resolvedName = name || 'noName';
       ensCache.set(connectedAddress, resolvedName);
       setEnsName(resolvedName);
-    } catch (error) {
-      if (error.message.includes('429')) {
-        // Rate limit exceeded
-        failedRequests.add(connectedAddress);
-        setEnsName('noName');
-        
-        // Retry after delay
-        setTimeout(() => {
-          failedRequests.delete(connectedAddress);
-        }, RETRY_DELAY);
+    } catch (error: unknown) {
+      // Type guard for error object with message property
+      if (error && typeof error === 'object' && 'message' in error) {
+        if (typeof error.message === 'string' && error.message.includes('429')) {
+          // Rate limit exceeded
+          failedRequests.add(connectedAddress);
+          setEnsName('noName');
+          
+          // Retry after delay
+          setTimeout(() => {
+            failedRequests.delete(connectedAddress);
+          }, RETRY_DELAY);
+        }
       }
     }
   };
