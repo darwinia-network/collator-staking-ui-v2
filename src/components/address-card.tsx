@@ -69,7 +69,7 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
       <span className="text-[0.875rem] text-foreground" title={address}>
         {isLoading 
           ? '...' 
-          : (ensName && ensName !== undefined ? ensName : toShortAddress(address))}
+          : (ensName ? ensName : toShortAddress(address))}
       </span>
       {copyable && (
         <div>
