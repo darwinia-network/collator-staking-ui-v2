@@ -14,7 +14,7 @@ import { getEnsName } from '@/utils/ensName';
 // Pure utility function for shortening addresses
 export function toShortAddress(address?: string) {
   if (!address) return '';
-  return address.length > 16 ? `${address.slice(0, 6)}...${address.slice(-4)}` : address;
+  return address?.length > 16 ? `${address?.slice(0, 6)}...${address?.slice(-4)}` : address;
 }
 
 // New custom hook for ENS name resolution
