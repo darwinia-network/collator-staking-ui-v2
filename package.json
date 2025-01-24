@@ -21,6 +21,7 @@
     "bignumber.js": "^9.1.2",
     "blo": "^1.2.0",
     "dayjs": "^1.11.13",
+    "ethers": "^6.13.4",
     "framer-motion": "^11.3.30",
     "graphql-request": "^7.1.0",
     "lodash-es": "^4.17.21",
