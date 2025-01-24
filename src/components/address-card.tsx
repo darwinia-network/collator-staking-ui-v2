@@ -20,7 +20,7 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
 
   const getEnsName = async (connectedAddress: string): Promise<void> => {
     if (failedRequests.has(connectedAddress)) {
-      setEnsName(undefined);
+      setEnsName('noName');
       return;
     }
 
@@ -36,17 +36,14 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
       const name = await resolveEnsName(connectedAddress);
       if (requestId !== currentRequestId) return;
 
-      if (name) {
-        ensCache.set(connectedAddress, name);
-        setEnsName(name);
-      } else {
-        setEnsName(undefined);
-      }
+      const resolvedName = name || 'noName';
+      ensCache.set(connectedAddress, resolvedName);
+      setEnsName(resolvedName);
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'message' in error) {
         if (typeof error.message === 'string' && error.message.includes('429')) {
           failedRequests.add(connectedAddress);
-          setEnsName(undefined);
+          setEnsName('noName');
           
           setTimeout(() => {
             failedRequests.delete(connectedAddress);
@@ -68,7 +65,9 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
     <div className="flex items-center gap-[0.31rem]">
       {address && <Avatar address={address} />}
       <span className="text-[0.875rem] text-foreground" title={address}>
-        {isLoading ? '...' : (ensName || toShortAddress(address))}
+        {isLoading 
+          ? '...' 
+          : (ensName && ensName !== 'noName' ? ensName : toShortAddress(address))}
       </span>
       {copyable && (
         <div>
