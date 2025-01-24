@@ -36,14 +36,16 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
       const name = await resolveEnsName(connectedAddress);
       if (requestId !== currentRequestId) return;
 
-      const resolvedName = name || 'noName';
-      ensCache.set(connectedAddress, resolvedName);
-      setEnsName(resolvedName);
+      const resolvedName = name || undefined;
+      if (resolvedName) {
+        ensCache.set(connectedAddress, resolvedName);
+        setEnsName(resolvedName);
+      }
+      
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'message' in error) {
         if (typeof error.message === 'string' && error.message.includes('429')) {
           failedRequests.add(connectedAddress);
-          setEnsName('noName');
           
           setTimeout(() => {
             failedRequests.delete(connectedAddress);
@@ -67,7 +69,7 @@ const AddressCard = ({ address, copyable = true }: AddressCardProps) => {
       <span className="text-[0.875rem] text-foreground" title={address}>
         {isLoading 
           ? '...' 
-          : (ensName && ensName !== 'noName' ? ensName : toShortAddress(address))}
+          : (ensName && ensName !== undefined ? ensName : toShortAddress(address))}
       </span>
       {copyable && (
         <div>
