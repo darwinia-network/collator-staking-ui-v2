@@ -43,7 +43,7 @@ const MobileControls = forwardRef<MobileControlsProps, unknown>((_props, ref) =>
         <ChainSwitch activeChain={activeChain} onChainChange={handleChainChange} isMobile={true} />
       </>
     );
-  }, [isConnected, address, activeChain, handleChainChange, openConnectModal]);
+  }, [isConnected, address, activeChain, handleChainChange, openConnectModal, name]);
 
   useImperativeHandle(
     ref,

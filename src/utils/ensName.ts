@@ -13,19 +13,19 @@ const REQUEST_DELAY = 200; // 500ms between requests
 const pendingRequests = new Map<string, Promise<string | null>>();
 
 // Add a queue to manage requests
-let requestQueue: (() => Promise<void>)[] = [];
+const requestQueue: (() => Promise<void>)[] = [];
 let isProcessingQueue = false;
 
 // Function to process the queue
 async function processQueue() {
   if (isProcessingQueue || requestQueue.length === 0) return;
-  
+
   isProcessingQueue = true;
   while (requestQueue.length > 0) {
     const request = requestQueue.shift();
     if (request) {
       await request();
-      await new Promise(resolve => setTimeout(resolve, REQUEST_DELAY));
+      await new Promise((resolve) => setTimeout(resolve, REQUEST_DELAY));
     }
   }
   isProcessingQueue = false;
@@ -62,7 +62,7 @@ export const getEnsName = async (connectedAddress: string) => {
         if (error && typeof error === 'object' && 'message' in error) {
           if (typeof error.message === 'string' && error.message.includes('429')) {
             failedRequests.add(connectedAddress);
-            
+
             setTimeout(() => {
               failedRequests.delete(connectedAddress);
             }, RETRY_DELAY);

@@ -26,7 +26,7 @@ const DesktopControls = () => {
         <ChainSwitch activeChain={activeChain} onChainChange={handleChainChange} />
       </>
     );
-  }, [isConnected, address, activeChain, openConnectModal, handleChainChange]);
+  }, [isConnected, address, activeChain, openConnectModal, handleChainChange, name]);
 
   return (
     <div className="flex items-center gap-[0.625rem]">
