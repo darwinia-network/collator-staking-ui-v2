@@ -28,6 +28,8 @@ const DesktopAccount = ({ address, isMobile, name }: DesktopAccountProps) => {
   const [, copyToClipboard] = useCopyToClipboard();
   const { disconnectWallet } = useDisconnectWallet();
 
+  const formattedAddress = useAddressOrEns(address);
+
   const handleCopy = useCallback(() => {
     copyToClipboard(address);
     success('Address successfully copied to clipboard.');
@@ -54,7 +56,7 @@ const DesktopAccount = ({ address, isMobile, name }: DesktopAccountProps) => {
           <div className="flex items-center gap-[0.31rem]">
             <Avatar address={address} />
             <span className="text-[0.875rem] font-normal text-foreground">
-              {name ? name : useAddressOrEns(address)}
+              {name || formattedAddress}
             </span>
           </div>
 

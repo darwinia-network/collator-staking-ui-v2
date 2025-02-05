@@ -50,6 +50,8 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
     setSelectCollatorOpen(false);
   }, []);
 
+  const formattedAddress = useAddressOrEns(selectedCollator?.address || '');
+
   useEffect(() => {
     if (!isOpen) {
       setSelectedCollator(undefined);
@@ -89,7 +91,8 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
                   <div className="flex items-center gap-[0.62rem]">
                     <Avatar address={selectedCollator.address} className="size-[1.625rem]" />
                     <div className="text-[0.875rem] font-bold text-foreground">
-                      {useAddressOrEns(selectedCollator.address)}
+                      {/* {useAddressOrEns(selectedCollator.address)} */}
+                      {selectedCollator?.address ? formattedAddress : 'Select a collator'}
                     </div>
                   </div>
                 ) : (
