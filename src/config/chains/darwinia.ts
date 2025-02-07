@@ -22,8 +22,8 @@ export const chain: Chain = {
   },
   blockExplorers: {
     default: {
-      name: 'Subscan',
-      url: 'https://explorer.darwinia.network/'
+      name: 'Darwinia explorer',
+      url: 'https://explorer.darwinia.network'
     }
   },
 
