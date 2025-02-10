@@ -11,6 +11,7 @@ import {
 
 import { getChains } from '@/utils/chain';
 import { getBlockQueryOptions } from 'wagmi/query';
+import { mainnet } from 'wagmi/chains';
 
 export const projectId = import.meta.env.VITE_PROJECT_ID;
 
@@ -46,7 +47,7 @@ export const config = getDefaultConfig({
       wallets: [talismanWallet, okxWallet, imTokenWallet, trustWallet, safeWallet]
     }
   ],
-  chains: getChains(),
+  chains: [mainnet, ...getChains()],
   storage: createStorage({
     storage: cookieStorage
   })
