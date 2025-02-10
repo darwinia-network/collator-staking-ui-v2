@@ -15,7 +15,7 @@ export function useConnectButton() {
 
   const { data: name } = useEnsName({
     address,
-    chainId: chain?.id // resolution always starts from L1
+    chainId: 1 // resolution always starts from L1
   });
 
   console.log('ens name', name);
