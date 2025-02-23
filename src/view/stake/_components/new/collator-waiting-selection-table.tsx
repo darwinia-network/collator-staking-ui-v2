@@ -84,14 +84,7 @@ const CollatorWaitingSelectionTable = ({
       }
       case 'commission':
         return cellValue ? `${cellValue}%` : '-';
-      case 'session': {
-        const formattedReward = formatEther(item.reward ? BigInt(item.reward) : 0n);
-        return (
-          <FormattedNumberTooltip value={formattedReward}>
-            {(formattedValue) => <span className="line-clamp-1">{formattedValue}</span>}
-          </FormattedNumberTooltip>
-        );
-      }
+
       default:
         return null;
     }
@@ -168,14 +161,6 @@ const CollatorWaitingSelectionTable = ({
           </TableColumn>
           <TableColumn className="w-[4.43rem] bg-secondary" key="commission" width={40}>
             Commission
-          </TableColumn>
-          <TableColumn
-            className="w-[6rem] whitespace-normal bg-secondary"
-            width={60}
-            key="session"
-            align="end"
-          >
-            Last Session rewards
           </TableColumn>
         </TableHeader>
         <TableBody
