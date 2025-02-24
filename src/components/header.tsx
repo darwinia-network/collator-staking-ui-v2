@@ -7,7 +7,7 @@ const Header = () => {
     <header className="h-[var(--header-height)] w-full py-[var(--header-padding-y)]">
       <div className="mx-auto flex h-full w-full items-center justify-between px-[var(--container-padding-x)]">
         <Link
-          href="/"
+          to="/"
           title="Collator staking"
           className="relative h-[1.375rem] w-[6.78156rem] object-contain md:inline"
         >
