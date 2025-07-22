@@ -13,8 +13,7 @@ import {
   TableCell,
   TableColumn,
   TableHeader,
-  TableRow,
-  Tooltip
+  TableRow
 } from '@nextui-org/react';
 import { X } from 'lucide-react';
 import { Key, useCallback, useEffect, useState } from 'react';
@@ -148,40 +147,44 @@ const DepositRecordsModal = ({
           );
 
         case 'value': {
-          const { startAtDate, endAtDate, progressValue } = calculateDepositProgress(
-            item?.startAt,
-            item?.endAt
-          );
+          const { progressValue } = calculateDepositProgress(item?.startAt, item?.endAt);
 
           return (
-            <Tooltip closeDelay={0} content={`${startAtDate} - ${endAtDate}`} placement="bottom">
-              <Progress
-                classNames={{
-                  label: 'w-full'
-                }}
-                label={
-                  <div className="flex w-full items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <FormattedNumberTooltip value={formatEther(item?.value)}>
-                        {(formattedValue) => (
-                          <span className="text-[0.875rem] font-normal text-foreground">
-                            {formattedValue}
-                          </span>
-                        )}
-                      </FormattedNumberTooltip>
+            <Progress
+              classNames={{
+                label: 'w-full'
+              }}
+              label={
+                <div className="flex w-full items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FormattedNumberTooltip value={formatEther(item?.value)}>
+                      {(formattedValue) => (
+                        <span className="text-[0.875rem] font-normal text-foreground">
+                          {formattedValue}
+                        </span>
+                      )}
+                    </FormattedNumberTooltip>
 
-                      <span className="text-[0.875rem] font-normal text-foreground">
-                        {currentChain?.nativeCurrency?.symbol}
-                      </span>
-                    </div>
+                    <span className="text-[0.875rem] font-normal text-foreground">
+                      {currentChain?.nativeCurrency?.symbol}
+                    </span>
                   </div>
-                }
-                value={progressValue}
-                className="w-full gap-1"
-                size="sm"
-                color="primary"
-              />
-            </Tooltip>
+                </div>
+              }
+              value={progressValue}
+              className="w-full gap-1"
+              size="sm"
+              color="primary"
+            />
+          );
+        }
+
+        case 'duration': {
+          const { startAtDate, endAtDate } = calculateDepositProgress(item?.startAt, item?.endAt);
+          return (
+            <div className="text-[0.875rem] font-normal text-foreground">
+              {startAtDate} - {endAtDate}
+            </div>
           );
         }
 
@@ -237,16 +240,16 @@ const DepositRecordsModal = ({
         isOpen={isOpen}
         placement="center"
         onClose={onClose}
-        size="xl"
         className="bg-background"
         backdrop="blur"
         classNames={{
+          base: 'max-w-[800px]',
           closeButton:
             'p-0 top-[1.25rem] right-[1.25rem] hover:opacity-[var(--nextui-hover-opacity)] hover:bg-transparent  z-10'
         }}
         closeButton={<X />}
       >
-        <ModalContent className="w-[calc(100vw-1.24rem)] px-5 py-0 md:w-[35.625rem]">
+        <ModalContent className="w-[calc(100vw-1.24rem)] px-5 py-0 md:w-[47.75rem]">
           <ModalHeader className="px-0 py-5 text-[1.125rem] font-bold text-foreground">
             <span>Deposit in Wallet</span>
           </ModalHeader>
@@ -282,7 +285,10 @@ const DepositRecordsModal = ({
                 <TableColumn className="w-[9.375rem] bg-secondary" key="tokenId">
                   ERC-721
                 </TableColumn>
-                <TableColumn className="w-[10.625rem] bg-secondary" key="value">
+                <TableColumn className="w-[15.625rem] bg-secondary" key="duration">
+                  Duration
+                </TableColumn>
+                <TableColumn className="w-[9.375rem] bg-secondary" key="value">
                   Amount
                 </TableColumn>
                 <TableColumn className="w-[9.375rem] bg-secondary" key="action" align="end">
