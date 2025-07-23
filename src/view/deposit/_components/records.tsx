@@ -147,7 +147,25 @@ const DepositRecordsModal = ({
           );
 
         case 'value': {
-          const { progressValue } = calculateDepositProgress(item?.startAt, item?.endAt);
+          return (
+            <FormattedNumberTooltip value={formatEther(item?.value)}>
+              {(formattedValue) => (
+                <span className="text-[0.875rem] font-normal text-foreground">
+                  {formattedValue}{' '}
+                  <span className="text-[0.875rem] font-normal text-foreground">
+                    {currentChain?.nativeCurrency?.symbol}
+                  </span>
+                </span>
+              )}
+            </FormattedNumberTooltip>
+          );
+        }
+
+        case 'duration': {
+          const { startAtDate, endAtDate, progressValue } = calculateDepositProgress(
+            item?.startAt,
+            item?.endAt
+          );
 
           return (
             <Progress
@@ -156,19 +174,7 @@ const DepositRecordsModal = ({
               }}
               label={
                 <div className="flex w-full items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <FormattedNumberTooltip value={formatEther(item?.value)}>
-                      {(formattedValue) => (
-                        <span className="text-[0.875rem] font-normal text-foreground">
-                          {formattedValue}
-                        </span>
-                      )}
-                    </FormattedNumberTooltip>
-
-                    <span className="text-[0.875rem] font-normal text-foreground">
-                      {currentChain?.nativeCurrency?.symbol}
-                    </span>
-                  </div>
+                  <div className="flex items-center gap-2">{`${startAtDate} - ${endAtDate}`}</div>
                 </div>
               }
               value={progressValue}
@@ -176,15 +182,6 @@ const DepositRecordsModal = ({
               size="sm"
               color="primary"
             />
-          );
-        }
-
-        case 'duration': {
-          const { startAtDate, endAtDate } = calculateDepositProgress(item?.startAt, item?.endAt);
-          return (
-            <div className="text-[0.875rem] font-normal text-foreground">
-              {startAtDate} - {endAtDate}
-            </div>
           );
         }
 
@@ -285,10 +282,10 @@ const DepositRecordsModal = ({
                 <TableColumn className="w-[9.375rem] bg-secondary" key="tokenId">
                   ERC-721
                 </TableColumn>
-                <TableColumn className="w-[15.625rem] bg-secondary" key="duration">
+                <TableColumn className="w-[15.625rem] bg-secondary" key="duration" align="center">
                   Duration
                 </TableColumn>
-                <TableColumn className="w-[9.375rem] bg-secondary" key="value">
+                <TableColumn className="w-[9.375rem] bg-secondary" key="value" align="center">
                   Amount
                 </TableColumn>
                 <TableColumn className="w-[9.375rem] bg-secondary" key="action" align="end">
