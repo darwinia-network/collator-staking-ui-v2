@@ -3,9 +3,13 @@ import { useQuery } from '@tanstack/react-query';
 import {
   fetchCollatorSet,
   fetchCollatorSetByAccounts,
+  fetchLastRewardDistributeds,
   fetchStakingAccount
 } from '@/service/services';
-import type { CollatorSetQueryParams, StakingAccountQueryParams } from '@/service/type';
+import type {
+  CollatorSetQueryParams,
+  StakingAccountQueryParams
+} from '@/service/type';
 import useWalletStatus from './useWalletStatus';
 
 const toLowerCase = (value: string | undefined) => (value ? value.toLowerCase() : '');
@@ -47,6 +51,33 @@ export function useCollatorSet({
     },
     placeholderData: (prevData) => prevData,
     enabled: isEnabled && enabled
+  });
+}
+
+type LastRewardDistributedsParams = {
+  addresses: `0x${string}`[];
+  enabled?: boolean;
+};
+
+export function useLastRewardDistributeds({
+  addresses,
+  enabled = true
+}: LastRewardDistributedsParams) {
+  const { isEnabled, currentChainId } = useWalletStatus();
+
+  return useQuery({
+    queryKey: ['lastRewardDistributeds', addresses.join('-'), currentChainId],
+    queryFn: async () => {
+      const result = await fetchLastRewardDistributeds(addresses, currentChainId!);
+
+      if (result === null) {
+        throw new Error('Failed to fetch reward distributeds');
+      }
+
+      return result;
+    },
+    placeholderData: (previousData) => previousData,
+    enabled: isEnabled && enabled && addresses.length > 0
   });
 }
 

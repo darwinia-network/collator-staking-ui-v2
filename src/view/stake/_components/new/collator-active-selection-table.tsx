@@ -12,10 +12,11 @@ import {
 import { SearchIcon } from 'lucide-react';
 
 import AddressCard from '@/components/address-card';
-import type { CollatorSet } from '@/service/type';
 import { formatEther } from 'viem';
 import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
-import { useActiveCollatorList } from '@/hooks/useCollatorList';
+import { useActiveCollatorList, type CollatorWithLastReward } from '@/hooks/useCollatorList';
+import type { CollatorSet } from '@/service/type';
+import { formatRelativeTimeShort } from '@/utils/date';
 
 interface CollatorSelectionTableProps {
   symbol: string;
@@ -55,7 +56,7 @@ const CollatorSelectionTable = ({
     setKeyword('');
   }, []);
 
-  const renderCell = useCallback((item: CollatorSet, columnKey: Key) => {
+  const renderCell = useCallback((item: CollatorWithLastReward, columnKey: Key) => {
     const cellValue = item[columnKey as keyof CollatorSet];
 
     switch (columnKey) {
@@ -77,9 +78,16 @@ const CollatorSelectionTable = ({
         return cellValue ? `${cellValue}%` : '-';
       case 'session': {
         const formattedReward = formatEther(item.reward ? BigInt(item.reward) : 0n);
+        const relativeTime = formatRelativeTimeShort(item.lastReward?.blockTimestamp);
+        const timeLabel = relativeTime !== '-' ? `(${relativeTime === 'now' ? 'now' : `${relativeTime} ago`})` : '';
+
         return (
           <FormattedNumberTooltip value={formattedReward}>
-            {(formattedValue) => <span className="line-clamp-1">{formattedValue}</span>}
+            {(formattedValue) => (
+              <span className="line-clamp-1 text-right">
+                {formattedValue} <span className="text-foreground/50">{timeLabel}</span>
+              </span>
+            )}
           </FormattedNumberTooltip>
         );
       }
@@ -154,7 +162,7 @@ const CollatorSelectionTable = ({
           emptyContent={<div className="text-center">No records</div>}
           loadingState={isCollatorListLoading || isPending ? 'loading' : 'idle'}
         >
-          {(item: CollatorSet) => (
+          {(item: CollatorWithLastReward) => (
             <TableRow
               key={item?.id}
               onClick={() => {

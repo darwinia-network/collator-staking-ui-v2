@@ -90,3 +90,45 @@ export const GET_DEPLOYMENT_META = gql`
     }
   }
 `;
+
+export const createRewardDistributedDocument = (collators: `0x${string}`[]) => {
+  if (!collators.length) {
+    throw new Error('createRewardDistributedDocument: collator list is empty');
+  }
+
+  const aliasMap = collators.map((collator, index) => ({
+    alias: `c${index}`,
+    address: collator.toLowerCase() as `0x${string}`
+  }));
+
+  const fields = aliasMap
+    .map(
+      ({ alias, address }) => `
+        ${alias}: rewardDistributeds(
+          first: 1
+          orderBy: blockTimestamp
+          orderDirection: desc
+          where: { collator: "${address}" }
+        ) {
+          id
+          collator
+          reward
+          blockNumber
+          blockTimestamp
+          transactionHash
+        }
+      `
+    )
+    .join('\n');
+
+  const document = gql`
+    query GetRewardDistributeds {
+      ${fields}
+    }
+  `;
+
+  return {
+    document,
+    aliasMap
+  };
+};

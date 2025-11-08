@@ -1,6 +1,11 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import useActiveCollators from './useActiveCollators';
-import { useCollatorSet } from './useService';
+import { useCollatorSet, useLastRewardDistributeds } from './useService';
+import type { CollatorSet, RewardDistributed } from '@/service/type';
+
+export type CollatorWithLastReward = CollatorSet & {
+  lastReward?: RewardDistributed | null;
+};
 
 export const useActiveCollatorList = ({ enabled }: { enabled: boolean }) => {
   const {
@@ -22,15 +27,61 @@ export const useActiveCollatorList = ({ enabled }: { enabled: boolean }) => {
     enabled: !!activeCollators && enabled
   });
 
+  const collatorAddresses = useMemo<`0x${string}`[]>(() => {
+    if (!list?.length) {
+      return [];
+    }
+
+    return list.map((item) => item.address.toLowerCase() as `0x${string}`);
+  }, [list]);
+
+  const {
+    data: rewardMap,
+    isLoading: isRewardsLoading,
+    isRefetching: isRewardsRefetching,
+    refetch: refetchRewards
+  } = useLastRewardDistributeds({
+    addresses: collatorAddresses,
+    enabled: collatorAddresses.length > 0 && enabled
+  });
+
+  const listWithRewards = useMemo<CollatorWithLastReward[] | undefined>(() => {
+    if (!list) {
+      return list;
+    }
+
+    if (!rewardMap) {
+      return list as CollatorWithLastReward[];
+    }
+
+    return list.map((item) => {
+      const key = item.address.toLowerCase() as `0x${string}`;
+
+      return {
+        ...item,
+        lastReward: rewardMap[key] ?? null
+      };
+    });
+  }, [list, rewardMap]);
+
   const refetch = useCallback(() => {
     refetchActiveCollators();
     refetchList();
-  }, [refetchActiveCollators, refetchList]);
+    refetchRewards();
+  }, [refetchActiveCollators, refetchList, refetchRewards]);
+
+  const isCollatorListLoading =
+    isActiveCollatorsLoading ||
+    isListLoading ||
+    isActiveCollatorsRefetching ||
+    isListRefetching;
+
+  const isRewardInfoLoading = isRewardsLoading || isRewardsRefetching;
 
   return {
-    list,
-    isLoading:
-      isActiveCollatorsLoading || isListLoading || isActiveCollatorsRefetching || isListRefetching,
+    list: listWithRewards,
+    isLoading: isCollatorListLoading,
+    isRewardInfoLoading,
     refetch
   };
 };
