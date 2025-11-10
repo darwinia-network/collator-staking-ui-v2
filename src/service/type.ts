@@ -10,6 +10,15 @@ export interface CollatorSet {
   reward?: string;
   inset?: number;
 }
+
+export interface RewardDistributed {
+  id: string;
+  collator: `0x${string}`;
+  reward: string;
+  blockNumber: string;
+  blockTimestamp: string;
+  transactionHash: string;
+}
 export type CollatorSetOrderByField =
   | 'id'
   | 'address'
