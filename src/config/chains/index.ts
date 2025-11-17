@@ -25,7 +25,7 @@ export const KTON_TOKEN_INFO_MAP = new Map<
       symbol: 'CKTON',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000402',
-      governanceName: 'CktonDAO'
+      governanceName: 'Crab Chain governance(Only for Test)'
     }
   ],
   [
@@ -49,8 +49,8 @@ export const RING_DAO_GOVERNANCE_MAP = new Map<
   [
     ChainId.CRAB,
     {
-      url: "'http://crab-vote.ringdao.com'",
-      name: 'CrabDAO governance'
+      url: "'https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fcrab-rpc.darwinia.network%2F#/referenda'",
+      name: 'Crab Chain governance'
     }
   ],
   [
