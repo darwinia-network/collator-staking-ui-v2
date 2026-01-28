@@ -1,11 +1,10 @@
-import { darwinia, crab } from '@/config/chains';
+import { darwinia } from '@/config/chains';
 import { ChainId } from '@/types/chains';
 
 import type { Chain } from '@rainbow-me/rainbowkit';
 
 const chainConfigMap: Record<ChainId, Chain> = {
-  [ChainId.DARWINIA]: darwinia,
-  [ChainId.CRAB]: crab
+  [ChainId.DARWINIA]: darwinia
 };
 
 // Helper function to filter chains based on deployment mode

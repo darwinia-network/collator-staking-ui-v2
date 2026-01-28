@@ -5,7 +5,6 @@ import { useSendTransaction } from 'wagmi';
 const getData = (sessionKey: string, chainId: ChainId) => {
   switch (chainId) {
     case ChainId.DARWINIA:
-    case ChainId.CRAB:
       return `0x0d00${sessionKey}00`;
 
     default:

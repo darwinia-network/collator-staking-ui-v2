@@ -13,6 +13,12 @@ dist-ssr
 .vscode
 *.local
 
+# Lockfiles
+package-lock.json
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
