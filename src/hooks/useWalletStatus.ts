@@ -17,8 +17,7 @@ function useWalletStatus() {
   const currentChainId = isSupportedChain ? (result.chainId as ChainId) : undefined;
   const currentChain = currentChainId ? getChainById(currentChainId) : undefined;
   const nativeTokenIcon = NATIVE_TOKEN_ICON_MAP.get(currentChainId as ChainId);
-  const ktonInfo =
-    KTON_TOKEN_INFO_MAP.get(currentChainId as ChainId) ?? KTON_TOKEN_INFO_MAP.get(ChainId.DARWINIA);
+  const ktonInfo = KTON_TOKEN_INFO_MAP.get(currentChainId as ChainId);
 
   const ringDAOGovernance = RING_DAO_GOVERNANCE_MAP.get(currentChainId as ChainId);
 
