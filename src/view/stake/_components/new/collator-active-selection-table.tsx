@@ -7,9 +7,10 @@ import {
   TableRow,
   TableCell,
   Input,
-  Spinner
+  Spinner,
+  Tooltip
 } from '@nextui-org/react';
-import { SearchIcon } from 'lucide-react';
+import { AlertTriangle, SearchIcon } from 'lucide-react';
 
 import AddressCard from '@/components/address-card';
 import { formatEther } from 'viem';
@@ -17,6 +18,7 @@ import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
 import { useActiveCollatorList, type CollatorWithLastReward } from '@/hooks/useCollatorList';
 import type { CollatorSet } from '@/service/type';
 import { formatRelativeTimeShort } from '@/utils/date';
+import { BLACKLISTED_COLLATOR_TOOLTIP, isBlacklistedCollator } from '@/config/collator-blacklist';
 
 interface CollatorSelectionTableProps {
   symbol: string;
@@ -58,10 +60,23 @@ const CollatorSelectionTable = ({
 
   const renderCell = useCallback((item: CollatorWithLastReward, columnKey: Key) => {
     const cellValue = item[columnKey as keyof CollatorSet];
+    const isBlacklisted = isBlacklistedCollator(item.address);
 
     switch (columnKey) {
       case 'collator':
-        return <AddressCard address={item.address as `0x${string}`} />;
+        return (
+          <div className="flex items-center gap-2">
+            <AddressCard address={item.address as `0x${string}`} />
+            {isBlacklisted && (
+              <Tooltip closeDelay={0} content={BLACKLISTED_COLLATOR_TOOLTIP} placement="top">
+                <span className="flex items-center gap-1 rounded-full bg-danger/10 px-2 py-0.5 text-xs font-medium text-danger">
+                  <AlertTriangle size={14} />
+                  Risk
+                </span>
+              </Tooltip>
+            )}
+          </div>
+        );
       case 'balance': {
         const formattedBalance = formatEther(item.assets ? BigInt(item.assets) : 0n);
         return (
@@ -79,7 +94,8 @@ const CollatorSelectionTable = ({
       case 'session': {
         const formattedReward = formatEther(item.reward ? BigInt(item.reward) : 0n);
         const relativeTime = formatRelativeTimeShort(item.lastReward?.blockTimestamp);
-        const timeLabel = relativeTime !== '-' ? `(${relativeTime === 'now' ? 'now' : `${relativeTime} ago`})` : '';
+        const timeLabel =
+          relativeTime !== '-' ? `(${relativeTime === 'now' ? 'now' : `${relativeTime} ago`})` : '';
 
         return (
           <FormattedNumberTooltip value={formattedReward}>
@@ -125,6 +141,9 @@ const CollatorSelectionTable = ({
         selectionMode="single"
         selectionBehavior="replace"
         selectedKeys={selectedCollator?.address}
+        disabledKeys={data
+          .filter((item) => isBlacklistedCollator(item.address))
+          .map((item) => item.id)}
         bottomContentPlacement="outside"
         classNames={{
           wrapper:
@@ -165,7 +184,15 @@ const CollatorSelectionTable = ({
           {(item: CollatorWithLastReward) => (
             <TableRow
               key={item?.id}
+              className={
+                isBlacklistedCollator(item.address)
+                  ? 'cursor-not-allowed bg-danger/5 text-danger opacity-80'
+                  : 'cursor-pointer'
+              }
               onClick={() => {
+                if (isBlacklistedCollator(item.address)) {
+                  return;
+                }
                 onSelectCollatorChange?.(item);
               }}
             >
