@@ -8,9 +8,10 @@ import {
   TableCell,
   Input,
   Spinner,
-  Button
+  Button,
+  Tooltip
 } from '@nextui-org/react';
-import { SearchIcon } from 'lucide-react';
+import { AlertTriangle, SearchIcon } from 'lucide-react';
 
 import AddressCard from '@/components/address-card';
 import type { CollatorSet } from '@/service/type';
@@ -18,6 +19,7 @@ import { formatEther } from 'viem';
 import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
 import { useWaitingCollatorList } from '@/hooks/useCollatorList';
 import { useDebouncedState } from '@/hooks/useDebouncedState';
+import { BLACKLISTED_COLLATOR_TOOLTIP, isBlacklistedCollator } from '@/config/collator-blacklist';
 
 interface CollatorWaitingSelectionTableProps {
   symbol: string;
@@ -66,10 +68,23 @@ const CollatorWaitingSelectionTable = ({
 
   const renderCell = (item: CollatorSet, columnKey: Key) => {
     const cellValue = item[columnKey as keyof CollatorSet];
+    const isBlacklisted = isBlacklistedCollator(item.address);
 
     switch (columnKey) {
       case 'collator':
-        return <AddressCard address={item.address as `0x${string}`} />;
+        return (
+          <div className="flex items-center gap-2">
+            <AddressCard address={item.address as `0x${string}`} />
+            {isBlacklisted && (
+              <Tooltip closeDelay={0} content={BLACKLISTED_COLLATOR_TOOLTIP} placement="top">
+                <span className="flex items-center gap-1 rounded-full bg-danger/10 px-2 py-0.5 text-xs font-medium text-danger">
+                  <AlertTriangle size={14} />
+                  Risk
+                </span>
+              </Tooltip>
+            )}
+          </div>
+        );
       case 'balance': {
         const formattedBalance = formatEther(item.assets ? BigInt(item.assets) : 0n);
         return (
@@ -120,6 +135,9 @@ const CollatorWaitingSelectionTable = ({
         selectionMode="single"
         selectionBehavior="replace"
         selectedKeys={selectedCollator?.address}
+        disabledKeys={data
+          .filter((item) => isBlacklistedCollator(item.address))
+          .map((item) => item.id)}
         bottomContentPlacement="outside"
         classNames={{
           wrapper:
@@ -176,7 +194,15 @@ const CollatorWaitingSelectionTable = ({
           {(item: CollatorSet) => (
             <TableRow
               key={item?.id}
+              className={
+                isBlacklistedCollator(item.address)
+                  ? 'cursor-not-allowed bg-danger/5 text-danger opacity-80'
+                  : 'cursor-pointer'
+              }
               onClick={() => {
+                if (isBlacklistedCollator(item.address)) {
+                  return;
+                }
                 onSelectCollatorChange?.(item);
               }}
             >
