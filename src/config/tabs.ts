@@ -8,19 +8,8 @@ export const defiTabs = [
     label: 'Claim'
   },
   {
-    key: 'deposit',
-    label: 'Deposit'
-  }
-];
-
-export const stakeTabs = (tokenName: string) => [
-  {
-    label: `Stake ${tokenName}`,
-    key: 'stake-ring'
-  },
-  {
-    label: 'Stake Deposit',
-    key: 'stake-deposit'
+    key: 'withdraw',
+    label: 'Withdraw'
   }
 ];
 

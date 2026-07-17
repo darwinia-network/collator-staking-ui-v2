@@ -1,28 +1,14 @@
-import {
-  cn,
-  Divider,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalHeader,
-  Pagination,
-  Progress,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow
-} from '@nextui-org/react';
-import { X } from 'lucide-react';
-import { Key, useCallback, useEffect, useState } from 'react';
+import { cn, Pagination, Progress, Skeleton } from '@nextui-org/react';
+import { ExternalLink } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useUserDepositDetails } from '@/hooks/useUserDepositDetails';
 import { formatEther } from 'viem';
 
 import type { DepositInfo } from '@/hooks/useUserDepositDetails';
+import type { BaseError } from 'wagmi';
 import useWalletStatus from '@/hooks/useWalletStatus';
+import { address as depositAddress } from '@/config/abi/deposit';
 import { checkIsClaimRequirePenalty } from '@/view/deposit/service';
 import WithdrawEarlier from './withdraw-earlier';
 import { useWithdraw } from '@/view/deposit/_hooks/withdraw';
@@ -31,20 +17,16 @@ import AsyncButton from '@/components/async-button';
 import { error } from '@/components/toast';
 import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
 import { calculateDepositProgress } from '@/utils/date';
+import Empty from '@/components/empty';
 
-const PAGE_SIZE = 10;
-interface DepositRecordsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+const PAGE_SIZE = 3;
+
+interface DepositRecordsProps {
   onRefreshRingBalance?: () => void;
 }
 
-const DepositRecordsModal = ({
-  isOpen,
-  onClose,
-  onRefreshRingBalance
-}: DepositRecordsModalProps) => {
-  const { currentChain, ktonInfo } = useWalletStatus();
+const DepositRecords = ({ onRefreshRingBalance }: DepositRecordsProps) => {
+  const { address, currentChain, ktonInfo } = useWalletStatus();
   const [page, setPage] = useState(1);
   const [currentTokenId, setCurrentTokenId] = useState<bigint>();
   const [withdrawEarlierOpen, setWithdrawEarlierOpen] = useState<boolean>(false);
@@ -54,7 +36,7 @@ const DepositRecordsModal = ({
     isLoading: isDepositListLoading,
     deleteDepositInfoByTokenId
   } = useUserDepositDetails({
-    enabled: isOpen
+    enabled: true
   });
   const { withdraw } = useWithdraw();
 
@@ -62,15 +44,13 @@ const DepositRecordsModal = ({
     async (tokenId: bigint) => {
       setCurrentTokenId(tokenId);
       try {
-        const tx = await withdraw(tokenId)?.catch((e) => {
-          error(e.shortMessage);
-        });
+        const tx = await withdraw(tokenId);
         if (tx) {
           setWithdrawHash(tx);
         }
-      } catch (e) {
-        console.warn('Error withdrawing:', e);
-        error('Something went wrong while withdrawing');
+      } catch (cause) {
+        console.warn('Error withdrawing:', cause);
+        error((cause as BaseError).shortMessage || 'Something went wrong while withdrawing');
         setCurrentTokenId(undefined);
       }
     },
@@ -88,8 +68,10 @@ const DepositRecordsModal = ({
         } else {
           await handleWithdraw(tokenId);
         }
-      } catch (error) {
-        console.error('Error checking claim penalty:', error);
+      } catch (cause) {
+        console.error('Error checking claim penalty:', cause);
+        error('Unable to confirm the early withdrawal penalty');
+        setCurrentTokenId(undefined);
       }
     },
     [handleWithdraw]
@@ -102,7 +84,7 @@ const DepositRecordsModal = ({
   }, []);
 
   const handleWithdrawEarlierSuccess = useCallback(() => {
-    if (currentTokenId) {
+    if (currentTokenId !== undefined) {
       deleteDepositInfoByTokenId(currentTokenId);
       onRefreshRingBalance?.();
     }
@@ -118,203 +100,156 @@ const DepositRecordsModal = ({
 
   const handleWithdrawFail = useCallback(() => {
     setWithdrawHash(undefined);
+    setCurrentTokenId(undefined);
   }, []);
 
   const handleWithdrawSuccess = useCallback(() => {
-    if (currentTokenId) {
+    if (currentTokenId !== undefined) {
       deleteDepositInfoByTokenId(currentTokenId);
       onRefreshRingBalance?.();
     }
     handleWithdrawFail();
   }, [deleteDepositInfoByTokenId, currentTokenId, handleWithdrawFail, onRefreshRingBalance]);
 
-  const renderCell = useCallback(
-    (item: DepositInfo, columnKey: Key) => {
-      const cellValue = item[columnKey as keyof DepositInfo];
-
-      switch (columnKey) {
-        case 'tokenId':
-          return (
-            <div className="text-[0.875rem] font-bold text-primary">
-              <a
-                href={`${currentChain?.blockExplorers?.default.url}/token/0x46275d29113f065c2aac262f34C7a3d8a8B7377D/instance/${cellValue.toString()}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Token ID [{cellValue.toString()}]
-              </a>
-            </div>
-          );
-
-        case 'value': {
-          return (
-            <FormattedNumberTooltip value={formatEther(item?.value)}>
-              {(formattedValue) => (
-                <span className="text-[0.875rem] font-normal text-foreground">
-                  {formattedValue}{' '}
-                  <span className="text-[0.875rem] font-normal text-foreground">
-                    {currentChain?.nativeCurrency?.symbol}
-                  </span>
-                </span>
-              )}
-            </FormattedNumberTooltip>
-          );
-        }
-
-        case 'duration': {
-          const { startAtDate, endAtDate, progressValue } = calculateDepositProgress(
-            item?.startAt,
-            item?.endAt
-          );
-
-          return (
-            <Progress
-              classNames={{
-                label: 'w-full'
-              }}
-              label={
-                <div className="flex w-full items-center justify-between">
-                  <div className="flex items-center gap-2">{`${startAtDate} - ${endAtDate}`}</div>
-                </div>
-              }
-              value={progressValue}
-              className="w-full gap-1"
-              size="sm"
-              color="primary"
-            />
-          );
-        }
-
-        case 'action': {
-          if (item.isClaimRequirePenalty) {
-            return (
-              <AsyncButton
-                color="primary"
-                size="sm"
-                loadingText="Pending"
-                onClick={() => handleWithdrawEarlier(item.tokenId)}
-              >
-                Withdraw Earlier
-              </AsyncButton>
-            );
-          } else {
-            return (
-              <AsyncButton
-                color="primary"
-                size="sm"
-                loadingText="Pending"
-                onClick={() => handleWithdraw(item.tokenId)}
-              >
-                Withdraw
-              </AsyncButton>
-            );
-          }
-        }
-
-        default:
-          return null;
-      }
-    },
-    [
-      currentChain?.nativeCurrency?.symbol,
-      currentChain?.blockExplorers?.default.url,
-      handleWithdrawEarlier,
-      handleWithdraw
-    ]
+  const totalPages = Math.max(1, Math.ceil((depositList?.length || 0) / PAGE_SIZE));
+  const paginatedData = useMemo(
+    () => depositList?.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) || [],
+    [depositList, page]
   );
-  const totalPages = Math.ceil((depositList?.length || 0) / PAGE_SIZE);
-  const paginatedData = depositList?.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   useEffect(() => {
-    if (!isOpen) {
-      setPage(1);
-    }
-  }, [isOpen]);
+    setPage((currentPage) => Math.min(currentPage, totalPages));
+  }, [totalPages]);
 
   return (
     <>
-      <Modal
-        isOpen={isOpen}
-        placement="center"
-        onClose={onClose}
-        className="bg-background"
-        backdrop="blur"
-        classNames={{
-          base: 'max-w-[800px]',
-          closeButton:
-            'p-0 top-[1.25rem] right-[1.25rem] hover:opacity-[var(--nextui-hover-opacity)] hover:bg-transparent  z-10'
-        }}
-        closeButton={<X />}
-      >
-        <ModalContent className="w-[calc(100vw-1.24rem)] px-5 py-0 md:w-[47.75rem]">
-          <ModalHeader className="px-0 py-5 text-[1.125rem] font-bold text-foreground">
-            <span>Deposit in Wallet</span>
-          </ModalHeader>
-          <Divider />
-          <ModalBody
-            className={cn('relative px-0 py-5', isDepositListLoading ? 'overflow-hidden' : '')}
-          >
-            <Table
-              aria-label="deposit records table"
-              color="primary"
-              layout="fixed"
-              classNames={{
-                wrapper:
-                  'overflow-auto max-h-[50vh] rounded-medium  p-0 shadow-none bg-background dark:bg-secondary',
-                td: 'text-foreground'
-              }}
-              bottomContentPlacement="outside"
-              bottomContent={
-                depositList?.length ? (
-                  <div className="flex w-full justify-end">
-                    <Pagination
-                      showControls
+      <section aria-labelledby="deposit-ticket-heading" className="flex flex-col gap-[0.62rem]">
+        <div className="flex items-center justify-between">
+          <h2 id="deposit-ticket-heading" className="m-0 text-[0.875rem] font-bold text-foreground">
+            My Deposit Tickets
+          </h2>
+          {address && depositList.length > 0 ? (
+            <span className="text-[0.75rem] text-foreground/50">
+              {depositList.length} {depositList.length === 1 ? 'ticket' : 'tickets'}
+            </span>
+          ) : null}
+        </div>
+
+        {isDepositListLoading ? (
+          <div aria-label="Loading deposit tickets" className="flex flex-col gap-[0.62rem]">
+            <Skeleton className="h-[11.5rem] w-full rounded-medium" />
+            <Skeleton className="h-[11.5rem] w-full rounded-medium" />
+          </div>
+        ) : !address ? (
+          <Empty label="Connect wallet to view existing deposit tickets" />
+        ) : paginatedData.length === 0 ? (
+          <Empty label="No deposit tickets available to withdraw" />
+        ) : (
+          <div className="flex flex-col gap-[0.62rem]">
+            {paginatedData.map((item: DepositInfo) => {
+              const { startAtDate, endAtDate, progressValue } = calculateDepositProgress(
+                item.startAt,
+                item.endAt
+              );
+              const explorerUrl = currentChain?.blockExplorers?.default.url;
+              const tokenUrl = explorerUrl
+                ? `${explorerUrl}/token/${depositAddress}/instance/${item.tokenId.toString()}`
+                : undefined;
+
+              return (
+                <article
+                  key={item.tokenId}
+                  className="flex flex-col gap-[0.62rem] rounded-medium bg-secondary p-[0.62rem]"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    {tokenUrl ? (
+                      <a
+                        href={tokenUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-w-0 items-center gap-1 truncate text-[0.75rem] font-bold text-primary transition-opacity hover:opacity-[var(--nextui-hover-opacity)]"
+                      >
+                        <span className="truncate">Token ID [{item.tokenId.toString()}]</span>
+                        <ExternalLink
+                          aria-hidden="true"
+                          className="flex-shrink-0"
+                          size={12}
+                          strokeWidth={2}
+                        />
+                      </a>
+                    ) : (
+                      <span className="truncate text-[0.75rem] font-bold text-foreground">
+                        Token ID [{item.tokenId.toString()}]
+                      </span>
+                    )}
+                    <span
+                      className={cn(
+                        'flex-shrink-0 rounded-small px-2 py-1 text-[0.6875rem] font-bold',
+                        item.isClaimRequirePenalty
+                          ? 'bg-default-200 text-foreground/60'
+                          : 'bg-success/15 text-success'
+                      )}
+                    >
+                      {item.isClaimRequirePenalty ? 'Locked' : 'Ready'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-[0.62rem] text-[0.75rem]">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-foreground/50">Amount</span>
+                      <FormattedNumberTooltip value={formatEther(item.value)}>
+                        {(formattedValue) => (
+                          <span className="font-bold text-foreground">
+                            {formattedValue} {currentChain?.nativeCurrency?.symbol}
+                          </span>
+                        )}
+                      </FormattedNumberTooltip>
+                    </div>
+                    <div className="flex flex-col gap-1 text-right">
+                      <span className="text-foreground/50">Maturity</span>
+                      <span className="font-bold text-foreground">{endAtDate}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between text-[0.6875rem] text-foreground/50">
+                      <span>{startAtDate}</span>
+                      <span>{endAtDate}</span>
+                    </div>
+                    <Progress
+                      aria-label={`Deposit ${item.tokenId.toString()} duration`}
+                      value={progressValue}
                       size="sm"
-                      page={page}
-                      total={totalPages}
-                      onChange={(newPage) => setPage(newPage)}
+                      color="primary"
                     />
                   </div>
-                ) : null
-              }
-            >
-              <TableHeader>
-                <TableColumn className="w-[9.375rem] bg-secondary" key="tokenId">
-                  ERC-721
-                </TableColumn>
-                <TableColumn className="w-[15.625rem] bg-secondary" key="duration" align="center">
-                  Duration
-                </TableColumn>
-                <TableColumn className="w-[9.375rem] bg-secondary" key="value" align="center">
-                  Amount
-                </TableColumn>
-                <TableColumn className="w-[9.375rem] bg-secondary" key="action" align="end">
-                  Action
-                </TableColumn>
-              </TableHeader>
-              <TableBody
-                items={paginatedData || []}
-                emptyContent={<div className="text-center">No deposit in wallet</div>}
-                className="relative"
-                loadingContent={
-                  <div className="absolute inset-0 flex w-full items-center justify-center bg-background/50">
-                    <Spinner />
-                  </div>
-                }
-                loadingState={isDepositListLoading ? 'loading' : 'idle'}
-              >
-                {(item: DepositInfo) => (
-                  <TableRow key={item?.tokenId}>
-                    {(columnKey: Key) => {
-                      return <TableCell>{renderCell(item, columnKey)}</TableCell>;
-                    }}
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+
+                  <AsyncButton
+                    color="primary"
+                    variant={item.isClaimRequirePenalty ? 'flat' : 'solid'}
+                    className="w-full font-bold"
+                    loadingText="Pending"
+                    onClick={() =>
+                      item.isClaimRequirePenalty
+                        ? handleWithdrawEarlier(item.tokenId)
+                        : handleWithdraw(item.tokenId)
+                    }
+                  >
+                    {item.isClaimRequirePenalty ? 'Withdraw Early' : 'Withdraw'}
+                  </AsyncButton>
+                </article>
+              );
+            })}
+          </div>
+        )}
+
+        {address && depositList.length > PAGE_SIZE ? (
+          <div className="flex w-full justify-end pt-1">
+            <Pagination showControls size="sm" page={page} total={totalPages} onChange={setPage} />
+          </div>
+        ) : null}
+      </section>
+
       <WithdrawEarlier
         symbol={ktonInfo?.symbol || ''}
         tokenId={currentTokenId}
@@ -332,4 +267,4 @@ const DepositRecordsModal = ({
   );
 };
 
-export default DepositRecordsModal;
+export default DepositRecords;

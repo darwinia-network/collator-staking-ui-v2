@@ -15,7 +15,6 @@ import AddressCard from '@/components/address-card';
 import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
 import StakeMore from './stake-more';
 import Unstake from './unstake';
-import StakeMoreDeposits from './stake-more-deposits';
 import UnstakeDeposits from './unstake-deposts';
 import { useStaked } from '../../_hooks/staked';
 import { useCollatorByAddress } from '@/hooks/useService';
@@ -37,7 +36,6 @@ const StakeManagementModal = ({
 }: StakeManagementModalProps) => {
   const [isStakeMoreOpen, setIsStakeMoreOpen] = useState(false);
   const [isUnstakeOpen, setIsUnstakeOpen] = useState(false);
-  const [isStakeMoreDepositsOpen, setIsStakeMoreDepositsOpen] = useState(false);
   const [isUnstakeDepositsOpen, setIsUnstakeDepositsOpen] = useState(false);
   const {
     data: collators,
@@ -96,15 +94,6 @@ const StakeManagementModal = ({
     setIsUnstakeOpen(false);
   }, []);
 
-  const handleOkStakeMoreDeposits = useCallback(() => {
-    setIsStakeMoreDepositsOpen(false);
-    handleSuccess();
-  }, [handleSuccess]);
-
-  const handleCloseStakeMoreDeposits = useCallback(() => {
-    setIsStakeMoreDepositsOpen(false);
-  }, []);
-
   const handleOkUnstakeDeposits = useCallback(() => {
     setIsUnstakeDepositsOpen(false);
     handleSuccess();
@@ -123,9 +112,6 @@ const StakeManagementModal = ({
 
   const handleUnstakeDepositsOpen = useCallback(() => {
     setIsUnstakeDepositsOpen(true);
-  }, []);
-  const handleStakeMoreDepositsOpen = useCallback(() => {
-    setIsStakeMoreDepositsOpen(true);
   }, []);
 
   const UnstakeButton = useMemo(() => {
@@ -275,19 +261,7 @@ const StakeManagementModal = ({
                       </p>
                     )}
                   </FormattedNumberTooltip>
-                  <div className="flex items-center gap-[0.62rem]">
-                    {UnstakeDepositsButton}
-                    {!isInactive && (
-                      <Button
-                        size="sm"
-                        color="primary"
-                        className="font-bold"
-                        onClick={handleStakeMoreDepositsOpen}
-                      >
-                        Stake
-                      </Button>
-                    )}
-                  </div>
+                  <div className="flex items-center gap-[0.62rem]">{UnstakeDepositsButton}</div>
                 </div>
               </div>
             </div>
@@ -307,12 +281,6 @@ const StakeManagementModal = ({
         symbol={symbol}
         totalAmount={formattedStakedRING}
         onOk={handleOkUnstake}
-        collator={collator}
-      />
-      <StakeMoreDeposits
-        isOpen={isStakeMoreDepositsOpen}
-        onClose={handleCloseStakeMoreDeposits}
-        onOk={handleOkStakeMoreDeposits}
         collator={collator}
       />
       <UnstakeDeposits

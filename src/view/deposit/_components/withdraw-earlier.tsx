@@ -61,7 +61,7 @@ const WithdrawEarlier = ({ tokenId, isOpen, onClose, symbol, onSuccess }: Withdr
     if (needApprove) {
       return `Approve ${penaltyInKton.fixed} ${symbol}`;
     }
-    return `Pay ${penaltyInKton.fixed} ${symbol}`;
+    return `Pay ${penaltyInKton.fixed} ${symbol} and withdraw`;
   }, [
     allowPenalty,
     isPenaltyLoading,
@@ -131,14 +131,14 @@ const WithdrawEarlier = ({ tokenId, isOpen, onClose, symbol, onSuccess }: Withdr
       >
         <ModalContent className="w-[calc(100vw-1.24rem)] px-5 py-0 md:w-[25rem]">
           <ModalHeader className="px-0 py-5 text-[1.125rem] text-foreground">
-            Sure to withdraw now?
+            Withdraw early?
           </ModalHeader>
 
           <Divider />
           <ModalBody className="flex w-full flex-col items-center justify-center gap-5 px-0 py-5">
             <p className="m-0 text-left text-[0.75rem] font-bold text-foreground">
-              Since the deposit term doesn’t end yet, you’ll be charged a penalty of 3 times the
-              KTON reward if you try to withdraw the RINGs in advance.
+              This deposit has not matured. Withdrawing now requires a penalty equal to three times
+              the KTON reward.
             </p>
             <Button
               color="primary"
