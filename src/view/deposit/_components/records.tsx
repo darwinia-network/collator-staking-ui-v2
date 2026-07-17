@@ -1,6 +1,7 @@
-import { cn, Pagination, Progress, Skeleton } from '@nextui-org/react';
+import { Button, cn, Pagination, Progress, Skeleton } from '@nextui-org/react';
 import { ExternalLink } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSwitchChain } from 'wagmi';
 
 import { useUserDepositDetails } from '@/hooks/useUserDepositDetails';
 import { formatEther } from 'viem';
@@ -17,6 +18,7 @@ import AsyncButton from '@/components/async-button';
 import { error } from '@/components/toast';
 import FormattedNumberTooltip from '@/components/formatted-number-tooltip';
 import { calculateDepositProgress } from '@/utils/date';
+import { getDefaultChainId } from '@/utils/chain';
 import Empty from '@/components/empty';
 
 const PAGE_SIZE = 3;
@@ -26,7 +28,8 @@ interface DepositRecordsProps {
 }
 
 const DepositRecords = ({ onRefreshRingBalance }: DepositRecordsProps) => {
-  const { address, currentChain, ktonInfo } = useWalletStatus();
+  const { address, currentChain, ktonInfo, isEnabled, isSupportedChain } = useWalletStatus();
+  const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
   const [page, setPage] = useState(1);
   const [currentTokenId, setCurrentTokenId] = useState<bigint>();
   const [withdrawEarlierOpen, setWithdrawEarlierOpen] = useState<boolean>(false);
@@ -36,9 +39,13 @@ const DepositRecords = ({ onRefreshRingBalance }: DepositRecordsProps) => {
     isLoading: isDepositListLoading,
     deleteDepositInfoByTokenId
   } = useUserDepositDetails({
-    enabled: true
+    enabled: isEnabled
   });
   const { withdraw } = useWithdraw();
+
+  const handleSwitchChain = useCallback(() => {
+    switchChain({ chainId: getDefaultChainId() });
+  }, [switchChain]);
 
   const handleWithdraw = useCallback(
     async (tokenId: bigint) => {
@@ -128,20 +135,33 @@ const DepositRecords = ({ onRefreshRingBalance }: DepositRecordsProps) => {
           <h2 id="deposit-ticket-heading" className="m-0 text-[0.875rem] font-bold text-foreground">
             My Deposit Tickets
           </h2>
-          {address && depositList.length > 0 ? (
+          {isEnabled && depositList.length > 0 ? (
             <span className="text-[0.75rem] text-foreground/50">
               {depositList.length} {depositList.length === 1 ? 'ticket' : 'tickets'}
             </span>
           ) : null}
         </div>
 
-        {isDepositListLoading ? (
+        {!address ? (
+          <Empty label="Connect wallet to view existing deposit tickets" />
+        ) : !isSupportedChain ? (
+          <div className="flex flex-col gap-[0.62rem]">
+            <Empty label="Switch to Darwinia to view existing deposit tickets" />
+            <Button
+              color="primary"
+              variant="flat"
+              className="w-full font-bold"
+              isLoading={isSwitchingChain}
+              onPress={handleSwitchChain}
+            >
+              Switch to Darwinia
+            </Button>
+          </div>
+        ) : isDepositListLoading ? (
           <div aria-label="Loading deposit tickets" className="flex flex-col gap-[0.62rem]">
             <Skeleton className="h-[11.5rem] w-full rounded-medium" />
             <Skeleton className="h-[11.5rem] w-full rounded-medium" />
           </div>
-        ) : !address ? (
-          <Empty label="Connect wallet to view existing deposit tickets" />
         ) : paginatedData.length === 0 ? (
           <Empty label="No deposit tickets available to withdraw" />
         ) : (
@@ -229,6 +249,7 @@ const DepositRecords = ({ onRefreshRingBalance }: DepositRecordsProps) => {
                     variant={item.isClaimRequirePenalty ? 'flat' : 'solid'}
                     className="w-full font-bold"
                     loadingText="Pending"
+                    isDisabled={!isEnabled}
                     onClick={() =>
                       item.isClaimRequirePenalty
                         ? handleWithdrawEarlier(item.tokenId)
@@ -243,7 +264,7 @@ const DepositRecords = ({ onRefreshRingBalance }: DepositRecordsProps) => {
           </div>
         )}
 
-        {address && depositList.length > PAGE_SIZE ? (
+        {isEnabled && depositList.length > PAGE_SIZE ? (
           <div className="flex w-full justify-end pt-1">
             <Pagination showControls size="sm" page={page} total={totalPages} onChange={setPage} />
           </div>

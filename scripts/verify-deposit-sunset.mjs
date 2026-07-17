@@ -82,10 +82,46 @@ requireCount(
   2,
   'token ID zero-safe withdrawal cleanup'
 );
+requireCount(
+  'src/view/deposit/_components/records.tsx',
+  'isEnabled && depositList.length',
+  2,
+  'supported-chain ticket metadata and pagination'
+);
 requireIncludes(
   'src/view/deposit/_components/records.tsx',
-  'address && depositList.length > PAGE_SIZE',
-  'wallet-scoped ticket pagination'
+  'enabled: isEnabled',
+  'supported-chain ticket loading guard'
+);
+requireIncludes(
+  'src/view/deposit/_components/records.tsx',
+  'Switch to Darwinia to view existing deposit tickets',
+  'wrong-network empty state'
+);
+requireIncludes(
+  'src/view/deposit/_components/records.tsx',
+  'switchChain({ chainId: getDefaultChainId() })',
+  'wrong-network recovery action'
+);
+requireIncludes(
+  'src/view/deposit/_components/records.tsx',
+  'isDisabled={!isEnabled}',
+  'withdrawal action supported-chain guard'
+);
+requireIncludes(
+  'src/hooks/useUserDepositDetails.ts',
+  'enabled: enabled && balanceNumber > 0',
+  'token ID query supported-chain guard'
+);
+requireIncludes(
+  'src/hooks/useUserDepositDetails.ts',
+  'enabled: enabled && validTokenIds.length > 0',
+  'ticket detail query supported-chain guard'
+);
+requireText(
+  'src/hooks/useUserDepositDetails.ts',
+  'if (!enabled) { setDepositList([]); return; }',
+  'disabled ticket state reset'
 );
 requireIncludes(
   'src/view/deposit/_components/withdraw-earlier.tsx',
