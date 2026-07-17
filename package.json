@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "type-check": "tsc --b",
     "lint": "eslint .",
+    "test:design": "node scripts/verify-deposit-sunset.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

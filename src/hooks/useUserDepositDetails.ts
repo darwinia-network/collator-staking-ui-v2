@@ -54,7 +54,7 @@ export function useUserDepositDetails({ enabled = true }: UseUserDepositDetailsP
       args: [account as `0x${string}`, BigInt(index)]
     })),
     query: {
-      enabled: balanceNumber > 0,
+      enabled: enabled && balanceNumber > 0,
       refetchOnWindowFocus: false,
       refetchOnMount: true,
       staleTime: 0
@@ -94,7 +94,7 @@ export function useUserDepositDetails({ enabled = true }: UseUserDepositDetailsP
       ])
       .flat(),
     query: {
-      enabled: validTokenIds.length > 0,
+      enabled: enabled && validTokenIds.length > 0,
       refetchOnWindowFocus: false,
       refetchOnMount: true,
       staleTime: 0
@@ -124,6 +124,10 @@ export function useUserDepositDetails({ enabled = true }: UseUserDepositDetailsP
     isCombinedInfosRefetching
   ]);
   useEffect(() => {
+    if (!enabled) {
+      setDepositList([]);
+      return;
+    }
     if (isLoading) return;
 
     if (validTokenIds && combinedInfos) {
@@ -159,7 +163,7 @@ export function useUserDepositDetails({ enabled = true }: UseUserDepositDetailsP
     } else {
       setDepositList([]);
     }
-  }, [validTokenIds, combinedInfos, setDepositList, isLoading]);
+  }, [validTokenIds, combinedInfos, setDepositList, isLoading, enabled]);
 
   const refetch = useCallback(async () => {
     refetchBalance();

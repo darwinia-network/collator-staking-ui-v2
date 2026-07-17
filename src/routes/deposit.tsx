@@ -1,10 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
-import Deposit from '@/view/deposit';
-import NotFound from '@/components/not-found';
-import Error from '@/components/error';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/deposit')({
-  component: () => <Deposit />,
-  notFoundComponent: () => <NotFound />,
-  errorComponent: () => <Error />
+  beforeLoad: () => {
+    throw redirect({ to: '/withdraw' });
+  }
 });

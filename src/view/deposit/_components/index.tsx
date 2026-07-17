@@ -1,135 +1,47 @@
-import { useCallback, useState, useMemo } from 'react';
-import { Button, Select, SelectItem } from '@nextui-org/react';
-import useWalletStatus from '@/hooks/useWalletStatus';
+import { ExternalLink } from 'lucide-react';
+
 import useBalance from '@/hooks/useBalance';
-import AmountInput from '@/components/amount-input-with-balance';
-import TransactionStatus from '@/components/transaction-status';
-import Rewards from './rewards';
-import DepositRecordsModal from './records';
-import useComputeInterest from '../_hooks/compute-interest';
-import useDeposit from '../_hooks/deposit';
-import { error } from '@/components/toast';
+import DepositRecords from './records';
 
-import type { SharedSelection } from '@nextui-org/react';
+const PROPOSAL_URL =
+  'https://gov.ringdao.com/proposal/0xf26faca1125af8f9813c5d88fecf533aa11d5a1b4f9b6dcd131c90206156dd1d';
 
-const terms = new Array(12).fill(0).map((_, index) => index + 1);
-
-const Deposit = () => {
-  const [hash, setHash] = useState<`0x${string}` | undefined>(undefined);
-  const [isOpen, setIsOpen] = useState(false);
-  const [amount, setAmount] = useState<string>('0');
-  const [selectedMonthPeriod, setSelectedMonthPeriod] = useState<SharedSelection>(new Set());
-  const { isEnabled, ktonInfo } = useWalletStatus();
-  const { formatted, isLoading, data: balance, refetch: refetchBalance } = useBalance();
-  const { handleDeposit, isPending: isPendingDeposit } = useDeposit();
-  const computeInterest = useComputeInterest(amount, selectedMonthPeriod?.currentKey);
-
-  const handleSelectionChange = useCallback((keys: SharedSelection) => {
-    setSelectedMonthPeriod(keys as Set<string>);
-  }, []);
-
-  const handleConfirmDeposit = useCallback(async () => {
-    const hash = await handleDeposit({
-      months: selectedMonthPeriod?.currentKey,
-      value: amount
-    })?.catch((e) => {
-      error(e.shortMessage);
-    });
-    if (hash) {
-      setHash(hash);
-    }
-  }, [handleDeposit, selectedMonthPeriod, amount]);
-
-  const handleCloseTransactionStatus = useCallback(() => {
-    setHash(undefined);
-    setAmount('0');
-    setSelectedMonthPeriod(new Set());
-    refetchBalance();
-  }, [refetchBalance]);
-
-  const isDisabledDeposit = useMemo(() => {
-    return (
-      !isEnabled ||
-      !amount ||
-      amount === '0' ||
-      !selectedMonthPeriod?.currentKey ||
-      computeInterest.isLoading
-    );
-  }, [isEnabled, amount, selectedMonthPeriod, computeInterest.isLoading]);
+const Withdraw = () => {
+  const { refetch: refetchBalance } = useBalance();
 
   return (
-    <>
-      <div className="flex flex-col items-center justify-center gap-5">
-        <AmountInput
-          symbol={balance?.symbol}
-          balance={formatted}
-          isLoading={isLoading}
-          value={amount}
-          min="1"
-          onChange={(e) => setAmount(e.target.value)}
-        />
-        <Select
-          label="Deposit term"
-          placeholder="Select"
-          className="w-full"
-          isDisabled={!isEnabled}
-          selectedKeys={selectedMonthPeriod}
-          onSelectionChange={handleSelectionChange}
-          classNames={{
-            trigger:
-              'p-[0.62rem] h-[4.3125rem] bg-secondary hover:opacity-[var(--nextui-hover-opacity)] hover:bg-secondary transition-opacity',
-            label: 'text-[0.875rem] font-normal !text-foreground/50',
-            value: 'text-[0.875rem] font-bold text-foreground',
-            innerWrapper: 'pt-[1.56rem]',
-            listbox: 'text-foreground'
-          }}
-        >
-          {terms.map((term) => (
-            <SelectItem
-              key={term.toString()}
-            >{`${term} ${term > 1 ? 'Months' : 'Month'}`}</SelectItem>
-          ))}
-        </Select>
-        <Rewards
-          symbol={ktonInfo?.symbol || ''}
-          isLoading={computeInterest.isLoading}
-          data={computeInterest.data || BigInt(0)}
-        />
-        <div className="w-full space-y-[0.62rem]">
-          <Button
-            className="w-full font-bold"
-            color="primary"
-            isLoading={isPendingDeposit || isLoading}
-            isDisabled={isDisabledDeposit}
-            onClick={handleConfirmDeposit}
+    <div className="flex flex-col gap-5">
+      <section
+        aria-labelledby="deposit-sunset-title"
+        className="rounded-medium border border-primary/20 bg-primary/10 p-[0.62rem]"
+      >
+        <div className="flex flex-col gap-2">
+          <p id="deposit-sunset-title" className="m-0 text-[0.875rem] font-bold text-foreground">
+            Deposit creation has ended
+          </p>
+          <p className="m-0 text-[0.75rem] leading-5 text-foreground/70">
+            New RING deposits are no longer available. Existing deposit tickets remain withdrawable.
+          </p>
+          <a
+            href={PROPOSAL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-fit items-center gap-1 text-[0.75rem] font-bold text-primary transition-opacity hover:opacity-[var(--nextui-hover-opacity)]"
           >
-            Deposit
-          </Button>
-
-          <div className="flex flex-col items-center gap-1">
-            <Button
-              className="w-full"
-              color="primary"
-              isDisabled={!isEnabled}
-              variant="light"
-              onClick={() => setIsOpen(true)}
-            >
-              Deposit in Wallet
-            </Button>
-            <p className="text-xs text-foreground/50">
-              Powered and governed by {ktonInfo?.governanceName}
-            </p>
-          </div>
+            View governance proposal
+            <ExternalLink aria-hidden="true" size={12} strokeWidth={2} />
+          </a>
         </div>
-      </div>
-      <DepositRecordsModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onRefreshRingBalance={refetchBalance}
-      />
-      <TransactionStatus hash={hash} title="Deposit" onSuccess={handleCloseTransactionStatus} />
-    </>
+      </section>
+
+      <DepositRecords onRefreshRingBalance={refetchBalance} />
+
+      <p className="m-0 text-[0.75rem] leading-5 text-foreground/50">
+        A ticket used for staking will not appear here. Unstake it from its collator under Stake
+        before withdrawing.
+      </p>
+    </div>
   );
 };
 
-export default Deposit;
+export default Withdraw;
