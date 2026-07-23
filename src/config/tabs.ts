@@ -13,6 +13,17 @@ export const defiTabs = [
   }
 ];
 
+export const stakeTabs = (tokenName: string) => [
+  {
+    label: `Stake ${tokenName}`,
+    key: 'stake-ring'
+  },
+  {
+    label: 'Stake Deposit',
+    key: 'stake-deposit'
+  }
+];
+
 export const selectCollatorTabs = [
   {
     key: 'active-pool',
