@@ -1,13 +1,27 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, cn, Divider } from '@nextui-org/react';
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  cn,
+  Tab,
+  Tabs,
+  Divider
+} from '@nextui-org/react';
 import { ChevronDown, X } from 'lucide-react';
 
+import useWalletStatus from '@/hooks/useWalletStatus';
+import { TransitionPanel } from '@/components/transition-panel';
 import Avatar from '@/components/avatar';
+import { stakeTabs } from '@/config/tabs';
 import { useAddressOrEns } from '@/utils';
 
 import StakeRing from './stake-ring';
+import StakeDeposit from './stake-deposit';
 import SelectCollator from './collator-selection-modal';
 
+import type { Key } from '@/types/ui';
 import type { CollatorSet } from '@/service/type';
 
 interface NewStakeModalProps {
@@ -16,8 +30,14 @@ interface NewStakeModalProps {
   isOpen?: boolean;
 }
 const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
+  const { currentChain } = useWalletStatus();
+  const [selected, setSelected] = useState<Key>('stake-ring');
   const [selectedCollator, setSelectedCollator] = useState<CollatorSet | undefined>(undefined);
   const [selectCollatorOpen, setSelectCollatorOpen] = useState(false);
+
+  const handleTabChange = useCallback((key: Key) => {
+    setSelected(key);
+  }, []);
 
   const handleSelectCollatorChange = useCallback((collator: CollatorSet) => {
     setSelectedCollator(collator);
@@ -96,7 +116,51 @@ const NewStakeModal = ({ onClose, isOpen, onSuccess }: NewStakeModalProps) => {
                 />
               </div>
             </div>
-            <StakeRing selectedCollator={selectedCollator} onSuccess={onSuccess} />
+            {/* todo  */}
+            {/* Animation is not working when tabs are used inside a modal. */}
+            {/* https://github.com/nextui-org/nextui/issues/2297 */}
+            {/* https://github.com/framer/motion/issues/1302 */}
+            <Tabs
+              aria-label="Options"
+              color="primary"
+              variant="underlined"
+              className="-mt-4"
+              selectedKey={selected}
+              onSelectionChange={handleTabChange}
+              classNames={{
+                tabList: 'gap-6 w-full relative rounded-none p-0 border-b border-divider',
+                cursor: 'w-full bg-foreground font-bold',
+                tab: 'max-w-fit px-0 h-12 !outline-none',
+                tabContent: 'group-data-[selected=true]:text-foreground  font-bold'
+              }}
+            >
+              {stakeTabs(currentChain?.nativeCurrency?.symbol || 'RING').map((tab) => (
+                <Tab
+                  key={tab.key}
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>{tab.label}</span>
+                    </div>
+                  }
+                ></Tab>
+              ))}
+            </Tabs>
+            <TransitionPanel
+              activeIndex={selected === 'stake-ring' ? 0 : 1}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              variants={{
+                enter: { opacity: 0, filter: 'blur(4px)' },
+                center: { opacity: 1, filter: 'blur(0px)' },
+                exit: { opacity: 0, filter: 'blur(4px)' }
+              }}
+            >
+              {selected === 'stake-ring' && (
+                <StakeRing selectedCollator={selectedCollator} onSuccess={onSuccess} />
+              )}
+              {selected === 'stake-deposit' && (
+                <StakeDeposit selectedCollator={selectedCollator} onSuccess={onSuccess} />
+              )}
+            </TransitionPanel>
           </ModalBody>
         </ModalContent>
       </Modal>

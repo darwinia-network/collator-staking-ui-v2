@@ -51,7 +51,7 @@ function requireMissing(path, label = path) {
 requireIncludes('src/config/tabs.ts', "key: 'withdraw'", 'Withdraw navigation key');
 requireIncludes('src/config/tabs.ts', "label: 'Withdraw'", 'Withdraw navigation label');
 forbidIncludes('src/config/tabs.ts', "label: 'Deposit'", 'Deposit creation navigation label');
-forbidIncludes('src/config/tabs.ts', 'Stake Deposit', 'new Deposit staking tab');
+requireIncludes('src/config/tabs.ts', 'Stake Deposit', 'Stake page Deposit staking tab');
 
 requireIncludes('src/routes/withdraw.tsx', "createFileRoute('/withdraw')", 'Withdraw route');
 requireIncludes('src/routes/deposit.tsx', "to: '/withdraw'", 'legacy Deposit route redirect');
@@ -164,22 +164,44 @@ forbidIncludes(
   'StakeMoreDeposits',
   'new Deposit staking management entry'
 );
-forbidIncludes(
+requireIncludes(
   'src/view/stake/_components/new/index.tsx',
   'StakeDeposit',
-  'new Deposit staking flow'
+  'Stake page Deposit staking flow'
+);
+requireIncludes(
+  'src/view/stake/_components/new/stake-deposit.tsx',
+  'DepositList',
+  'selectable wallet Deposit list'
+);
+requireIncludes(
+  'src/view/stake/_components/new/stake-deposit.tsx',
+  'useApprovalForAll',
+  'Deposit approval flow'
+);
+requireIncludes(
+  'src/view/stake/_hooks/stake.ts',
+  "functionName: 'stakeDeposits'",
+  'Deposit staking transaction'
 );
 
 requireMissing('src/view/deposit/_hooks/deposit.ts', 'new Deposit write hook');
 requireMissing('src/view/deposit/_hooks/compute-interest.ts', 'new Deposit reward preview hook');
 requireMissing('src/view/deposit/_components/rewards.tsx', 'new Deposit reward preview component');
-requireMissing('src/view/stake/_components/new/stake-deposit.tsx', 'new Deposit staking component');
 requireMissing(
   'src/view/stake/_components/manage/stake-more-deposits.tsx',
   'new Deposit staking management component'
 );
-requireMissing('src/components/deposit-list.tsx', 'selectable wallet Deposit staking list');
-requireMissing('src/components/deposit-item.tsx', 'selectable wallet Deposit staking item');
+requireIncludes(
+  'src/components/deposit-list.tsx',
+  'useUserDepositDetails',
+  'selectable wallet Deposit staking list'
+);
+requireIncludes(
+  'src/components/deposit-item.tsx',
+  'DepositInfo',
+  'selectable wallet Deposit staking item'
+);
 
 if (failures.length > 0) {
   console.error('Deposit sunset design contract failed:');
